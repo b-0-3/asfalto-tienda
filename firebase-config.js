@@ -14,7 +14,7 @@ window.ASF_FIREBASE = null;
 
 /* Ejemplo de cómo queda (los valores son inventados):
 window.ASF_FIREBASE = {
-  apiKey: "AIzaSyA-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  apiKey: "AQUÍ-VA-TU-APIKEY",
   authDomain: "asfalto-tienda.firebaseapp.com",
   projectId: "asfalto-tienda",
   storageBucket: "asfalto-tienda.appspot.com",
