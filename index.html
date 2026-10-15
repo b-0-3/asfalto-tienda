@@ -1782,7 +1782,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     if (pr && v.prov !== pr) { err.prov = `El ${v.cp} es de la provincia de ${pr}.`; fix.prov = [pr]; }
     else if (!pr && !v.prov) err.prov = 'Elige tu provincia.';
     const numIn = (v.num || '').replace(/\s+/g, '').replace(/^n[º°o.]?/i, '');
-    const st = parseStreet(v.dir + (numIn ? ' ' + numIn : ''));
+    const st = parseStreet(cleanStreet(v.dir) + (numIn ? ' ' + numIn : ''));
     if (!/\p{L}{2,}/u.test(st.name)) err.dir = 'Escribe el nombre de la calle, por ejemplo «Calle Mayor».';
     else if (numIn && !/^(\d{1,4}[a-z]?|s\/?n)$/i.test(numIn)) err.num = 'Solo cifras y, como mucho, una letra (por ejemplo 10 o 10B).';
     else if (!st.num) err.num = 'Pon el número del portal. Si no tiene, escribe «s/n».';
@@ -1832,30 +1832,57 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   const sinTipo = s => norm(s).replace(/^(calle|avenida|plaza|paseo|carretera|travesia|ronda|glorieta|camino|urbanizacion)\s+/, '').replace(/\s+/g, ' ').trim();
   /* El callejero a veces ya trae el tipo dentro del nombre ("CALLE ROSARIO"): no lo repetimos */
   function cartoName(c) {
-    const via = String(c.tip_via || '').trim(), addr = String(c.address || '').trim();
+    const via = String(c.tip_via || '').trim(), addr = String(c.address || '').split(',')[0].trim();
     const nv = norm(via), na = norm(addr);
     const full = via && na !== nv && !na.startsWith(nv + ' ') ? via + ' ' + addr : addr;
     const words = titleCase(full).split(' ');
     if (words.length > 2 && norm(words[0]) === norm(words[1])) words.shift();
     return words.join(' ');
   }
+  /* ¿Es la misma calle? (sin tipo de vía ni palabras pequeñas: "C/ Doña Romera" = "Calle de Doña Romera") */
+  function sameStreet(a, b) {
+    const x = cityKey(sinTipo(a)), y = cityKey(sinTipo(b));
+    return !!(x.length && y.length && (x.join(' ') === y.join(' ') || x.every(w => y.includes(w)) || y.every(w => x.includes(w))));
+  }
+  /* ¿Es el mismo número? El callejero, si no tiene el número exacto, devuelve el portal más cercano: hay que compararlo */
+  const numParts = n => { const m = String(n == null ? '' : n).trim().match(/^(\d+)\s*([a-z]?)/i); return m ? [+m[1], m[2].toLowerCase()] : null; };
+  function samePortal(c, num) {
+    const want = numParts(num), have = numParts(c.portalNumber);
+    if (!want || !have || want[0] !== have[0] || c.noNumber === true) return false;
+    const ext = norm(String(c.extension || have[1] || ''));
+    return !want[1] || ext === want[1];
+  }
+  /* Resultado: ok (calle y número existen) · cp (existe pero con otro código postal) · calle (la calle existe, el número no) · no (no está la calle) */
   async function cartoLookup(d) {
     const calle = [d.via, d.calle].filter(Boolean).join(' ');
-    if (d.num && d.num !== 's/n') {
-      const f = await cartoGet('/find?q=' + encodeURIComponent(`${calle} ${d.num}, ${d.cp} ${d.ciudad.split('/')[0]}`));
-      if (f && f.type === 'portal' && String(f.postalCode) === d.cp) return { status: 'ok', calle: cartoName(f) };
+    const wantsNum = !!(d.num && d.num !== 's/n');
+    let seen = null;
+    if (wantsNum) {
+      const f = await cartoGet('/find?q=' + encodeURIComponent(`${calle} ${d.num}, ${d.cp} ${(d.ciudad || '').split('/')[0]}`));
+      if (f && (f.type === 'portal' || f.type === 'callejero') && sameStreet(cartoName(f), calle)) {
+        seen = cartoName(f);
+        if (f.type === 'portal' && samePortal(f, d.num)) {
+          if (!f.postalCode || String(f.postalCode) === d.cp) return { status: 'ok', calle: seen };
+          return { status: 'cp', calle: seen, cpReal: String(f.postalCode) };
+        }
+      }
+      const lp = await cartoGet('/candidates?limit=12&q=' + encodeURIComponent(`${calle} ${d.num}`) + '&cod_postal_filter=' + d.cp);
+      const ports = (Array.isArray(lp) ? lp : []).filter(c => c.type === 'portal' && sameStreet(cartoName(c), calle));
+      const hit = ports.find(c => samePortal(c, d.num) && (!c.postalCode || String(c.postalCode) === d.cp)) || ports.find(c => samePortal(c, d.num));
+      if (hit) return (!hit.postalCode || String(hit.postalCode) === d.cp) ? { status: 'ok', calle: cartoName(hit) } : { status: 'cp', calle: cartoName(hit), cpReal: String(hit.postalCode) };
+      if (ports.length && !seen) seen = cartoName(ports[0]);
     }
-    const lista = await cartoGet('/candidates?limit=6&q=' + encodeURIComponent(calle) + '&cod_postal_filter=' + d.cp);
+    const lista = await cartoGet('/candidates?limit=8&q=' + encodeURIComponent(calle) + '&cod_postal_filter=' + d.cp);
     const calles = (Array.isArray(lista) ? lista : []).filter(c => c.type === 'callejero' || c.type === 'portal');
-    const igual = calles.find(c => sinTipo(c.address) === sinTipo(calle));
-    if (igual) return { status: 'calle', calle: cartoName(igual) };
+    const igual = calles.find(c => sameStreet(cartoName(c), calle));
+    if (igual || seen) return { status: 'calle', calle: igual ? cartoName(igual) : seen };
     return { status: 'no', sugerencias: [...new Set(calles.map(cartoName))].slice(0, 4) };
   }
   async function checkStreet(d) {
     try {
       const q = new URLSearchParams({ calle: [d.via, d.calle].filter(Boolean).join(' '), numero: d.num === 's/n' ? '' : d.num, cp: d.cp, municipio: d.ciudad.split('/')[0] });
       const j = await getJSON('/.netlify/functions/verificar-direccion?' + q);
-      if (j && ['ok', 'calle', 'no'].includes(j.status)) return j;
+      if (j && ['ok', 'cp', 'calle', 'no'].includes(j.status)) return j;
     } catch (e) { }
     try { return await cartoLookup(d); } catch (e) { return { status: 'skip' }; }
   }
@@ -1895,7 +1922,9 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
 
   /* Sugerencias de calles mientras se escribe (CartoCiudad, filtrado por código postal) */
   const ac = { items: [], idx: -1, seq: 0, timer: 0, cache: {} };
-  const streetPart = v => v.replace(/[,\s]+(?:n[º°o.]?\s*)?(?:\d|s\/?n\b).*$/i, '').trim();
+  /* Quita la población pegada al final ("Calle Doña Romera, Getafe") y el número */
+  const cleanStreet = s => String(s || '').replace(/,\s*[^,\d]*$/, '').trim();
+  const streetPart = v => cleanStreet(v.replace(/[,\s]+(?:n[º°o.]?\s*)?(?:\d|s\/?n\b).*$/i, ''));
   async function streetSuggest(q, cp) {
     const okCp = !!provOf(cp), key = (okCp ? cp : '') + '|' + norm(q);
     if (ac.cache[key]) return ac.cache[key];
@@ -1943,7 +1972,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     const it = ac.items[i], el = $('#co-dir'), numEl = $('#co-num'); if (!it || !el) return;
     const tail = el.value.slice(streetPart(el.value).length).replace(/^[,\s]+/, '').trim();
     const typedNum = (tail.match(/^(?:n[º°o.]?\s*)?(\d{1,4}\s?[a-z]?|s\/?n)\b/i) || [])[1] || '';
-    el.value = it.name;
+    el.value = cleanStreet(it.name);
     el.removeAttribute('aria-invalid'); $('#err-dir').textContent = '';
     if (numEl) {
       const n = it.num || typedNum.replace(/\s/g, '');
@@ -1967,11 +1996,13 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     pc.timer = setTimeout(async () => {
       const st = parseStreet(streetPart(dir) + ' ' + num);
       let res = null;
-      try { res = await cartoGet('/find?q=' + encodeURIComponent(`${[st.via, st.name].filter(Boolean).join(' ')} ${st.num}, ${cp}`)); } catch (e) { return; }
-      const hh = $('#hint-num'); if (seq !== pc.seq || !hh) return;
-      if (res && res.type === 'portal' && String(res.postalCode) === cp) { hh.className = 'hint'; hh.textContent = '✓ Este portal existe'; }
-      else if (res && (res.type === 'callejero' || res.type === 'portal')) { hh.className = 'hint warn'; hh.textContent = `No encontramos el nº ${st.num} en esta calle. Revísalo.`; }
-    }, 500);
+      try { res = await cartoLookup({ via: st.via, calle: st.name, num: st.num, cp, ciudad: ($('#co-ciudad') || {}).value || '' }); } catch (e) { return; }
+      const hh = $('#hint-num'); if (seq !== pc.seq || !hh || !res) return;
+      if (res.status === 'ok') { hh.className = 'hint'; hh.textContent = '✓ Este portal existe'; }
+      else if (res.status === 'cp') { hh.className = 'hint warn'; hh.textContent = `Este portal es del código postal ${res.cpReal}, no del ${cp}.`; }
+      else if (res.status === 'calle') { hh.className = 'hint warn'; hh.textContent = `No encontramos el nº ${st.num} en esta calle. Revísalo.`; }
+      else if (res.status === 'no') { hh.className = 'hint warn'; hh.textContent = `No encontramos esta calle en el ${cp}.`; }
+    }, 600);
   }
   function shipPrice(m) { const sub = subtotal(); return (SHIP[m].free && sub >= FREE) ? 0 : SHIP[m].price; }
   const itemRow = it => { const p = byId[it.id]; return `<div class="sum-it">${thumb(p, it.ci)}<span>${esc(p.name)}<br><span class="note">${C[p.colors[it.ci]].n} · ${sizeLabel(it.size)} · ${it.qty} ud.</span></span><span class="num">${eur(p.price * it.qty)}</span></div>`; };
@@ -2015,10 +2046,12 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       checks.push(['ok', `Provincia de ${esc(d.prov)}`]);
       checks.push(['ok', d.num === 's/n' ? 'Calle sin número (s/n)' : 'La dirección tiene calle y número']);
       if (v.status === 'ok') checks.push(['ok', 'La calle y el número existen en el callejero oficial']);
+      else if (v.status === 'cp') checks.push(['warn', `Ese portal existe, pero su código postal es el ${esc(v.cpReal)}, no el ${esc(d.cp)}. <button class="fix" data-act="use-cp" data-cp="${esc(v.cpReal)}">Usar ${esc(v.cpReal)}</button>`]);
+      else if (v.status === 'calle' && d.num === 's/n') checks.push(['ok', 'La calle existe en el callejero oficial']);
       else if (v.status === 'calle') checks.push(['warn', `La calle existe en el ${esc(d.cp)}, pero no encontramos el número ${esc(d.num)}. Revisa que esté bien.`]);
       else if (v.status === 'no') checks.push(['warn', `No encontramos «${esc([d.via, d.calle].filter(Boolean).join(' '))}» en el ${esc(d.cp)}. Revisa cómo se escribe.`]);
       else checks.push(['info', 'La calle exacta se comprueba con el callejero oficial (CartoCiudad) cuando la tienda está publicada. En esta vista previa se han comprobado el código postal, la población y la provincia.']);
-      const warn = v.status === 'calle' || v.status === 'no';
+      const warn = v.status === 'cp' || v.status === 'no' || (v.status === 'calle' && d.num !== 's/n');
       const sugs = v.status === 'no' && Array.isArray(v.sugerencias) ? v.sugerencias.slice(0, 4) : [];
       const changed = co.typed && (norm(co.typed.dir) !== norm(d.dirFmt + (d.piso ? ', ' + d.piso : '')) || norm(co.typed.ciudad) !== norm(d.ciudad));
       main.innerHTML = `<h2 class="co-h">Confirma tu dirección</h2>
@@ -2319,6 +2352,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       case 'promo-off': promo = null; save('asfalto-promo', null); renderCart(); break;
       case 'checkout': if (count()) { co.step = 1; co.order = null; loadCP(); renderCheckout(); openLayer('checkout'); } break;
       case 'co-confirm': gotoStep(2); break;
+      case 'use-cp': co.data.cp = d.cp; co.data.prov = provOf(d.cp) || co.data.prov; co.step = 1; renderCheckout(); loadCP().then(() => { cpHint(d.cp); submitStep1(); }); break;
       case 'co-finish': nav(st.g); break;
       case 'ck-all': setCookies(true, true); break;
       case 'ck-none': setCookies(false, false); break;
