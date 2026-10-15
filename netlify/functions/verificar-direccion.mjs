@@ -17,7 +17,14 @@ const sinAcentos = (s = '') => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowe
 const PEQUENAS = new Set(['de', 'del', 'la', 'las', 'los', 'el', 'y']);
 const bonito = (s = '') => s.toLowerCase().split(' ').filter(Boolean)
   .map((w, i) => (i && PEQUENAS.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-const nombreCalle = c => bonito([c.tip_via, c.address].filter(Boolean).join(' '));
+// El callejero a veces ya trae el tipo dentro del nombre ("CALLE ROSARIO"): no lo repetimos
+const nombreCalle = c => {
+  const via = String(c.tip_via || '').trim(), addr = String(c.address || '').trim();
+  const nv = sinAcentos(via), na = sinAcentos(addr);
+  const palabras = bonito(via && na !== nv && !na.startsWith(nv + ' ') ? via + ' ' + addr : addr).split(' ');
+  if (palabras.length > 2 && sinAcentos(palabras[0]) === sinAcentos(palabras[1])) palabras.shift();
+  return palabras.join(' ');
+};
 const TIPOS = /^(calle|avenida|plaza|paseo|carretera|travesia|ronda|glorieta|camino|urbanizacion)\s+/;
 
 async function pedir(ruta) {

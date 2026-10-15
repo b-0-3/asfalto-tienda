@@ -1757,6 +1757,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   function parseStreet(raw) {
     let s = raw.replace(/\s+/g, ' ').trim(), via = '';
     for (const [re, n] of VIAS) if (re.test(s)) { via = n; s = s.replace(re, '').trim(); break; }
+    if (via) for (const [re, n] of VIAS) if (n === via && re.test(s)) { s = s.replace(re, '').trim(); break; }
     const m = s.match(/^(.*?\p{L}.*?)[,\s]+(?:n[º°o.]?\s*)?(\d{1,4}\s?[a-z]?(?=$|[\s,])|s\/?n(?=$|[\s,]))(.*)$/iu);
     if (!m) return { via, name: titleCase(s.replace(/,$/, ''), !!via), num: '', rest: '' };
     let num = m[2].replace(/\s/g, '').toUpperCase(); if (/^S\/?N$/.test(num)) num = 's/n';
@@ -1829,7 +1830,15 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     catch (e) { return await getJSONP(CARTO + path.replace(/^\/(find|candidates)\?/, '/$1Jsonp?')); }
   }
   const sinTipo = s => norm(s).replace(/^(calle|avenida|plaza|paseo|carretera|travesia|ronda|glorieta|camino|urbanizacion)\s+/, '').replace(/\s+/g, ' ').trim();
-  const cartoName = c => titleCase([c.tip_via, c.address].filter(Boolean).join(' '));
+  /* El callejero a veces ya trae el tipo dentro del nombre ("CALLE ROSARIO"): no lo repetimos */
+  function cartoName(c) {
+    const via = String(c.tip_via || '').trim(), addr = String(c.address || '').trim();
+    const nv = norm(via), na = norm(addr);
+    const full = via && na !== nv && !na.startsWith(nv + ' ') ? via + ' ' + addr : addr;
+    const words = titleCase(full).split(' ');
+    if (words.length > 2 && norm(words[0]) === norm(words[1])) words.shift();
+    return words.join(' ');
+  }
   async function cartoLookup(d) {
     const calle = [d.via, d.calle].filter(Boolean).join(' ');
     if (d.num && d.num !== 's/n') {
