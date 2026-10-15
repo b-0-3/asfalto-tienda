@@ -1,0 +1,1058 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffffff">
+<title>Asfalto · Gestión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Panel de gestión de Asfalto: mismo blanco y negro que la tienda, pensado primero para el móvil. */
+:root{
+  color-scheme:light;
+  --bg:#fff;--fg:#000;--muted:#6f6f6f;--line:#e5e5e5;--surface:#f4f4f4;
+  --sale:#d6001c;--ok:#11823b;--warn:#a14a0c;--err:#c4141f;--info:#2443a6;
+  --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --gut:max(16px,env(safe-area-inset-left,0px));
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+button:disabled{cursor:not-allowed;opacity:.45}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:1120px;margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+.note{color:var(--muted);font-size:12px}
+.mono{font-family:var(--mono)}
+.err{color:var(--err);font-size:13px;min-height:0}
+.err:empty{display:none}
+.ok-txt{color:var(--ok)}
+.sp{flex:1}
+
+/* Cabecera */
+.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.top-in{display:flex;align-items:center;gap:10px;height:54px}
+.logo{font-weight:900;font-stretch:118%;font-size:20px;letter-spacing:.02em;text-decoration:none;line-height:1}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);padding:2px 6px}
+.who{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw}
+.top-btn{font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;padding:8px 0}
+.tabs{display:flex;gap:22px;overflow-x:auto;scrollbar-width:none;height:44px;align-items:stretch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-size:13px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;color:var(--muted)}
+.tab[aria-current="page"]{color:var(--fg);border-color:var(--fg);font-weight:700}
+.count{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--fg);color:#fff;font-size:11px;font-weight:700;letter-spacing:0}
+
+/* Bloques */
+main{padding-top:22px;padding-bottom:80px}
+.h{font-size:13px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:12px}
+.big-h{font-size:clamp(26px,6vw,40px);font-weight:900;font-stretch:112%;text-transform:uppercase;line-height:1;letter-spacing:-.01em}
+.sec{margin-bottom:30px}
+.card{border:1px solid var(--line);padding:18px}
+.card + .card{margin-top:12px}
+.lead{font-size:15px;max-width:60ch}
+.banner{border-left:3px solid var(--warn);background:#fff8ef;padding:12px 14px;margin-bottom:18px;font-size:13px}
+.banner.bad{border-color:var(--err);background:#fdf1f1}
+.banner b{display:block;margin-bottom:2px}
+.hero{background:var(--fg);color:#fff;padding:22px 18px;margin-bottom:22px;display:grid;gap:12px}
+.hero p{max-width:62ch}
+.hero .btn{background:#fff;color:#000;justify-self:start}
+
+/* Botones y campos */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;background:var(--fg);color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;text-align:center}
+.btn-line{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border:1px solid var(--fg);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;text-align:center;background:var(--bg)}
+.btn-sm{min-height:36px;padding:0 12px;font-size:11px}
+.btn-red{background:var(--bg);color:var(--err);border:1px solid var(--err)}
+.link{text-decoration:underline;text-underline-offset:3px;font-size:13px}
+.fields{display:grid;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:520px){.grid3{grid-template-columns:1fr 1fr}}
+.fld{display:grid;gap:5px;min-width:0}
+.fld > span{font-size:12px;color:var(--muted)}
+.fld input,.fld select{width:100%;height:46px;border:1px solid #c9c9c9;border-radius:0;background:#fff;padding:0 12px;font-size:16px;-webkit-appearance:none;appearance:none}
+.fld input:focus,.fld select:focus{border-color:var(--fg);outline:none}
+.fld input[aria-invalid="true"]{border-color:var(--err)}
+.in-wrap{position:relative}
+.in-wrap .suf{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.in-wrap input{padding-right:30px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.check{display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:#000;margin:0}
+.seg{display:flex;border:1px solid var(--fg)}
+.seg label{flex:1;text-align:center;cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;padding:12px 8px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.seg input:checked + span{background:var(--fg);color:#fff}
+.seg input:focus-visible + span{outline:2px solid var(--fg);outline-offset:2px}
+
+/* Chips y buscador */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.search{flex:1 1 220px;height:44px;border:1px solid #c9c9c9;border-radius:0;padding:0 12px;font-size:16px;min-width:0;-webkit-appearance:none}
+.search:focus{border-color:var(--fg);outline:none}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:12px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--fg);color:#fff;border-color:var(--fg)}
+.chip .c{opacity:.6;margin-left:4px}
+
+/* Resumen */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
+@media (min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--surface);padding:14px 14px 16px;display:grid;gap:4px}
+.kpi span{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.kpi b{font-size:clamp(20px,5vw,28px);font-weight:800;font-stretch:108%;line-height:1.1}
+.two{display:grid;gap:26px}
+@media (min-width:900px){.two{grid-template-columns:1fr 1fr}}
+.alert-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.alert-row:first-child{border-top:1px solid var(--line)}
+
+/* Insignias */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;background:var(--surface);color:var(--fg);white-space:nowrap}
+.b-new{background:var(--fg);color:#fff}
+.b-prep{background:#fff1df;color:var(--warn)}
+.b-sent{background:#e8eefc;color:var(--info)}
+.b-done{background:#e5f4ea;color:var(--ok)}
+.b-cancel{background:var(--surface);color:var(--muted)}
+.b-sale{background:#fde8ea;color:var(--sale)}
+.b-out{background:#fdeceb;color:var(--err)}
+.b-low{background:#fff1df;color:var(--warn)}
+.dots{display:inline-flex;gap:3px}
+.dots i,.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.18);flex:none}
+
+/* Pedidos */
+.ord{border-bottom:1px solid var(--line)}
+.ord:first-child{border-top:1px solid var(--line)}
+.ord-head{display:grid;gap:3px;width:100%;padding:14px 0}
+.ord-l1{display:flex;gap:10px;align-items:center}
+.ord-l1 b.mono{font-size:13px}
+.ord-l2{font-size:14px}
+.ord.open .ord-head{padding-bottom:10px}
+.ord-body{padding:0 0 18px;display:grid;gap:16px}
+.items{display:grid;gap:10px;background:var(--surface);padding:12px}
+.it{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start}
+.it .dot{margin-top:5px}
+.kv{display:grid;gap:4px;margin:0}
+.kv div{display:flex;justify-content:space-between;gap:10px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-variant-numeric:tabular-nums}
+.kv .tot{font-weight:700;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+.kv .tot dt{color:var(--fg)}
+.info3{display:grid;gap:14px}
+@media (min-width:700px){.info3{grid-template-columns:repeat(3,1fr)}}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:3px}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+
+/* Productos */
+.prow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;width:100%;padding:13px 0;border-bottom:1px solid var(--line);text-align:left}
+.prow:first-child{border-top:1px solid var(--line)}
+.prow b{font-weight:600}
+.pmain{display:grid;gap:3px;min-width:0}
+.pmain .l1{display:flex;gap:8px;align-items:center;min-width:0}
+.pmain .l1 b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badges{display:flex;gap:5px;flex-wrap:wrap}
+.pright{display:grid;justify-items:end;gap:2px;text-align:right}
+.now{font-weight:700}
+.now.sale{color:var(--sale)}
+.old{text-decoration:line-through;color:var(--muted);font-size:12px;margin-left:5px}
+
+/* Hoja lateral (editar prenda) */
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.4);display:flex;justify-content:flex-end}
+.sheet-panel{background:var(--bg);width:min(600px,100%);height:100%;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.12)}
+.sh-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) var(--gut) 14px;border-bottom:1px solid var(--line)}
+.sh-head h2{font-size:18px;font-weight:800;line-height:1.2}
+.sh-x{width:40px;height:40px;display:grid;place-items:center;font-size:20px;flex:none;margin:-6px -8px 0 0}
+.sh-body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:18px var(--gut) 26px;display:grid;grid-template-columns:minmax(0,1fr);gap:26px;align-content:start}
+.sh-body > *{min-width:0}
+.sh-foot{display:flex;gap:10px;padding:12px var(--gut) calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--bg)}
+.sh-foot .btn{flex:1}
+.preview{background:var(--surface);padding:10px 12px;font-size:13px}
+.tbl-wrap{overflow-x:auto;margin:0 calc(-1 * var(--gut));padding:0 var(--gut)}
+.stock-tbl{border-collapse:collapse;min-width:100%}
+.stock-tbl th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:0 2px 6px;text-align:center}
+.stock-tbl th:first-child{text-align:left}
+.stock-tbl td{padding:3px 2px}
+.stock-tbl td:first-child{padding-right:8px;font-size:12px;line-height:1.25;max-width:104px}
+.stock-tbl td:first-child .dot{margin-right:5px;vertical-align:-1px}
+.stock-tbl input{width:48px;height:42px;text-align:center;border:1px solid #c9c9c9;border-radius:0;font-size:16px;font-variant-numeric:tabular-nums;-webkit-appearance:none;background:#fff}
+.stock-tbl input:focus{border-color:var(--fg);outline:none}
+.stock-tbl input.zero{background:#fdeceb;border-color:#f1b9bd}
+.stock-tbl input.low{background:#fff1df;border-color:#f0cf9f}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.inline input{width:70px;height:36px;border:1px solid #c9c9c9;text-align:center;font-size:16px;border-radius:0}
+
+/* Códigos y equipo */
+.row-item{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.row-item:first-child{border-top:1px solid var(--line)}
+.code{font-family:var(--mono);font-size:16px;font-weight:500;letter-spacing:.02em}
+.row-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.off{opacity:.55}
+@media (max-width:560px){.row-item{grid-template-columns:1fr;gap:10px}.row-btns{justify-content:flex-start}}
+
+/* Acceso */
+.auth{max-width:420px;margin:0 auto;padding:calc(8vh + env(safe-area-inset-top,0px)) var(--gut) 60px}
+.auth .logo{font-size:30px;display:block;margin-bottom:6px}
+.auth .tag{display:inline-block;margin-bottom:28px}
+.auth form{display:grid;gap:14px;margin-top:20px}
+.steps{padding-left:20px;display:grid;gap:8px;margin:14px 0}
+
+/* Aviso flotante */
+#toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translate(-50%,-20px);opacity:0;pointer-events:none;background:var(--fg);color:#fff;padding:12px 18px;font-size:13px;z-index:80;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast.bad{background:var(--err)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--fg);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}#toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="top" id="top" hidden>
+  <div class="wrap top-in">
+    <a class="logo" href="./" title="Ver la tienda">ASFALTO</a><span class="tag">Gestión</span>
+    <span class="sp"></span>
+    <span class="who" id="who"></span>
+    <button class="top-btn" data-act="logout">Salir</button>
+  </div>
+  <nav class="wrap tabs" id="tabs" aria-label="Secciones"></nav>
+</header>
+<main id="main" class="wrap"><p class="note" style="padding:40px 0"><span class="spin" aria-hidden="true"></span>Cargando…</p></main>
+<div class="sheet" id="sheet" hidden><div class="sheet-panel" id="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sh-title"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="catalogo.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module">
+/* ============================================================
+   Panel de gestión de Asfalto
+   Usa Firebase Authentication (cuentas) y Firestore (datos).
+   Colecciones: productos, stock, codigos, pedidos, ajustes, admins, config
+   ============================================================ */
+const VERSION = '10.12.2';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+const eur = n => money.format(+n || 0);
+const r2 = n => Math.round(n * 100) / 100;
+const num = v => { const s = String(v ?? '').trim().replace(/\s|€/g, '').replace(',', '.'); if (s === '') return NaN; const x = Number(s); return Number.isFinite(x) ? x : NaN; };
+const inNum = n => n == null || n === '' ? '' : String(r2(n)).replace('.', ',');
+const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const dFmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const dayFmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+const dayTxt = s => { const d = new Date(s + 'T12:00:00'); return isNaN(d) ? String(s) : dayFmt.format(d); };
+
+const CAT = window.ASF_CAT;
+const { C, P } = CAT;
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const slugOf = p => norm(p.name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + p.id;
+const skey = (id, c, t) => `${id}__${c}__${t}`;
+const GEN = { mujer: 'Mujer', hombre: 'Hombre', ambos: 'Unisex' };
+const CATN = { sudaderas: 'Sudaderas y punto', pantalones: 'Pantalones', faldas: 'Faldas y vestidos', camisetas: 'Camisetas y tops', chaquetas: 'Chaquetas', accesorios: 'Accesorios' };
+const ESTADOS = { nuevo: ['Nuevo', 'b-new'], preparando: ['Preparando', 'b-prep'], enviado: ['Enviado', 'b-sent'], entregado: ['Entregado', 'b-done'], cancelado: ['Cancelado', 'b-cancel'] };
+const SIGUIENTE = { nuevo: 'preparando', preparando: 'enviado', enviado: 'entregado' };
+const SIG_TXT = { preparando: 'Empezar a prepararlo', enviado: 'Marcar como enviado', entregado: 'Marcar como entregado' };
+const PAGOS = { card: 'Tarjeta', bizum: 'Bizum', paypal: 'PayPal' };
+const DEF_AJ = { envioGratisDesde: 29.9, envios: { std: 3.95, exp: 6.95, pick: 1.95 }, mensajes: [], pocasUnidades: 3 };
+const MSG_DEF = ['Envío gratis a partir de 29,90 €', 'Devoluciones gratis durante 30 días', '-15% en tu primera compra con la newsletter'];
+const TAGS = ['Nuevo', 'Solo online', 'Últimas unidades', 'Edición limitada', 'Unisex', 'Más vendido'];
+
+const S = {
+  user: null, me: null, iniciado: null, creating: false,
+  tab: 'resumen', productos: null, stock: null, codigos: null, pedidos: null, ajustes: undefined, admins: null,
+  errs: {}, pf: 'pendientes', pq: '', open: new Set(), prf: 'todos', prq: '', codEdit: null, ajDirty: false, edit: null, seenOrders: null
+};
+const main = $('#main');
+
+/* ---------- Avisos ---------- */
+let toastT;
+function toast(msg, bad = false) {
+  const t = $('#toast'); t.textContent = msg; t.classList.toggle('bad', bad); t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), bad ? 6000 : 2800);
+}
+function errMsg(e) {
+  const c = (e && e.code) || '';
+  const M = {
+    'permission-denied': 'Firebase no deja hacer esto. Revisa que hayas pegado las reglas de firestore.rules y que tu cuenta tenga permiso.',
+    'unavailable': 'No hay conexión con Firebase. Revisa internet y vuelve a probar.',
+    'auth/invalid-credential': 'Email o contraseña incorrectos.',
+    'auth/invalid-login-credentials': 'Email o contraseña incorrectos.',
+    'auth/wrong-password': 'Email o contraseña incorrectos.',
+    'auth/user-not-found': 'Email o contraseña incorrectos.',
+    'auth/invalid-email': 'Ese email no es válido.',
+    'auth/too-many-requests': 'Demasiados intentos seguidos. Espera unos minutos.',
+    'auth/email-already-in-use': 'Ese email ya tiene cuenta.',
+    'auth/weak-password': 'La contraseña es demasiado corta (mínimo 8 caracteres).',
+    'auth/network-request-failed': 'Sin conexión. Revisa internet y vuelve a probar.',
+    'auth/operation-not-allowed': 'Activa «Correo electrónico/contraseña» en Firebase → Authentication → Método de inicio de sesión.',
+    'auth/configuration-not-found': 'Activa Authentication en Firebase (Authentication → Comenzar) y el método «Correo electrónico/contraseña».',
+    'auth/unauthorized-domain': `Añade ${location.hostname} en Firebase → Authentication → Configuración → Dominios autorizados.`,
+    'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'La apiKey de firebase-config.js no es válida. Vuelve a copiar el bloque firebaseConfig.',
+    'ya-existe': 'Ese email ya tiene cuenta en Firebase con otra contraseña. Bórrala en Firebase → Authentication → Usuarios y vuelve a añadirla.'
+  };
+  return M[c] || (e && e.message ? `Algo ha fallado: ${e.message}` : 'Algo ha fallado. Vuelve a probar.');
+}
+function busy(btn, on, txt) {
+  if (!btn) return;
+  if (on) { btn.dataset.txt = btn.textContent; btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span>${esc(txt || 'Guardando…')}`; }
+  else { btn.disabled = false; btn.textContent = btn.dataset.txt || btn.textContent; }
+}
+
+/* ---------- Sin configuración ---------- */
+const cfg = window.ASF_FIREBASE;
+function renderNoConfig() {
+  main.innerHTML = `<div class="auth" style="max-width:640px;padding-top:6vh">
+    <span class="logo">ASFALTO</span><span class="tag">Gestión</span>
+    <h1 class="big-h" style="margin-bottom:14px">Falta conectar Firebase</h1>
+    <p class="lead">El panel necesita tu proyecto de Firebase para guardar el stock, los pedidos y las cuentas. Son 5 minutos:</p>
+    <ol class="steps">
+      <li>Entra en <b>console.firebase.google.com</b> y crea un proyecto (por ejemplo «asfalto-tienda»).</li>
+      <li><b>Authentication</b> → Comenzar → activa <b>Correo electrónico/contraseña</b>.</li>
+      <li>En Authentication → Configuración → <b>Dominios autorizados</b>, añade <span class="mono">${esc(location.hostname || 'tu-dominio')}</span>.</li>
+      <li><b>Firestore Database</b> → Crear base de datos → ubicación <span class="mono">eur3 (Europa)</span> → modo producción. En la pestaña <b>Reglas</b>, pega el contenido de <span class="mono">firestore.rules</span> y pulsa Publicar.</li>
+      <li>⚙️ Configuración del proyecto → Tus apps → icono <b>&lt;/&gt;</b> → registra la app y copia el bloque <span class="mono">firebaseConfig</span>.</li>
+      <li>Pégalo en el archivo <span class="mono">firebase-config.js</span> del repositorio (o pásaselo a Claude y lo pone él).</li>
+    </ol>
+    <p class="note">Las claves de firebaseConfig no son secretas: lo que protege tus datos son las reglas.</p>
+  </div>`;
+}
+function renderFatal(msg) { main.innerHTML = `<div class="auth"><span class="logo">ASFALTO</span><span class="tag">Gestión</span><p class="banner bad">${esc(msg)}</p><button class="btn" onclick="location.reload()">Recargar</button></div>`; }
+if (!cfg || !cfg.apiKey || !cfg.projectId) { renderNoConfig(); throw new Error('Sin firebase-config'); }
+
+/* ---------- Firebase ---------- */
+async function loadSDK() {
+  if (window.ASF_FB_SDK) return window.ASF_FB_SDK; // para pruebas
+  const base = `https://www.gstatic.com/firebasejs/${VERSION}/`;
+  const [app, auth, fs] = await Promise.all(['firebase-app.js', 'firebase-auth.js', 'firebase-firestore.js'].map(f => import(base + f)));
+  return { app, auth, fs };
+}
+let FA, AU, FS;
+try { ({ app: FA, auth: AU, fs: FS } = await loadSDK()); }
+catch (e) { renderFatal('No se ha podido cargar Firebase. Revisa tu conexión y recarga la página.'); throw e; }
+const fbApp = FA.initializeApp(cfg);
+const auth = AU.getAuth(fbApp);
+const db = FS.getFirestore(fbApp);
+const D = (c, id) => FS.doc(db, c, id);
+const COL = c => FS.collection(db, c);
+const isOwner = () => !!S.me && S.me.rol === 'dueno';
+
+/* ---------- Acceso ---------- */
+async function isIniciado() { try { return (await FS.getDoc(D('config', 'iniciado'))).exists(); } catch (e) { return null; } }
+
+function authShell(inner) {
+  $('#top').hidden = true;
+  main.innerHTML = `<div class="auth"><span class="logo">ASFALTO</span><span class="tag">Gestión</span>${inner}</div>`;
+}
+function renderLogin(mode) {
+  mode = mode || (S.iniciado === false ? 'owner' : 'login');
+  const rulesWarn = S.iniciado === null ? `<p class="banner bad"><b>No puedo leer Firestore</b>¿Has creado la base de datos y pegado las reglas de <span class="mono">firestore.rules</span>? Sin eso, el panel no puede funcionar.</p>` : '';
+  if (mode === 'owner') {
+    authShell(`${rulesWarn}<h1 class="big-h">Crea tu cuenta</h1>
+      <p class="lead" style="margin-top:10px">Es la primera vez que se abre el panel. La cuenta que crees ahora será la del <b>dueño</b>: podrá hacerlo todo y dar acceso a más gente.</p>
+      <form id="owner-form" novalidate>
+        <label class="fld"><span>Tu nombre</span><input id="o-name" autocomplete="name" required></label>
+        <label class="fld"><span>Email</span><input id="o-email" type="email" autocomplete="email" inputmode="email" required></label>
+        <label class="fld"><span>Contraseña (mínimo 8 caracteres)</span><input id="o-pass" type="password" autocomplete="new-password" required></label>
+        <label class="fld"><span>Repite la contraseña</span><input id="o-pass2" type="password" autocomplete="new-password" required></label>
+        <p class="err" id="auth-err" role="alert"></p>
+        <button class="btn" type="submit">Crear cuenta y entrar</button>
+        <button class="link" type="button" data-mode="login" style="justify-self:start">Ya tengo cuenta</button>
+      </form>`);
+  } else {
+    authShell(`${rulesWarn}<h1 class="big-h">Entrar</h1>
+      <form id="login-form" novalidate>
+        <label class="fld"><span>Email</span><input id="l-email" type="email" autocomplete="username" inputmode="email" required></label>
+        <label class="fld"><span>Contraseña</span><input id="l-pass" type="password" autocomplete="current-password" required></label>
+        <p class="err" id="auth-err" role="alert"></p>
+        <button class="btn" type="submit">Entrar</button>
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <button class="link" type="button" data-act="forgot">He olvidado mi contraseña</button>
+          ${S.iniciado === false || S.iniciado === null ? '<button class="link" type="button" data-mode="owner">Crear la cuenta del dueño</button>' : ''}
+        </div>
+      </form>`);
+  }
+  setTimeout(() => { const f = $('#main input'); if (f) f.focus(); }, 50);
+}
+function renderNoAccess(e) {
+  const canOwn = S.iniciado === false;
+  authShell(`<h1 class="big-h">Sin acceso</h1>
+    <p class="lead" style="margin-top:10px">La cuenta <b>${esc(S.user && S.user.email)}</b> no tiene permiso para usar el panel.</p>
+    ${e ? `<p class="banner bad">${esc(errMsg(e))}</p>` : ''}
+    ${canOwn ? `<p class="note" style="margin-top:12px">Todavía no hay dueño. Si esta es tu cuenta, actívala como dueño:</p><div class="actions"><button class="btn" data-act="make-owner">Activar como dueño</button></div>`
+      : `<p class="note" style="margin-top:12px">Pide al dueño de la tienda que te añada en Gestión → Equipo.</p>`}
+    <div class="actions"><button class="btn-line" data-act="logout">Salir</button></div>`);
+}
+async function makeOwner(user, nombre) {
+  const b = FS.writeBatch(db);
+  b.set(D('admins', user.uid), { email: user.email, nombre: nombre || user.email.split('@')[0], rol: 'dueno', alta: FS.serverTimestamp() });
+  b.set(D('config', 'iniciado'), { uid: user.uid, fecha: FS.serverTimestamp() });
+  await b.commit();
+}
+
+/* ---------- Escuchar los datos en directo ---------- */
+let unsubs = [];
+function stopListeners() { unsubs.forEach(u => { try { u(); } catch (e) { } }); unsubs = []; }
+function listen(ref, onData, key) {
+  unsubs.push(FS.onSnapshot(ref, snap => { delete S.errs[key]; onData(snap); refresh(); }, e => { console.warn(key, e); S.errs[key] = e; refresh(); }));
+}
+const mapDocs = snap => { const o = {}; snap.forEach(d => { o[d.id] = d.data(); }); return o; };
+const fecha = o => (o.fecha && typeof o.fecha.toDate === 'function') ? o.fecha.toDate() : new Date();
+
+async function onUser(u) {
+  if (S.creating) return;
+  stopListeners(); closeSheet();
+  S.user = u; S.me = null;
+  Object.assign(S, { productos: null, stock: null, codigos: null, pedidos: null, ajustes: undefined, admins: null, errs: {}, seenOrders: null });
+  if (!u) { S.iniciado = await isIniciado(); renderLogin(); return; }
+  authShell(`<p class="note" style="margin-top:20px"><span class="spin" aria-hidden="true"></span>Comprobando tu acceso…</p>`);
+  let snap;
+  try { snap = await FS.getDoc(D('admins', u.uid)); }
+  catch (e) { S.iniciado = await isIniciado(); renderNoAccess(e); return; }
+  if (!snap.exists()) { S.iniciado = await isIniciado(); renderNoAccess(); return; }
+  S.me = { uid: u.uid, ...snap.data() };
+  startApp();
+}
+function startApp() {
+  const h = location.hash.slice(1);
+  S.tab = TABS().some(t => t[0] === h) ? h : 'resumen';
+  $('#top').hidden = false;
+  $('#who').textContent = `${S.me.nombre || S.user.email} · ${isOwner() ? 'Dueño' : 'Empleado'}`;
+  listen(COL('productos'), s => { S.productos = mapDocs(s); }, 'productos');
+  listen(COL('stock'), s => { const o = {}; s.forEach(d => { const n = d.data().n; if (typeof n === 'number') o[d.id] = n; }); S.stock = o; }, 'stock');
+  listen(COL('codigos'), s => { S.codigos = mapDocs(s); }, 'codigos');
+  listen(D('ajustes', 'tienda'), s => { S.ajustes = s.exists() ? s.data() : null; }, 'ajustes');
+  listen(COL('admins'), s => { S.admins = Object.entries(mapDocs(s)).map(([uid, v]) => ({ uid, ...v })); }, 'admins');
+  listen(FS.query(COL('pedidos'), FS.orderBy('fecha', 'desc'), FS.limit(300)), s => {
+    const list = []; s.forEach(d => list.push({ id: d.id, ...d.data() }));
+    if (S.seenOrders) {
+      const nuevos = list.filter(o => !S.seenOrders.has(o.id));
+      if (nuevos.length) toast(nuevos.length === 1 ? `Nuevo pedido: ${nuevos[0].numero || nuevos[0].id} · ${eur(nuevos[0].total)}` : `${nuevos.length} pedidos nuevos`);
+    }
+    S.seenOrders = new Set(list.map(o => o.id));
+    S.pedidos = list;
+  }, 'pedidos');
+  renderTabs(); renderTab();
+}
+
+/* ---------- Pestañas ---------- */
+const TABS = () => [['resumen', 'Resumen'], ['pedidos', 'Pedidos'], ['productos', 'Productos'], ['codigos', 'Códigos'], ...(isOwner() ? [['ajustes', 'Ajustes'], ['equipo', 'Equipo']] : [])];
+function renderTabs() {
+  const pend = (S.pedidos || []).filter(o => o.estado === 'nuevo').length;
+  $('#tabs').innerHTML = TABS().map(([k, n]) => `<button class="tab" data-tab="${k}" aria-current="${S.tab === k ? 'page' : 'false'}">${n}${k === 'pedidos' && pend ? `<span class="count">${pend}</span>` : ''}</button>`).join('');
+  document.title = `${pend ? `(${pend}) ` : ''}Asfalto · Gestión`;
+}
+function goTab(k) {
+  S.tab = k; S.codEdit = null; S.ajDirty = false;
+  try { history.replaceState(null, '', '#' + k); } catch (e) { }
+  renderTabs(); renderTab(); window.scrollTo(0, 0);
+}
+const VIEWS = {};
+function renderTab() { if (!S.me) return; main.innerHTML = VIEWS[S.tab].shell(); renderLive(); }
+let rafId = 0;
+function refresh() { if (!S.me) return; cancelAnimationFrame(rafId); rafId = requestAnimationFrame(() => { renderTabs(); renderLive(); }); }
+// Repinta las zonas «en directo» sin perder lo que estás escribiendo
+function renderLive() {
+  const v = VIEWS[S.tab]; if (!v || !v.live) return;
+  $$('[data-live]', main).forEach(box => {
+    const html = v.live(box.dataset.live); if (html == null) return;
+    const a = document.activeElement, keep = {};
+    $$('input[id],textarea[id],select[id]', box).forEach(i => { keep[i.id] = i.type === 'checkbox' ? i.checked : i.value; });
+    const focusId = a && box.contains(a) && a.id ? a.id : null;
+    box.innerHTML = html;
+    for (const [id, val] of Object.entries(keep)) { const i = document.getElementById(id); if (i) { if (i.type === 'checkbox') i.checked = val; else i.value = val; } }
+    if (focusId) { const i = document.getElementById(focusId); if (i) i.focus({ preventScroll: true }); }
+  });
+}
+const loading = '<p class="note" style="padding:24px 0"><span class="spin" aria-hidden="true"></span>Cargando…</p>';
+function errBanner(keys) {
+  const e = keys.map(k => S.errs[k]).find(Boolean);
+  return e ? `<p class="banner bad"><b>No se pueden leer los datos</b>${esc(errMsg(e))}</p>` : '';
+}
+
+/* ---------- Ayudas de producto ---------- */
+function info(p) {
+  const v = (S.productos && S.productos[p.id]) || {};
+  return {
+    precio: typeof v.precio === 'number' ? v.precio : p.price,
+    precioAntes: 'precioAntes' in v ? v.precioAntes : (p.old || null),
+    etiqueta: 'etiqueta' in v ? v.etiqueta : (p.tag || null),
+    visible: v.visible !== false
+  };
+}
+const low = () => (S.ajustes && typeof S.ajustes.pocasUnidades === 'number') ? S.ajustes.pocasUnidades : 3;
+function stockInfo(p) {
+  let total = 0, out = 0, few = 0, tracked = 0;
+  p.colors.forEach(c => p.sizes.forEach(t => {
+    const n = S.stock ? S.stock[skey(p.id, c, t)] : undefined;
+    if (n == null) return;
+    tracked++; total += n; if (n <= 0) out++; else if (n <= low()) few++;
+  }));
+  return { total, out, few, tracked, combos: p.colors.length * p.sizes.length };
+}
+const priceHTML = v => v.precioAntes && v.precioAntes > v.precio
+  ? `<span class="now sale">${eur(v.precio)}</span><span class="old">${eur(v.precioAntes)}</span>`
+  : `<span class="now">${eur(v.precio)}</span>`;
+const pctOff = v => v.precioAntes && v.precioAntes > v.precio ? Math.round((1 - v.precio / v.precioAntes) * 100) : 0;
+
+/* ---------- Cargar catálogo inicial ---------- */
+async function seed() {
+  const ops = [];
+  for (const p of P) {
+    ops.push([D('productos', p.id), { nombre: p.name, precio: p.price, precioAntes: p.old || null, etiqueta: p.tag || null, visible: true }]);
+    p.colors.forEach(c => p.sizes.forEach(t => {
+      ops.push([D('stock', skey(p.id, c, t)), { p: p.id, c, t, n: (p.out || []).includes(t) ? 0 : (p.low || []).includes(t) ? 2 : 20 }]);
+    }));
+  }
+  ops.push([D('ajustes', 'tienda'), DEF_AJ]);
+  ops.push([D('codigos', 'ASFALTO10'), { tipo: 'porcentaje', valor: 10, minimo: 0, caduca: null, activo: true }]);
+  ops.push([D('codigos', 'BIENVENIDA'), { tipo: 'porcentaje', valor: 15, minimo: 0, caduca: null, activo: true }]);
+  for (let i = 0; i < ops.length; i += 400) {
+    const b = FS.writeBatch(db);
+    ops.slice(i, i + 400).forEach(([ref, data]) => b.set(ref, data));
+    await b.commit();
+  }
+}
+
+/* =================== RESUMEN =================== */
+VIEWS.resumen = {
+  shell: () => `<div data-live="resumen">${loading}</div>`,
+  live() {
+    const err = errBanner(['productos', 'stock', 'pedidos']);
+    if (!S.productos || !S.stock || !S.pedidos) return err || loading;
+    const vacio = !Object.keys(S.productos).length && !Object.keys(S.stock).length;
+    const hero = vacio ? (isOwner()
+      ? `<div class="hero"><p class="h" style="margin:0">Primer paso</p><h2 class="big-h">Carga tu catálogo</h2><p>Sube a Firebase las ${P.length} prendas de la tienda con sus precios, 20 unidades por color y talla, los gastos de envío y los códigos ASFALTO10 y BIENVENIDA. Después lo cambias todo desde aquí.</p><button class="btn" data-act="seed">Cargar catálogo inicial</button></div>`
+      : `<p class="banner">El catálogo aún no está en Firebase. Pide al dueño que pulse «Cargar catálogo inicial».</p>`) : '';
+    const hoy0 = new Date(); hoy0.setHours(0, 0, 0, 0);
+    const hace30 = Date.now() - 30 * 864e5;
+    const ok = S.pedidos.filter(o => o.estado !== 'cancelado');
+    const hoy = ok.filter(o => fecha(o) >= hoy0), mes = ok.filter(o => fecha(o).getTime() >= hace30);
+    const sum = l => l.reduce((s, o) => s + (+o.total || 0), 0);
+    const pend = S.pedidos.filter(o => o.estado === 'nuevo' || o.estado === 'preparando');
+    const alerts = [];
+    P.forEach(p => p.colors.forEach(c => p.sizes.forEach(t => {
+      const n = S.stock[skey(p.id, c, t)];
+      if (n != null && n <= low() && info(p).visible) alerts.push({ p, c, t, n });
+    })));
+    alerts.sort((a, b) => a.n - b.n || a.p.name.localeCompare(b.p.name));
+    const last = S.pedidos.slice(0, 5);
+    return `${err}${hero}
+      <div class="kpis">
+        <div class="kpi"><span>Ventas hoy</span><b>${eur(sum(hoy))}</b><span>${hoy.length} ${hoy.length === 1 ? 'pedido' : 'pedidos'}</span></div>
+        <div class="kpi"><span>Por preparar</span><b>${pend.length}</b><span>${pend.filter(o => o.estado === 'nuevo').length} sin empezar</span></div>
+        <div class="kpi"><span>Últimos 30 días</span><b>${eur(sum(mes))}</b><span>${mes.length} ${mes.length === 1 ? 'pedido' : 'pedidos'}</span></div>
+        <div class="kpi"><span>Ticket medio</span><b>${mes.length ? eur(sum(mes) / mes.length) : '—'}</b><span>30 días</span></div>
+      </div>
+      <div class="two">
+        <section><h2 class="h">Stock bajo · ${alerts.length}</h2>${alerts.length ? alerts.slice(0, 12).map(a => `<button class="alert-row" data-prod="${a.p.id}"><span class="dot" style="--c:${C[a.c].h}"></span><span><b>${esc(a.p.name)}</b><br><span class="note">${esc(C[a.c].n)} · Talla ${esc(a.t)}</span></span><span class="badge ${a.n <= 0 ? 'b-out' : 'b-low'}">${a.n <= 0 ? 'Agotado' : a.n + ' ud.'}</span></button>`).join('') + (alerts.length > 12 ? `<div class="actions"><button class="link" data-tab="productos" data-prf="pocas">Ver las ${alerts.length}</button></div>` : '') : `<p class="note">${vacio ? 'Cuando cargues el catálogo, aquí verás lo que se está acabando.' : 'Todo con stock de sobra.'}</p>`}</section>
+        <section><h2 class="h">Últimos pedidos</h2>${last.length ? last.map(o => `<button class="alert-row" data-tab="pedidos" data-ord-open="${esc(o.id)}"><span class="badge ${(ESTADOS[o.estado] || [])[1] || ''}">${esc((ESTADOS[o.estado] || [o.estado])[0])}</span><span><b class="mono" style="font-size:12px">${esc(o.numero || o.id)}</b><br><span class="note">${esc(nombreDe(o))} · ${dFmt.format(fecha(o))}</span></span><b>${eur(o.total)}</b></button>`).join('') : '<p class="note">Aún no hay pedidos. Cuando alguien compre en la tienda, aparecerá aquí al momento.</p>'}</section>
+      </div>`;
+  }
+};
+const nombreDe = o => [o.cliente && o.cliente.nombre, o.cliente && o.cliente.apellidos].filter(Boolean).join(' ') || 'Sin nombre';
+
+/* =================== PEDIDOS =================== */
+const PF = [['pendientes', 'Por preparar', o => o.estado === 'nuevo' || o.estado === 'preparando'], ['enviado', 'Enviados', o => o.estado === 'enviado'], ['entregado', 'Entregados', o => o.estado === 'entregado'], ['cancelado', 'Cancelados', o => o.estado === 'cancelado'], ['todos', 'Todos', () => true]];
+VIEWS.pedidos = {
+  shell: () => `<div class="bar"><label class="sr" for="ped-q">Buscar pedido</label><input class="search" id="ped-q" type="search" placeholder="Buscar por número, nombre, email o ciudad" value="${esc(S.pq)}" autocomplete="off"></div>
+    <div data-live="ped-chips"></div><div data-live="ped-list">${loading}</div>`,
+  live(k) {
+    if (k === 'ped-chips') return `<div class="chips" role="group" aria-label="Filtrar">${PF.map(([id, n, f]) => `<button class="chip" data-pf="${id}" aria-pressed="${S.pf === id}">${n}<span class="c">${S.pedidos ? S.pedidos.filter(f).length : ''}</span></button>`).join('')}</div>`;
+    const err = errBanner(['pedidos']);
+    if (!S.pedidos) return err || loading;
+    const f = PF.find(x => x[0] === S.pf)[2], q = norm(S.pq.trim());
+    const list = S.pedidos.filter(f).filter(o => !q || norm([o.numero, nombreDe(o), o.cliente && o.cliente.email, o.direccion && o.direccion.ciudad, o.cliente && o.cliente.tel].join(' ')).includes(q));
+    if (!list.length) return `${err}<p class="empty">${S.pedidos.length ? 'No hay pedidos aquí.' : 'Aún no hay pedidos. En cuanto alguien compre, aparecerá aquí sin recargar.'}</p>`;
+    return err + list.map(pedidoHTML).join('');
+  }
+};
+function pedidoHTML(o) {
+  const [lab, cls] = ESTADOS[o.estado] || [o.estado || '—', ''];
+  const arts = Array.isArray(o.articulos) ? o.articulos : [];
+  const uds = arts.reduce((s, a) => s + (+a.cantidad || 0), 0), open = S.open.has(o.id);
+  return `<article class="ord${open ? ' open' : ''}">
+    <button class="ord-head" data-ord="${esc(o.id)}" aria-expanded="${open}">
+      <span class="ord-l1"><b class="mono">${esc(o.numero || o.id)}</b><span class="badge ${cls}">${esc(lab)}</span><span class="sp"></span><b>${eur(o.total)}</b></span>
+      <span class="ord-l2">${esc(nombreDe(o))}${o.direccion && o.direccion.ciudad ? ' · ' + esc(o.direccion.ciudad) : ''}</span>
+      <span class="note">${dFmt.format(fecha(o))} · ${uds} ${uds === 1 ? 'artículo' : 'artículos'}${o.envio && o.envio.nombre ? ' · ' + esc(o.envio.nombre) : ''}</span>
+    </button>
+    ${open ? detalleHTML(o, arts) : ''}
+  </article>`;
+}
+function dirTxt(o) {
+  const d = o.direccion || {};
+  return `${nombreDe(o)}\n${d.calle || ''}${d.piso ? ', ' + d.piso : ''}\n${d.cp || ''} ${d.ciudad || ''} (${d.provincia || ''})\n${(o.cliente && o.cliente.tel) || ''}`;
+}
+function detalleHTML(o, arts) {
+  const d = o.direccion || {}, c = o.cliente || {}, next = SIGUIENTE[o.estado];
+  return `<div class="ord-body">
+    <div class="items">${arts.map(a => `<div class="it"><span class="dot" style="--c:${C[a.colorId] ? C[a.colorId].h : '#ccc'}"></span><span>${esc(a.nombre)}<br><span class="note">${esc(a.color)} · Talla ${esc(a.talla)} · ${+a.cantidad || 0} ud.</span></span><span>${eur((+a.precio || 0) * (+a.cantidad || 0))}</span></div>`).join('')}</div>
+    <dl class="kv">
+      <div><dt>Subtotal</dt><dd>${eur(o.subtotal)}</dd></div>
+      ${o.descuento ? `<div><dt>Descuento${o.codigo ? ' · ' + esc(o.codigo) : ''}</dt><dd>−${eur(o.descuento)}</dd></div>` : ''}
+      <div><dt>${esc((o.envio && o.envio.nombre) || 'Envío')}</dt><dd>${o.envio && o.envio.precio ? eur(o.envio.precio) : 'Gratis'}</dd></div>
+      <div class="tot"><dt>Total</dt><dd>${eur(o.total)}</dd></div>
+    </dl>
+    <div class="info3">
+      <div><p class="lbl">Enviar a</p><p>${esc(nombreDe(o))}<br>${esc(d.calle)}${d.piso ? ', ' + esc(d.piso) : ''}<br>${esc(d.cp)} ${esc(d.ciudad)} (${esc(d.provincia)})</p><button class="link" data-copy="${esc(o.id)}" style="margin-top:6px">Copiar dirección</button></div>
+      <div><p class="lbl">Cliente</p><p>${c.tel ? `<a href="tel:${esc(String(c.tel).replace(/\s/g, ''))}">${esc(c.tel)}</a>` : '—'}<br>${c.email ? `<a href="mailto:${esc(c.email)}?subject=${encodeURIComponent('Tu pedido ' + (o.numero || o.id))}">${esc(c.email)}</a>` : ''}</p></div>
+      <div><p class="lbl">Pago</p><p>${esc(PAGOS[o.pago] || o.pago || '—')}</p>${o.seguimiento ? `<p class="lbl" style="margin-top:8px">Seguimiento</p><p class="mono">${esc(o.seguimiento)}</p>` : ''}</div>
+    </div>
+    ${next ? `<div>
+      ${next === 'enviado' ? `<label class="fld" style="max-width:340px;margin-bottom:10px"><span>Nº de seguimiento (opcional)</span><input id="seg-${esc(o.id)}" autocomplete="off"></label>` : ''}
+      <div class="actions" style="margin-top:0"><button class="btn" data-estado="${next}" data-id="${esc(o.id)}">${SIG_TXT[next]}</button>${o.estado !== 'entregado' ? `<button class="btn-line btn-red" data-cancel="${esc(o.id)}">Cancelar pedido</button>` : ''}</div>
+    </div>` : o.estado === 'cancelado' ? `<p class="note">Pedido cancelado.${o.stockDevuelto ? ' Las prendas volvieron al stock.' : ''}</p>` : ''}
+  </div>`;
+}
+async function setEstado(id, estado, btn) {
+  const o = S.pedidos.find(x => x.id === id); if (!o) return;
+  const data = { estado, actualizado: FS.serverTimestamp() };
+  const seg = $('#seg-' + CSS.escape(id)); if (seg && seg.value.trim()) data.seguimiento = seg.value.trim().slice(0, 60);
+  busy(btn, true);
+  try { await FS.updateDoc(D('pedidos', id), data); toast(`${o.numero || id}: ${ESTADOS[estado][0].toLowerCase()}`); }
+  catch (e) { busy(btn, false); toast(errMsg(e), true); }
+}
+async function cancelar(id, btn) {
+  const o = S.pedidos.find(x => x.id === id); if (!o) return;
+  if (!confirm(`¿Cancelar el pedido ${o.numero || id}?\n\nLas prendas vuelven al stock. Si ya lo había pagado, acuérdate de devolverle el dinero.`)) return;
+  busy(btn, true, 'Cancelando…');
+  try {
+    const b = FS.writeBatch(db);
+    b.update(D('pedidos', id), { estado: 'cancelado', stockDevuelto: true, actualizado: FS.serverTimestamp() });
+    if (!o.stockDevuelto) (o.articulos || []).forEach(a => {
+      const k = skey(a.id, a.colorId, a.talla);
+      if (S.stock && k in S.stock && +a.cantidad > 0) b.update(D('stock', k), { n: FS.increment(+a.cantidad) });
+    });
+    await b.commit(); toast('Pedido cancelado y stock devuelto');
+  } catch (e) { busy(btn, false); toast(errMsg(e), true); }
+}
+
+/* =================== PRODUCTOS =================== */
+const PRF = [
+  ['todos', 'Todos', () => true], ['mujer', 'Mujer', p => p.g === 'mujer'], ['hombre', 'Hombre', p => p.g === 'hombre'], ['ambos', 'Unisex', p => p.g === 'ambos'],
+  ['pocas', 'Stock bajo', p => { const s = stockInfo(p); return s.out + s.few > 0; }], ['rebajas', 'Rebajas', p => pctOff(info(p)) > 0], ['ocultos', 'Ocultos', p => !info(p).visible]
+];
+VIEWS.productos = {
+  shell: () => `<div class="bar"><label class="sr" for="prod-q">Buscar prenda</label><input class="search" id="prod-q" type="search" placeholder="Buscar prenda" value="${esc(S.prq)}" autocomplete="off"></div>
+    <div data-live="prod-chips"></div><div data-live="prod-list">${loading}</div>
+    <p class="note" style="margin-top:20px">Las prendas nuevas (con su dibujo, tallas y colores) se añaden en <span class="mono">catalogo.js</span>. Aquí cambias precio, rebaja, etiqueta, si se ve y el stock.</p>`,
+  live(k) {
+    if (k === 'prod-chips') return `<div class="chips" role="group" aria-label="Filtrar">${PRF.map(([id, n, f]) => `<button class="chip" data-prf="${id}" aria-pressed="${S.prf === id}">${n}<span class="c">${S.stock ? P.filter(f).length : ''}</span></button>`).join('')}</div>`;
+    const err = errBanner(['productos', 'stock']);
+    if (!S.productos || !S.stock) return err || loading;
+    const f = PRF.find(x => x[0] === S.prf)[2], q = norm(S.prq.trim());
+    const list = P.filter(f).filter(p => !q || norm(p.name + ' ' + p.id + ' ' + (CATN[p.cat] || '')).includes(q));
+    if (!list.length) return err + '<p class="empty">No hay prendas aquí.</p>';
+    return err + list.map(p => {
+      const v = info(p), s = stockInfo(p), pc = pctOff(v);
+      return `<button class="prow${v.visible ? '' : ' off'}" data-prod="${p.id}">
+        <span class="pmain"><span class="l1"><span class="dots">${p.colors.map(c => `<i style="--c:${C[c].h}"></i>`).join('')}</span><b>${esc(p.name)}</b></span>
+          <span class="note">${p.id} · ${GEN[p.g]} · ${esc(CATN[p.cat] || p.cat)}</span>
+          <span class="badges">${!v.visible ? '<span class="badge b-cancel">Oculto</span>' : ''}${pc ? `<span class="badge b-sale">−${pc}%</span>` : ''}${v.etiqueta ? `<span class="badge">${esc(v.etiqueta)}</span>` : ''}${s.out ? `<span class="badge b-out">${s.out} agotad${s.out === 1 ? 'a' : 'as'}</span>` : ''}${s.few ? `<span class="badge b-low">${s.few} con pocas</span>` : ''}</span></span>
+        <span class="pright"><span>${priceHTML(v)}</span><span class="note">${s.tracked ? `${s.total} uds` : 'Sin stock'}</span></span>
+      </button>`;
+    }).join('');
+  }
+};
+
+/* Editor de prenda (hoja lateral) */
+function openEditor(id) {
+  const p = byId[id]; if (!p) return;
+  const v = info(p), orig = {};
+  p.colors.forEach(c => p.sizes.forEach(t => { const k = skey(p.id, c, t); orig[k] = S.stock ? S.stock[k] : undefined; }));
+  S.edit = { id, orig, last: document.activeElement };
+  $('#sheet-panel').innerHTML = `
+    <div class="sh-head"><div><p class="note mono">${p.id} · ${GEN[p.g]} · ${esc(CATN[p.cat] || p.cat)}</p><h2 id="sh-title">${esc(p.name)}</h2></div><button class="sh-x" data-act="close-sheet" aria-label="Cerrar">✕</button></div>
+    <form class="sh-body" id="ed-form" novalidate>
+      <section>
+        <h3 class="h">Precio</h3>
+        <div class="grid2">
+          <label class="fld"><span>Precio de venta</span><span class="in-wrap"><input id="ed-precio" inputmode="decimal" value="${inNum(v.precio)}" autocomplete="off"><span class="suf">€</span></span></label>
+          <label class="fld"><span>Precio antes (tachado)</span><span class="in-wrap"><input id="ed-antes" inputmode="decimal" value="${inNum(v.precioAntes)}" placeholder="Sin rebaja" autocomplete="off"><span class="suf">€</span></span></label>
+        </div>
+        <div class="chips" style="margin:12px 0 10px" role="group" aria-label="Rebaja rápida">${[10, 20, 30, 40, 50].map(x => `<button type="button" class="chip" data-rebaja="${x}">−${x}%</button>`).join('')}<button type="button" class="chip" data-rebaja="0">Quitar rebaja</button></div>
+        <p class="preview" id="ed-prev"></p>
+      </section>
+      <section>
+        <h3 class="h">En la tienda</h3>
+        <div class="fields">
+          <label class="fld"><span>Etiqueta (sale encima del nombre)</span><input id="ed-tag" list="dl-tags" value="${esc(v.etiqueta || '')}" placeholder="Sin etiqueta" maxlength="24" autocomplete="off"></label>
+          <datalist id="dl-tags">${TAGS.map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+          <label class="check"><input type="checkbox" id="ed-vis"${v.visible ? ' checked' : ''}><span>Se ve en la tienda</span></label>
+        </div>
+      </section>
+      <section>
+        <h3 class="h">Stock</h3>
+        <p class="note" style="margin-bottom:12px">Unidades por color y talla. Rojo: agotado. Naranja: quedan ${low()} o menos. Vacío: sin control (se vende sin límite).</p>
+        <div class="tbl-wrap"><table class="stock-tbl"><thead><tr><th>Color</th>${p.sizes.map(t => `<th>${esc(t === 'Única' ? 'Única' : t)}</th>`).join('')}</tr></thead>
+          <tbody>${p.colors.map(c => `<tr><td><span class="dot" style="--c:${C[c].h}"></span>${esc(C[c].n)}</td>${p.sizes.map(t => { const k = skey(p.id, c, t), n = orig[k]; return `<td><input data-k="${esc(k)}" data-c="${esc(c)}" data-t="${esc(t)}" inputmode="numeric" pattern="[0-9]*" value="${n == null ? '' : n}" aria-label="${esc(C[c].n)}, talla ${esc(t)}" class="${stockCls(n)}" autocomplete="off"></td>`; }).join('')}</tr>`).join('')}</tbody></table></div>
+        <div class="inline"><span class="note">Poner todo a</span><input id="ed-all" inputmode="numeric" pattern="[0-9]*" aria-label="Unidades para todas las tallas"><button type="button" class="btn-line btn-sm" data-act="ed-all">Aplicar</button><button type="button" class="btn-line btn-sm" data-act="ed-plus">+10 a todo</button></div>
+        <p class="note" id="ed-total" style="margin-top:10px"></p>
+      </section>
+      <p class="err" id="ed-err" role="alert"></p>
+    </form>
+    <div class="sh-foot"><a class="btn-line" href="./#${slugOf(p)}" target="_blank" rel="noopener">Ver en tienda</a><button class="btn" type="submit" form="ed-form" id="ed-save">Guardar cambios</button></div>`;
+  $('#sheet').hidden = false; document.documentElement.style.overflow = 'hidden';
+  edPreview();
+  setTimeout(() => { const x = $('#sheet-panel .sh-x'); if (x) x.focus(); }, 30);
+}
+const stockCls = n => n == null || n === '' ? '' : +n <= 0 ? 'zero' : +n <= low() ? 'low' : '';
+function closeSheet() {
+  if ($('#sheet').hidden) return;
+  $('#sheet').hidden = true; document.documentElement.style.overflow = '';
+  const last = S.edit && S.edit.last; S.edit = null;
+  if (last && last.isConnected) last.focus({ preventScroll: true });
+}
+function edPreview() {
+  const pr = num($('#ed-precio').value), an = num($('#ed-antes').value), box = $('#ed-prev');
+  if (!(pr > 0)) { box.textContent = 'Escribe el precio.'; }
+  else if (an > pr) box.innerHTML = `Se verá así: ${priceHTML({ precio: pr, precioAntes: an })} <span class="badge b-sale" style="margin-left:6px">−${Math.round((1 - pr / an) * 100)}%</span>`;
+  else box.innerHTML = `Se verá así: ${priceHTML({ precio: pr })}${$('#ed-antes').value.trim() ? ' <span class="note">(el precio antes tiene que ser mayor para que salga como rebaja)</span>' : ''}`;
+  let tot = 0, cells = 0;
+  $$('[data-k]', $('#sheet-panel')).forEach(i => { i.className = stockCls(i.value.trim()); const n = parseInt(i.value, 10); if (Number.isFinite(n)) { tot += n; cells++; } });
+  $('#ed-total').textContent = cells ? `Total: ${tot} ${tot === 1 ? 'unidad' : 'unidades'}` : 'Sin control de stock';
+}
+function rebaja(pct) {
+  const pr = num($('#ed-precio').value), an = num($('#ed-antes').value);
+  const base = an > 0 ? an : pr; if (!(base > 0)) return;
+  if (!pct) { $('#ed-precio').value = inNum(base); $('#ed-antes').value = ''; }
+  else { $('#ed-antes').value = inNum(base); $('#ed-precio').value = inNum(Math.floor(base * (100 - pct) + 1e-6) / 100); }
+  edPreview();
+}
+async function saveEditor() {
+  const p = byId[S.edit.id], err = $('#ed-err'); err.textContent = '';
+  const pr = num($('#ed-precio').value), anRaw = $('#ed-antes').value.trim(), an = anRaw ? num(anRaw) : null;
+  if (!(pr > 0 && pr < 10000)) { err.textContent = 'El precio tiene que ser un número mayor que 0, por ejemplo 29,99.'; $('#ed-precio').focus(); return; }
+  if (anRaw && !(an > 0)) { err.textContent = 'El precio antes no es un número. Déjalo vacío si no hay rebaja.'; $('#ed-antes').focus(); return; }
+  const b = FS.writeBatch(db);
+  b.set(D('productos', p.id), { nombre: p.name, precio: r2(pr), precioAntes: an && an > pr ? r2(an) : null, etiqueta: $('#ed-tag').value.trim().slice(0, 24) || null, visible: $('#ed-vis').checked, actualizado: FS.serverTimestamp() }, { merge: true });
+  let bad = null, changed = 0;
+  for (const i of $$('[data-k]', $('#sheet-panel'))) {
+    const k = i.dataset.k, raw = i.value.trim(), was = S.edit.orig[k];
+    if (raw === '') { if (was != null) { b.delete(D('stock', k)); changed++; } continue; }
+    if (!/^\d{1,4}$/.test(raw)) { bad = i; break; }
+    const n = parseInt(raw, 10);
+    if (n !== was) { b.set(D('stock', k), { p: p.id, c: i.dataset.c, t: i.dataset.t, n }, { merge: true }); changed++; }
+  }
+  if (bad) { err.textContent = 'En el stock solo van números enteros (0, 1, 2…).'; bad.setAttribute('aria-invalid', 'true'); bad.focus(); return; }
+  const btn = $('#ed-save'); busy(btn, true);
+  try { await b.commit(); closeSheet(); toast(`${p.name}: guardado${changed ? ` (${changed} ${changed === 1 ? 'talla' : 'tallas'} de stock)` : ''}`); }
+  catch (e) { busy(btn, false); err.textContent = errMsg(e); }
+}
+
+/* =================== CÓDIGOS =================== */
+VIEWS.codigos = {
+  shell: () => {
+    const c = S.codEdit && S.codigos ? S.codigos[S.codEdit] : null;
+    const tipo = c ? c.tipo : 'porcentaje';
+    return `<section class="sec card" id="cod-card">
+      <h2 class="h">${c ? `Editar ${esc(S.codEdit)}` : 'Nuevo código de descuento'}</h2>
+      <form id="cod-form" novalidate class="fields">
+        <label class="fld"><span>Código (lo que escribe el cliente)</span><input id="cod-code" value="${esc(S.codEdit || '')}" placeholder="VERANO20" autocapitalize="characters" autocomplete="off" maxlength="30"${c ? ' readonly' : ''}></label>
+        <div class="seg" role="radiogroup" aria-label="Tipo de descuento">
+          <label><input type="radio" name="cod-tipo" value="porcentaje"${tipo !== 'importe' ? ' checked' : ''}><span>Porcentaje %</span></label>
+          <label><input type="radio" name="cod-tipo" value="importe"${tipo === 'importe' ? ' checked' : ''}><span>Importe fijo €</span></label>
+        </div>
+        <div class="grid3">
+          <label class="fld"><span id="cod-vlab">${tipo === 'importe' ? 'Euros de descuento' : '% de descuento'}</span><input id="cod-valor" inputmode="decimal" value="${c ? inNum(c.valor) : ''}" placeholder="${tipo === 'importe' ? '5' : '20'}" autocomplete="off"></label>
+          <label class="fld"><span>Pedido mínimo (€)</span><input id="cod-min" inputmode="decimal" value="${c && c.minimo ? inNum(c.minimo) : ''}" placeholder="Sin mínimo" autocomplete="off"></label>
+          <label class="fld"><span>Caduca (opcional)</span><input id="cod-cad" type="date" value="${c && c.caduca ? esc(c.caduca) : ''}"></label>
+        </div>
+        <label class="check"><input type="checkbox" id="cod-act"${!c || c.activo !== false ? ' checked' : ''}><span>Activo (se puede usar ya)</span></label>
+        <p class="err" id="cod-err" role="alert"></p>
+        <div class="actions" style="margin-top:0"><button class="btn" type="submit">${c ? 'Guardar cambios' : 'Crear código'}</button>${c ? '<button class="btn-line" type="button" data-act="cod-cancel">Cancelar</button>' : ''}</div>
+      </form>
+    </section>
+    <section class="sec"><h2 class="h">Tus códigos</h2><div data-live="cod-list">${loading}</div></section>`;
+  },
+  live() {
+    const err = errBanner(['codigos']);
+    if (!S.codigos) return err || loading;
+    const usos = {}; (S.pedidos || []).forEach(o => { if (o.codigo && o.estado !== 'cancelado') usos[o.codigo] = (usos[o.codigo] || 0) + 1; });
+    const hoy = new Date().toISOString().slice(0, 10);
+    const list = Object.entries(S.codigos).sort((a, b) => a[0].localeCompare(b[0]));
+    if (!list.length) return err + '<p class="empty">Aún no hay códigos. Crea el primero arriba.</p>';
+    return err + list.map(([code, c]) => {
+      const cad = c.caduca && c.caduca < hoy, on = c.activo !== false && !cad;
+      const parts = [c.tipo === 'importe' ? `−${eur(c.valor)}` : `−${c.valor}%`, c.minimo ? `desde ${eur(c.minimo)}` : 'sin mínimo', c.caduca ? `${cad ? 'caducó' : 'caduca'} el ${dayTxt(c.caduca)}` : 'no caduca', `usado ${usos[code] || 0} ${usos[code] === 1 ? 'vez' : 'veces'}`];
+      return `<div class="row-item${on ? '' : ' off'}">
+        <div><span class="code">${esc(code)}</span> ${cad ? '<span class="badge b-cancel">Caducado</span>' : c.activo === false ? '<span class="badge b-cancel">Pausado</span>' : '<span class="badge b-done">Activo</span>'}<p class="note">${parts.join(' · ')}</p></div>
+        <div class="row-btns"><label class="check" style="font-size:12px"><input type="checkbox" data-cod-act="${esc(code)}"${c.activo !== false ? ' checked' : ''}><span>Activo</span></label><button class="btn-line btn-sm" data-cod-edit="${esc(code)}">Editar</button><button class="btn-line btn-sm btn-red" data-cod-del="${esc(code)}">Borrar</button></div>
+      </div>`;
+    }).join('');
+  }
+};
+async function saveCodigo() {
+  const err = $('#cod-err'); err.textContent = '';
+  const code = $('#cod-code').value.trim().toUpperCase().replace(/\s+/g, '');
+  const tipo = ($('input[name="cod-tipo"]:checked') || {}).value || 'porcentaje';
+  const valor = num($('#cod-valor').value), minRaw = $('#cod-min').value.trim(), minimo = minRaw ? num(minRaw) : 0;
+  const caduca = $('#cod-cad').value || null;
+  if (!/^[A-Z0-9_-]{3,30}$/.test(code)) { err.textContent = 'El código tiene que tener de 3 a 30 letras o números, sin espacios ni tildes. Ej.: VERANO20.'; $('#cod-code').focus(); return; }
+  if (tipo === 'porcentaje' && !(valor >= 1 && valor <= 90)) { err.textContent = 'El porcentaje tiene que estar entre 1 y 90.'; $('#cod-valor').focus(); return; }
+  if (tipo === 'importe' && !(valor > 0 && valor <= 500)) { err.textContent = 'El importe tiene que ser mayor que 0 €.'; $('#cod-valor').focus(); return; }
+  if (!(minimo >= 0)) { err.textContent = 'El pedido mínimo no es un número. Déjalo vacío si no hay mínimo.'; $('#cod-min').focus(); return; }
+  if (!S.codEdit && S.codigos && S.codigos[code]) { err.textContent = `Ya existe el código ${code}. Búscalo abajo y pulsa Editar.`; return; }
+  const btn = $('#cod-form [type="submit"]'); busy(btn, true);
+  try {
+    await FS.setDoc(D('codigos', code), { tipo, valor: tipo === 'porcentaje' ? Math.round(valor) : r2(valor), minimo: r2(minimo), caduca, activo: $('#cod-act').checked });
+    toast(S.codEdit ? `${code} guardado` : `Código ${code} creado`);
+    S.codEdit = null; renderTab();
+  } catch (e) { busy(btn, false); err.textContent = errMsg(e); }
+}
+
+/* =================== AJUSTES =================== */
+VIEWS.ajustes = {
+  shell: () => `<div data-live="aj">${loading}</div>`,
+  live() {
+    if (S.ajDirty && $('#aj-form')) return null; // no pisar lo que estás escribiendo
+    const err = errBanner(['ajustes']);
+    if (S.ajustes === undefined) return err || loading;
+    const a = { ...DEF_AJ, ...(S.ajustes || {}) }, e = { ...DEF_AJ.envios, ...(a.envios || {}) }, m = Array.isArray(a.mensajes) ? a.mensajes : [];
+    return `${err}<form id="aj-form" novalidate>
+      <section class="sec card"><h2 class="h">Envíos</h2>
+        <div class="fields">
+          <label class="fld" style="max-width:260px"><span>Envío gratis a partir de (€)</span><input id="aj-free" inputmode="decimal" value="${inNum(a.envioGratisDesde)}"></label>
+          <div class="grid3">
+            <label class="fld"><span>Estándar a domicilio</span><input id="aj-std" inputmode="decimal" value="${inNum(e.std)}"></label>
+            <label class="fld"><span>Express 24 h</span><input id="aj-exp" inputmode="decimal" value="${inNum(e.exp)}"></label>
+            <label class="fld"><span>Punto de recogida</span><input id="aj-pick" inputmode="decimal" value="${inNum(e.pick)}"></label>
+          </div>
+          <p class="note">El envío gratis se aplica al estándar y al punto de recogida. El express siempre se cobra.</p>
+        </div>
+      </section>
+      <section class="sec card"><h2 class="h">Mensajes de la barra de arriba</h2>
+        <div class="fields">${[0, 1, 2].map(i => `<label class="fld"><span>Mensaje ${i + 1}</span><input id="aj-m${i}" value="${esc(m[i] || '')}" placeholder="${esc(MSG_DEF[i])}" maxlength="80"></label>`).join('')}
+          <p class="note">Si los dejas vacíos, salen los de siempre (y el del envío gratis se actualiza solo con el importe de arriba).</p></div>
+      </section>
+      <section class="sec card"><h2 class="h">Stock</h2>
+        <label class="fld" style="max-width:260px"><span>Avisar de «pocas unidades» cuando queden</span><input id="aj-low" inputmode="numeric" value="${esc(a.pocasUnidades)}"></label>
+      </section>
+      <p class="err" id="aj-err" role="alert"></p>
+      <div class="actions"><button class="btn" type="submit">Guardar ajustes</button></div>
+    </form>
+    <section class="sec card" style="margin-top:34px;border-color:#f1b9bd"><h2 class="h" style="color:var(--err)">Volver a empezar</h2>
+      <p class="note" style="margin-bottom:12px">Vuelve a poner los precios, el stock (20 por talla), los envíos y los códigos de fábrica. No borra pedidos ni cuentas.</p>
+      <button class="btn-line btn-red" data-act="seed">Cargar catálogo inicial otra vez</button></section>`;
+  }
+};
+async function saveAjustes() {
+  const err = $('#aj-err'); err.textContent = '';
+  const v = id => num($('#' + id).value);
+  const free = v('aj-free'), std = v('aj-std'), exp = v('aj-exp'), pick = v('aj-pick'), lowN = parseInt($('#aj-low').value, 10);
+  for (const [x, id] of [[free, 'aj-free'], [std, 'aj-std'], [exp, 'aj-exp'], [pick, 'aj-pick']]) if (!(x >= 0 && x < 1000)) { err.textContent = 'Revisa los importes: tienen que ser números, por ejemplo 3,95.'; $('#' + id).focus(); return; }
+  if (!(lowN >= 0 && lowN <= 100)) { err.textContent = 'El aviso de pocas unidades tiene que ser un número entre 0 y 100.'; $('#aj-low').focus(); return; }
+  const mensajes = [0, 1, 2].map(i => $('#aj-m' + i).value.trim()).filter(Boolean);
+  const btn = $('#aj-form [type="submit"]'); busy(btn, true);
+  try {
+    await FS.setDoc(D('ajustes', 'tienda'), { envioGratisDesde: r2(free), envios: { std: r2(std), exp: r2(exp), pick: r2(pick) }, mensajes, pocasUnidades: lowN });
+    S.ajDirty = false; toast('Ajustes guardados. La tienda ya los usa.'); busy(btn, false);
+  } catch (e) { busy(btn, false); err.textContent = errMsg(e); }
+}
+
+/* =================== EQUIPO =================== */
+VIEWS.equipo = {
+  shell: () => `<section class="sec"><h2 class="h">Quién tiene acceso</h2><div data-live="eq-list">${loading}</div>
+      <p class="note" style="margin-top:12px"><b>Empleado:</b> pedidos, productos, stock y códigos. <b>Dueño:</b> además ajustes y equipo.</p></section>
+    <section class="sec card"><h2 class="h">Añadir a alguien</h2>
+      <form id="emp-form" class="fields" novalidate>
+        <label class="fld"><span>Nombre</span><input id="e-name" autocomplete="off"></label>
+        <label class="fld"><span>Email</span><input id="e-email" type="email" inputmode="email" autocomplete="off"></label>
+        <label class="fld"><span>Contraseña provisional (mínimo 8)</span><input id="e-pass" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+        <p class="note">Pásale el enlace del panel y esta contraseña. Luego puede cambiarla con «He olvidado mi contraseña».</p>
+        <p class="err" id="emp-err" role="alert"></p>
+        <div class="actions" style="margin-top:0"><button class="btn" type="submit">Dar acceso como empleado</button></div>
+      </form>
+    </section>`,
+  live() {
+    const err = errBanner(['admins']);
+    if (!S.admins) return err || loading;
+    const list = [...S.admins].sort((a, b) => (a.rol === 'dueno' ? 0 : 1) - (b.rol === 'dueno' ? 0 : 1) || String(a.nombre).localeCompare(String(b.nombre)));
+    return err + list.map(a => {
+      const me = a.uid === S.me.uid;
+      return `<div class="row-item"><div><b>${esc(a.nombre || a.email)}</b>${me ? ' <span class="note">(tú)</span>' : ''} <span class="badge ${a.rol === 'dueno' ? 'b-new' : ''}">${a.rol === 'dueno' ? 'Dueño' : 'Empleado'}</span><p class="note">${esc(a.email)}</p></div>
+        <div class="row-btns">${me ? '' : `<button class="btn-line btn-sm" data-adm-reset="${esc(a.email)}">Cambiar contraseña</button><button class="btn-line btn-sm" data-adm-rol="${esc(a.uid)}">${a.rol === 'dueno' ? 'Hacer empleado' : 'Hacer dueño'}</button><button class="btn-line btn-sm btn-red" data-adm-del="${esc(a.uid)}">Quitar acceso</button>`}</div></div>`;
+    }).join('');
+  }
+};
+async function addEmpleado() {
+  const err = $('#emp-err'); err.textContent = '';
+  const nombre = $('#e-name').value.trim(), email = $('#e-email').value.trim().toLowerCase(), pass = $('#e-pass').value;
+  if (!nombre) { err.textContent = 'Escribe su nombre.'; $('#e-name').focus(); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Escribe un email válido.'; $('#e-email').focus(); return; }
+  if (pass.length < 8) { err.textContent = 'La contraseña necesita al menos 8 caracteres.'; $('#e-pass').focus(); return; }
+  if ((S.admins || []).some(a => a.email === email)) { err.textContent = 'Esa persona ya tiene acceso.'; return; }
+  const btn = $('#emp-form [type="submit"]'); busy(btn, true, 'Creando cuenta…');
+  // Se usa una segunda conexión para crear la cuenta sin cerrar tu sesión
+  const app2 = FA.initializeApp(cfg, 'alta-' + Date.now());
+  const auth2 = AU.getAuth(app2);
+  try {
+    let cred;
+    try { cred = await AU.createUserWithEmailAndPassword(auth2, email, pass); }
+    catch (e) {
+      if (e.code !== 'auth/email-already-in-use') throw e;
+      try { cred = await AU.signInWithEmailAndPassword(auth2, email, pass); } catch (e2) { throw { code: 'ya-existe' }; }
+    }
+    await FS.setDoc(D('admins', cred.user.uid), { email, nombre, rol: 'empleado', alta: FS.serverTimestamp() });
+    await AU.signOut(auth2).catch(() => { });
+    ['e-name', 'e-email', 'e-pass'].forEach(id => { $('#' + id).value = ''; });
+    toast(`${nombre} ya puede entrar en el panel`); busy(btn, false);
+  } catch (e) { busy(btn, false); err.textContent = errMsg(e); }
+  finally { if (FA.deleteApp) FA.deleteApp(app2).catch(() => { }); }
+}
+
+/* =================== Eventos =================== */
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button, [data-tab]'); if (!t) return;
+  const d = t.dataset;
+  if (d.tab) {
+    if (d.prf) S.prf = d.prf;
+    if (d.ordOpen) { S.pf = 'todos'; S.open.add(d.ordOpen); }
+    goTab(d.tab);
+    if (d.ordOpen) requestAnimationFrame(() => { const el = $(`[data-ord="${CSS.escape(d.ordOpen)}"]`); if (el) el.scrollIntoView({ block: 'center' }); });
+    return;
+  }
+  if (d.mode) { renderLogin(d.mode); return; }
+  if (d.pf) { S.pf = d.pf; renderLive(); return; }
+  if (d.prf) { S.prf = d.prf; renderLive(); return; }
+  if (d.ord) { S.open.has(d.ord) ? S.open.delete(d.ord) : S.open.add(d.ord); renderLive(); const h = $(`[data-ord="${CSS.escape(d.ord)}"]`); if (h) h.focus({ preventScroll: true }); return; }
+  if (d.estado) { setEstado(d.id, d.estado, t); return; }
+  if (d.cancel) { cancelar(d.cancel, t); return; }
+  if (d.copy) {
+    const o = (S.pedidos || []).find(x => x.id === d.copy); if (!o) return;
+    try { await navigator.clipboard.writeText(dirTxt(o)); toast('Dirección copiada'); } catch (er) { prompt('Copia la dirección:', dirTxt(o).replace(/\n/g, ', ')); }
+    return;
+  }
+  if (d.prod) { openEditor(d.prod); return; }
+  if (d.rebaja != null) { rebaja(+d.rebaja); return; }
+  if (d.codEdit) { S.codEdit = d.codEdit; renderTab(); $('#cod-card').scrollIntoView({ block: 'start' }); $('#cod-valor').focus({ preventScroll: true }); return; }
+  if (d.codDel) {
+    if (!confirm(`¿Borrar el código ${d.codDel}? Los clientes ya no podrán usarlo.`)) return;
+    try { await FS.deleteDoc(D('codigos', d.codDel)); toast(`${d.codDel} borrado`); if (S.codEdit === d.codDel) { S.codEdit = null; renderTab(); } } catch (er) { toast(errMsg(er), true); }
+    return;
+  }
+  if (d.admDel) {
+    const a = S.admins.find(x => x.uid === d.admDel);
+    if (!confirm(`¿Quitar el acceso a ${a ? a.nombre || a.email : 'esta persona'}? Ya no podrá entrar en el panel.`)) return;
+    try { await FS.deleteDoc(D('admins', d.admDel)); toast('Acceso quitado'); } catch (er) { toast(errMsg(er), true); }
+    return;
+  }
+  if (d.admRol) {
+    const a = S.admins.find(x => x.uid === d.admRol); if (!a) return;
+    const rol = a.rol === 'dueno' ? 'empleado' : 'dueno';
+    if (rol === 'dueno' && !confirm(`¿Hacer dueño a ${a.nombre || a.email}? Podrá cambiar ajustes y quitarte permisos.`)) return;
+    try { await FS.updateDoc(D('admins', a.uid), { rol }); toast(`${a.nombre || a.email} ahora es ${rol === 'dueno' ? 'dueño' : 'empleado'}`); } catch (er) { toast(errMsg(er), true); }
+    return;
+  }
+  if (d.admReset) {
+    try { await AU.sendPasswordResetEmail(auth, d.admReset); toast(`Email enviado a ${d.admReset} para cambiar la contraseña`); } catch (er) { toast(errMsg(er), true); }
+    return;
+  }
+  switch (d.act) {
+    case 'logout': stopListeners(); await AU.signOut(auth); break;
+    case 'close-sheet': closeSheet(); break;
+    case 'forgot': {
+      const em = ($('#l-email') || {}).value || '';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.trim())) { $('#auth-err').textContent = 'Escribe tu email arriba y vuelve a pulsar «He olvidado mi contraseña».'; $('#l-email').focus(); break; }
+      try { await AU.sendPasswordResetEmail(auth, em.trim()); $('#auth-err').innerHTML = `<span class="ok-txt">Si ${esc(em.trim())} tiene cuenta, le acaba de llegar un email para cambiar la contraseña (mira también en spam).</span>`; }
+      catch (er) { $('#auth-err').textContent = errMsg(er); }
+      break;
+    }
+    case 'make-owner': {
+      busy(t, true, 'Activando…');
+      try { S.creating = true; await makeOwner(S.user, ''); S.creating = false; onUser(auth.currentUser); }
+      catch (er) { S.creating = false; busy(t, false); toast(errMsg(er), true); }
+      break;
+    }
+    case 'seed': {
+      const again = S.productos && Object.keys(S.productos).length;
+      if (again && !confirm('Esto vuelve a poner los precios, el stock, los envíos y los códigos como al principio. Los pedidos y las cuentas no se tocan. ¿Seguir?')) break;
+      busy(t, true, 'Cargando catálogo…');
+      try { await seed(); toast('Catálogo cargado. La tienda ya usa estos datos.'); if (again) busy(t, false); }
+      catch (er) { busy(t, false); toast(errMsg(er), true); }
+      break;
+    }
+    case 'ed-all': {
+      const v = $('#ed-all').value.trim(); if (!/^\d{1,4}$/.test(v)) { $('#ed-all').focus(); break; }
+      $$('[data-k]', $('#sheet-panel')).forEach(i => { i.value = v; }); edPreview(); break;
+    }
+    case 'ed-plus': $$('[data-k]', $('#sheet-panel')).forEach(i => { i.value = (parseInt(i.value, 10) || 0) + 10; }); edPreview(); break;
+    case 'cod-cancel': S.codEdit = null; renderTab(); break;
+  }
+});
+$('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#sheet').hidden) { closeSheet(); return; }
+  if (e.key === 'Tab' && !$('#sheet').hidden) {
+    const f = $$('#sheet-panel button:not([disabled]), #sheet-panel input, #sheet-panel a[href]').filter(x => x.getClientRects().length);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'ped-q') { S.pq = t.value; renderLive(); return; }
+  if (t.id === 'prod-q') { S.prq = t.value; renderLive(); return; }
+  if (t.closest('#ed-form')) { t.removeAttribute('aria-invalid'); edPreview(); return; }
+  if (t.closest('#aj-form')) { S.ajDirty = true; return; }
+  if (t.id === 'cod-code') { const v = t.value.toUpperCase().replace(/\s+/g, ''); if (v !== t.value) t.value = v; }
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.name === 'cod-tipo') { const imp = t.value === 'importe'; $('#cod-vlab').textContent = imp ? 'Euros de descuento' : '% de descuento'; $('#cod-valor').placeholder = imp ? '5' : '20'; return; }
+  if (t.dataset.codAct) {
+    try { await FS.updateDoc(D('codigos', t.dataset.codAct), { activo: t.checked }); toast(`${t.dataset.codAct} ${t.checked ? 'activado' : 'pausado'}`); }
+    catch (er) { t.checked = !t.checked; toast(errMsg(er), true); }
+  }
+});
+document.addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, btn = f.querySelector('[type="submit"]') || $(`[form="${f.id}"]`);
+  switch (f.id) {
+    case 'login-form': {
+      const em = $('#l-email').value.trim(), pw = $('#l-pass').value, err = $('#auth-err');
+      if (!em || !pw) { err.textContent = 'Escribe tu email y tu contraseña.'; break; }
+      busy(btn, true, 'Entrando…');
+      try { await AU.signInWithEmailAndPassword(auth, em, pw); }
+      catch (er) { busy(btn, false); err.textContent = errMsg(er); }
+      break;
+    }
+    case 'owner-form': {
+      const nombre = $('#o-name').value.trim(), em = $('#o-email').value.trim().toLowerCase(), pw = $('#o-pass').value, err = $('#auth-err');
+      if (!nombre) { err.textContent = 'Escribe tu nombre.'; $('#o-name').focus(); break; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { err.textContent = 'Escribe un email válido.'; $('#o-email').focus(); break; }
+      if (pw.length < 8) { err.textContent = 'La contraseña necesita al menos 8 caracteres.'; $('#o-pass').focus(); break; }
+      if (pw !== $('#o-pass2').value) { err.textContent = 'Las dos contraseñas no coinciden.'; $('#o-pass2').focus(); break; }
+      busy(btn, true, 'Creando cuenta…');
+      S.creating = true;
+      try {
+        let cred;
+        try { cred = await AU.createUserWithEmailAndPassword(auth, em, pw); }
+        catch (er) { if (er.code === 'auth/email-already-in-use') cred = await AU.signInWithEmailAndPassword(auth, em, pw); else throw er; }
+        await makeOwner(cred.user, nombre);
+        S.creating = false; onUser(auth.currentUser);
+      } catch (er) {
+        S.creating = false; busy(btn, false); err.textContent = errMsg(er);
+        if (auth.currentUser) { S.iniciado = await isIniciado(); if (S.iniciado) { onUser(auth.currentUser); } }
+      }
+      break;
+    }
+    case 'ed-form': saveEditor(); break;
+    case 'cod-form': saveCodigo(); break;
+    case 'aj-form': saveAjustes(); break;
+    case 'emp-form': addEmpleado(); break;
+  }
+});
+
+AU.onAuthStateChanged(auth, u => { onUser(u); });
+</script>
+</body>
+</html>

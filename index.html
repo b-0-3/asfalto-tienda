@@ -206,6 +206,8 @@ legend{padding:0}
 .qs button{min-width:34px;height:30px;padding:0 7px;border-radius:4px;border:1px solid rgba(0,0,0,.16);font-size:12px;font-variant-numeric:tabular-nums}
 .qs button:hover:not(:disabled){background:var(--tile-ink);color:var(--tile-chip);border-color:var(--tile-ink)}
 .qs button:disabled{opacity:.35;text-decoration:line-through}
+.qs button.sold{text-decoration:none}
+.qty button:disabled{opacity:.3}
 .card-info{padding:8px 2px 0;display:grid;gap:2px}
 .card-flag{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .card-flag.sale{color:var(--sale)}
@@ -510,7 +512,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
 </style>
 </head>
 <body>
-<div class="topbar" id="topbar" hidden><span id="topmsg">Envío gratis a partir de 29,90 €</span></div>
+<div class="topbar" id="topbar" hidden><span id="topmsg">Envío gratis a partir de <span data-free>29,90 €</span></span></div>
 
 <header class="site-head" id="head" hidden>
   <div class="head-row wrap">
@@ -642,7 +644,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       <button data-info="pedido">Estado del pedido <span aria-hidden="true">→</span></button>
     </div>
   </div>
-  <p class="menu-foot">Envío gratis desde 29,90 € · Devoluciones gratis 30 días</p>
+  <p class="menu-foot">Envío gratis desde <span data-free>29,90 €</span> · Devoluciones gratis 30 días</p>
 </aside>
 
 <aside class="drawer drawer-right" id="cart" aria-label="Cesta" inert aria-hidden="true">
@@ -732,11 +734,14 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   </div>
 </div>
 
+<script src="catalogo.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module" src="firebase-tienda.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
   const $$ = s => document.querySelectorAll(s);
-  const FREE = 29.90;
+  let FREE = 29.90;
   const fmt = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
   const eur = n => fmt.format(n);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -748,139 +753,36 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   const GN = { mujer: 'Mujer', hombre: 'Hombre' };
 
   /* ================= Catálogo ================= */
-  const C = {
-    negro: { n: 'Negro', h: '#1a1a1d', f: 'negro', c: 800 }, gris: { n: 'Gris jaspeado', h: '#bdbdc2', f: 'gris', c: 802 },
-    rosa: { n: 'Rosa chicle', h: '#f3b4c7', f: 'rosa', c: 620 }, blanco: { n: 'Blanco', h: '#f5f5f2', f: 'blanco', c: 250 },
-    klein: { n: 'Azul klein', h: '#2a36ff', f: 'azul', c: 410 }, caqui: { n: 'Caqui', h: '#86865a', f: 'verde', c: 505 },
-    rojo: { n: 'Rojo', h: '#b8261f', f: 'rosa', c: 600 }, plata: { n: 'Plata', h: '#cfd2d8', f: 'gris', c: 805 },
-    lavado: { n: 'Azul lavado', h: '#7f99ba', f: 'azul', c: 427 }, oscuro: { n: 'Azul oscuro', h: '#34476a', f: 'azul', c: 401 },
-    crudo: { n: 'Crudo', h: '#e7dfcd', f: 'blanco', c: 251 }, marron: { n: 'Marrón', h: '#6a4a36', f: 'marron', c: 700 },
-    bosque: { n: 'Verde bosque', h: '#2f4a3b', f: 'verde', c: 500 }, marino: { n: 'Azul marino', h: '#232f49', f: 'azul', c: 402 },
-    grisc: { n: 'Gris claro', h: '#cacac6', f: 'gris', c: 803 }, grisd: { n: 'Gris marengo', h: '#55565c', f: 'gris', c: 807 }
-  };
+  const { C, ROPA, P_MUJER, P_HOMBRE, UNI } = window.ASF_CAT;
+  const ALL = window.ASF_CAT.P;
+  let P = ALL; // solo las prendas visibles (el panel puede ocultar alguna)
   const FAMS = [
     { k: 'negro', n: 'Negro', h: '#1a1a1d' }, { k: 'blanco', n: 'Blanco y crudo', h: '#f1ede3' }, { k: 'gris', n: 'Gris', h: '#a9a9ae' },
     { k: 'azul', n: 'Azul', h: '#4a63b0' }, { k: 'verde', n: 'Verde', h: '#5f6b48' }, { k: 'rosa', n: 'Rosa y rojo', h: '#e48aa4' }, { k: 'marron', n: 'Marrón', h: '#6a4a36' }
   ];
-  const ROPA = ['XS', 'S', 'M', 'L', 'XL'], P_MUJER = ['32', '34', '36', '38', '40', '42'], P_HOMBRE = ['38', '40', '42', '44', '46'], UNI = ['Única'];
   const BGS = ['#ecebe7', '#e4e8ee', '#eee6e3', '#e6ebe3', '#e9e7f0', '#efebe2', '#e3e6e6', '#ece6ea'];
 
-  const P = [
-    { id: 'c01', g: 'mujer', name: 'Sudadera oversize con capucha', type: 'hoodie', cat: 'sudaderas', price: 29.99, tag: 'Nuevo', best: true, colors: ['gris', 'rosa', 'negro'], sizes: ROPA, out: ['XS'], low: ['M'], back: true, fit: 'Oversize', origin: 'Portugal', care: 'cotton30',
-      comp: ['Exterior: 80% algodón, 20% poliéster', 'Capucha forrada: 100% algodón'],
-      desc: 'Sudadera de felpa gordita con capucha forrada y bolsillo canguro. Es de corte oversize: si la quieres más ajustada, coge una talla menos.',
-      det: ['Capucha forrada con cordón plano', 'Bolsillo canguro', 'Puños y bajo de canalé', 'Hombro caído', 'Logo estampado en la espalda'],
-      meas: [['Largo', '70 cm'], ['Ancho de pecho', '64 cm'], ['Manga', '58 cm']] },
-    { id: 'c02', g: 'mujer', name: 'Falda mini cargo', type: 'skirt', cat: 'faldas', price: 22.99, colors: ['caqui', 'negro'], sizes: ROPA, fit: 'Tiro bajo', origin: 'Marruecos', care: 'cotton30',
-      comp: ['100% algodón (sarga)'],
-      desc: 'Minifalda de sarga con bolsillos de solapa a los lados. Va de tiro bajo y se cierra con cremallera y botón.',
-      det: ['Tiro bajo', 'Bolsillos cargo con solapa', 'Cremallera y botón delante', 'Trabillas para cinturón'],
-      meas: [['Cintura (en plano)', '37 cm'], ['Largo', '34 cm']] },
-    { id: 'c03', g: 'mujer', name: 'Top corsé satinado', type: 'top', cat: 'camisetas', price: 17.99, tag: 'Solo online', colors: ['negro', 'rojo'], sizes: ROPA, out: ['L'], fit: 'Ajustado', origin: 'Turquía', care: 'hand',
-      comp: ['Exterior: 97% poliéster, 3% elastano', 'Forro: 100% poliéster'],
-      desc: 'Top de satén con escote corazón, varillas cosidas y tirantes finos. Se ajusta al cuerpo y se cierra con cordón en la espalda.',
-      det: ['Escote corazón', 'Varillas interiores', 'Tirantes finos', 'Cordón cruzado en la espalda'],
-      meas: [['Largo', '34 cm'], ['Ancho de pecho', '40 cm']] },
-    { id: 'c04', g: 'mujer', name: 'Plumífero corto efecto brillo', type: 'puffer', cat: 'chaquetas', price: 49.99, tag: 'Nuevo', colors: ['negro', 'plata'], sizes: ROPA, low: ['S'], fit: 'Cropped', origin: 'China', care: 'synth30',
-      comp: ['Exterior: 100% poliamida', 'Relleno: 100% poliéster reciclado', 'Forro: 100% poliéster'],
-      desc: 'Plumífero corto con acabado brillante, cuello alto y cremallera hasta arriba. Abriga mucho y pesa poco.',
-      det: ['Acabado brillante', 'Cuello alto', 'Cremallera de doble cursor', 'Bolsillos con cremallera'],
-      meas: [['Largo', '50 cm'], ['Ancho de pecho', '62 cm'], ['Manga', '60 cm']] },
-    { id: 'c05', g: 'mujer', name: 'Jeans baggy tiro bajo', type: 'jeans', cat: 'pantalones', price: 35.99, best: true, colors: ['lavado', 'oscuro'], sizes: P_MUJER, out: ['32'], fit: 'Baggy', origin: 'Marruecos', care: 'denim',
-      comp: ['100% algodón (denim de 12 oz)'],
-      desc: 'Vaqueros anchos de tiro bajo con efecto lavado. Los bajos son largos para que caigan sobre la zapatilla.',
-      det: ['Tiro bajo', 'Pierna ancha', 'Cinco bolsillos', 'Cremallera y botón', 'Parche trasero'],
-      meas: [['Cintura (en plano)', '37 cm'], ['Tiro', '24 cm'], ['Largo', '106 cm'], ['Bajo', '25 cm']] },
-    { id: 'c06', g: 'mujer', name: 'Baby tee «Madrid»', type: 'tee', cat: 'camisetas', price: 12.99, old: 15.99, best: true, print: 'MADRID', colors: ['blanco', 'klein'], sizes: ROPA, fit: 'Cropped', origin: 'Portugal', care: 'cotton30',
-      comp: ['95% algodón, 5% elastano'],
-      desc: 'Camiseta corta y ajustada de punto elástico, con «Madrid» estampado en el pecho.',
-      det: ['Cuello redondo', 'Manga corta', 'Corte cropped', 'Estampado al agua'],
-      meas: [['Largo', '44 cm'], ['Ancho de pecho', '40 cm'], ['Manga', '12 cm']] },
-    { id: 'c07', g: 'mujer', name: 'Jersey de punto calado', type: 'sweater', cat: 'sudaderas', price: 27.99, colors: ['crudo', 'marron'], sizes: ROPA, fit: 'Relajado', origin: 'Turquía', care: 'hand',
-      comp: ['60% acrílico, 40% algodón'],
-      desc: 'Jersey de punto calado con caída suelta. Queda bien encima de un top de tirantes o de una manga larga.',
-      det: ['Punto calado', 'Cuello redondo', 'Hombro caído', 'Puños y bajo de canalé'],
-      meas: [['Largo', '60 cm'], ['Ancho de pecho', '56 cm'], ['Manga', '58 cm']] },
-    { id: 'c08', g: 'mujer', name: 'Vestido midi de punto canalé', type: 'dress', cat: 'faldas', price: 25.99, tag: 'Nuevo', colors: ['negro', 'marron', 'grisc'], sizes: ROPA, low: ['S', 'M'], fit: 'Ajustado', origin: 'Turquía', care: 'delicate30',
-      comp: ['70% viscosa, 30% poliamida'],
-      desc: 'Vestido hasta media pierna de punto canalé elástico. Se pega al cuerpo sin apretar.',
-      det: ['Punto canalé elástico', 'Tirantes anchos', 'Largo midi', 'Cremallera invisible en la espalda'],
-      meas: [['Largo', '118 cm'], ['Ancho de pecho', '38 cm'], ['Cintura (en plano)', '32 cm']] },
-    { id: 'c09', g: 'mujer', name: 'Camiseta manga larga ajustada', type: 'longsleeve', cat: 'camisetas', price: 9.99, old: 12.99, best: true, colors: ['blanco', 'negro', 'rosa'], sizes: ROPA, fit: 'Ajustado', origin: 'Portugal', care: 'cotton30',
-      comp: ['95% algodón, 5% elastano'],
-      desc: 'Básica de manga larga en algodón elástico. La que va debajo de todo.',
-      det: ['Cuello redondo', 'Manga larga', 'Corte ajustado', 'Algodón elástico'],
-      meas: [['Largo', '60 cm'], ['Ancho de pecho', '42 cm'], ['Manga', '62 cm']] },
-    { id: 'c10', g: 'mujer', name: 'Cazadora bomber cropped', type: 'bomber', cat: 'chaquetas', price: 39.99, colors: ['negro', 'caqui'], sizes: ROPA, low: ['M'], fit: 'Cropped', origin: 'China', care: 'synth30',
-      comp: ['Exterior: 100% poliéster', 'Relleno: 100% poliéster', 'Forro: 100% poliéster'],
-      desc: 'Bomber corta acolchada con canalé en cuello, puños y bajo. Lleva un bolsillo con cremallera en la manga.',
-      det: ['Largo cropped', 'Forro acolchado', 'Bolsillo con cremallera en la manga', 'Canalé en cuello, puños y bajo'],
-      meas: [['Largo', '48 cm'], ['Ancho de pecho', '58 cm'], ['Manga', '60 cm']] },
-    { id: 'h01', g: 'hombre', name: 'Sudadera con capucha básica', type: 'hoodie', cat: 'sudaderas', price: 29.99, best: true, colors: ['negro', 'bosque', 'gris'], sizes: ROPA, back: true, fit: 'Regular', origin: 'Portugal', care: 'cotton30',
-      comp: ['80% algodón, 20% poliéster'],
-      desc: 'Sudadera de felpa con capucha y el logo grande en la espalda. La que vas a llevar todo el invierno.',
-      det: ['Logo estampado en la espalda', 'Bolsillo canguro', 'Capucha con cordón', 'Puños y bajo de canalé'],
-      meas: [['Largo', '72 cm'], ['Ancho de pecho', '60 cm'], ['Manga', '64 cm']] },
-    { id: 'h02', g: 'hombre', name: 'Pantalón cargo parachute', type: 'cargo', cat: 'pantalones', price: 35.99, tag: 'Nuevo', best: true, colors: ['negro', 'caqui', 'grisc'], sizes: ROPA, out: ['XL'], low: ['L'], fit: 'Parachute', origin: 'China', care: 'synth30',
-      comp: ['100% poliamida'],
-      desc: 'Pantalón parachute de nailon ligero con bolsillos cargo. Los bajos llevan cordón para ajustarlos como quieras.',
-      det: ['Cintura elástica con cordón', 'Bolsillos cargo con solapa', 'Bajos ajustables con cordón', 'Tejido técnico ligero'],
-      meas: [['Cintura (en plano)', '38 cm'], ['Tiro', '30 cm'], ['Largo', '108 cm'], ['Bajo', '28 cm']] },
-    { id: 'h03', g: 'hombre', name: 'Camiseta boxy «Asfalto»', type: 'tee', cat: 'camisetas', price: 15.99, tag: 'Últimas unidades', best: true, print: 'ASFALTO', colors: ['negro', 'blanco'], sizes: ROPA, out: ['XS', 'S'], low: ['M', 'L'], back: true, fit: 'Boxy', origin: 'Portugal', care: 'cotton30',
-      comp: ['100% algodón (220 g/m²)'],
-      desc: 'Camiseta de algodón grueso, corta y ancha. Logo pequeño delante y grande detrás.',
-      det: ['Algodón grueso de 220 g/m²', 'Corte boxy', 'Cuello de canalé', 'Estampado delante y detrás'],
-      meas: [['Largo', '68 cm'], ['Ancho de pecho', '60 cm'], ['Manga', '24 cm']] },
-    { id: 'h04', g: 'hombre', name: 'Plumífero oversize mate', type: 'puffer', cat: 'chaquetas', price: 59.99, old: 69.99, colors: ['negro', 'marino'], sizes: ROPA, fit: 'Oversize', origin: 'China', care: 'synth30',
-      comp: ['Exterior: 100% poliéster', 'Relleno: 100% poliéster reciclado', 'Forro: 100% poliéster'],
-      desc: 'Plumífero grande y calentito con acabado mate y cuello alto. Para los días de 2 °C en la parada del bus.',
-      det: ['Acabado mate', 'Cuello alto', 'Bolsillo interior', 'Puños elásticos'],
-      meas: [['Largo', '72 cm'], ['Ancho de pecho', '68 cm'], ['Manga', '64 cm']] },
-    { id: 'h05', g: 'hombre', name: 'Jeans skater wide leg', type: 'jeans', cat: 'pantalones', price: 35.99, best: true, colors: ['lavado', 'grisd'], sizes: P_HOMBRE, fit: 'Wide leg', origin: 'Marruecos', care: 'denim',
-      comp: ['100% algodón (denim de 13 oz)'],
-      desc: 'Vaqueros de pierna ancha y tiro medio. El corte de siempre para patinar.',
-      det: ['Pierna ancha', 'Tiro medio', 'Cinco bolsillos', 'Parche trasero'],
-      meas: [['Cintura (en plano)', '42 cm'], ['Tiro', '30 cm'], ['Largo', '108 cm'], ['Bajo', '27 cm']] },
-    { id: 'h06', g: 'hombre', name: 'Jersey de punto grueso', type: 'sweater', cat: 'sudaderas', price: 29.99, colors: ['grisd', 'crudo'], sizes: ROPA, fit: 'Regular', origin: 'Turquía', care: 'hand',
-      comp: ['50% algodón, 50% acrílico'],
-      desc: 'Jersey de punto grueso y suave. Va bien solo o con una camisa debajo.',
-      det: ['Punto grueso', 'Cuello redondo de canalé', 'Hombro caído', 'Puños y bajo de canalé'],
-      meas: [['Largo', '68 cm'], ['Ancho de pecho', '60 cm'], ['Manga', '62 cm']] },
-    { id: 'h07', g: 'hombre', name: 'Gorra lavada con bordado', type: 'cap', cat: 'accesorios', price: 12.99, print: 'A', colors: ['negro', 'klein'], sizes: UNI, fit: 'Talla ajustable', origin: 'China', care: 'hand',
-      comp: ['100% algodón lavado'],
-      desc: 'Gorra de algodón lavado con la «A» bordada delante. Se ajusta con una hebilla detrás.',
-      det: ['Algodón lavado', 'Bordado delante', 'Visera curva', 'Cierre de hebilla'],
-      meas: [['Contorno', '56–60 cm'], ['Visera', '7 cm']] },
-    { id: 'h08', g: 'hombre', name: 'Bomber acolchada', type: 'bomber', cat: 'chaquetas', price: 45.99, tag: 'Nuevo', colors: ['bosque', 'negro'], sizes: ROPA, back: true, fit: 'Regular', origin: 'China', care: 'synth30',
-      comp: ['Exterior: 100% poliamida', 'Relleno: 100% poliéster reciclado'],
-      desc: 'Bomber de nailon con relleno ligero y el logo grande en la espalda.',
-      det: ['Relleno ligero', 'Logo en la espalda', 'Bolsillo en la manga', 'Canalé en cuello, puños y bajo'],
-      meas: [['Largo', '64 cm'], ['Ancho de pecho', '62 cm'], ['Manga', '64 cm']] },
-    { id: 'h09', g: 'hombre', name: 'Camiseta manga larga skater', type: 'longsleeve', cat: 'camisetas', price: 17.99, print: 'MAD', colors: ['grisc', 'negro'], sizes: ROPA, back: true, fit: 'Oversize', origin: 'Portugal', care: 'cotton30',
-      comp: ['100% algodón (200 g/m²)'],
-      desc: 'Manga larga de algodón con «MAD» delante y el logo en la espalda. Corte ancho.',
-      det: ['Estampado delante y detrás', 'Corte oversize', 'Puños de canalé', 'Algodón de 200 g/m²'],
-      meas: [['Largo', '72 cm'], ['Ancho de pecho', '58 cm'], ['Manga', '64 cm']] },
-    { id: 'h10', g: 'hombre', name: 'Jogger técnico con bolsillos', type: 'cargo', cat: 'pantalones', price: 29.99, old: 34.99, colors: ['grisd', 'negro'], sizes: ROPA, fit: 'Jogger', origin: 'China', care: 'synth30',
-      comp: ['92% poliéster, 8% elastano'],
-      desc: 'Jogger de tejido técnico que repele el agua, con bolsillos laterales y bajos con goma.',
-      det: ['Repele el agua', 'Cintura elástica', 'Bolsillos laterales con solapa', 'Bajos con goma'],
-      meas: [['Cintura (en plano)', '36 cm'], ['Tiro', '29 cm'], ['Largo', '100 cm']] },
-    { id: 'u01', g: 'ambos', name: 'Tote bag logo', type: 'tote', cat: 'accesorios', price: 9.99, tag: 'Unisex', colors: ['crudo', 'negro'], sizes: UNI, fit: '38 × 42 cm', origin: 'India', care: 'cotton30',
-      comp: ['100% algodón (lona de 280 g/m²)'],
-      desc: 'Bolsa de lona gruesa con el logo estampado. Cabe el portátil, el táper y lo que haga falta.',
-      det: ['Lona de 280 g/m²', 'Asas largas para llevar al hombro', 'Bolsillo interior', 'Logo estampado'],
-      meas: [['Alto', '42 cm'], ['Ancho', '38 cm'], ['Asas', '60 cm']] },
-    { id: 'u02', g: 'ambos', name: 'Gorro de punto con etiqueta', type: 'beanie', cat: 'accesorios', price: 9.99, tag: 'Unisex', best: true, print: 'ASF', colors: ['negro', 'klein', 'rosa'], sizes: UNI, fit: 'Talla única', origin: 'China', care: 'hand',
-      comp: ['100% acrílico'],
-      desc: 'Gorro de punto de doble vuelta con una etiqueta tejida delante.',
-      det: ['Doble vuelta', 'Etiqueta tejida', 'Punto canalé', 'Talla única elástica'],
-      meas: [['Alto', '24 cm'], ['Contorno', '52–60 cm']] }
-  ];
   const slugOf = p => norm(p.name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + p.id;
-  P.forEach((p, i) => { p.bg = BGS[i % BGS.length]; p.ref = 4120 + i * 37; p.idx = i; p.mod = 300 + (i * 13) % 90; p.slug = slugOf(p); });
-  const byId = Object.fromEntries(P.map(p => [p.id, p]));
-  const bySlug = Object.fromEntries(P.map(p => [p.slug, p]));
+  ALL.forEach((p, i) => { p.bg = BGS[i % BGS.length]; p.ref = 4120 + i * 37; p.idx = i; p.mod = 300 + (i * 13) % 90; p.slug = slugOf(p); });
+  const byId = Object.fromEntries(ALL.map(p => [p.id, p]));
+  const bySlug = Object.fromEntries(ALL.map(p => [p.slug, p]));
+  const shown = id => !!byId[id] && byId[id].visible !== false;
+
+  /* ================= Stock =================
+     Sin Firebase: se usa lo que pone el catálogo (tallas agotadas y con pocas unidades).
+     Con Firebase: cada combinación prenda + color + talla tiene su número de unidades. */
+  const LIVE = { on: false, stock: null, low: 3 };
+  const skey = (p, ci, s) => `${p.id}__${p.colors[ci]}__${s}`;
+  function stockOf(p, ci, s) {
+    if (p.visible === false) return 0;
+    if (LIVE.stock) { const n = LIVE.stock[skey(p, ci, s)]; return n == null ? Infinity : n; }
+    return (p.out || []).includes(s) ? 0 : (p.low || []).includes(s) ? 2 : Infinity;
+  }
+  const isOut = (p, ci, s) => stockOf(p, ci, s) <= 0;
+  const isLow = (p, ci, s) => { const n = stockOf(p, ci, s); return n > 0 && n <= LIVE.low; };
+  const allOut = p => p.colors.every((k, ci) => p.sizes.every(s => isOut(p, ci, s)));
+  const MAX_UDS = 10;
+  const maxQty = (p, ci, s) => Math.min(MAX_UDS, stockOf(p, ci, s));
   const GROUP = { hoodie: 0, tee: 0, longsleeve: 0, sweater: 0, bomber: 0, puffer: 0, top: 0, dress: 0, jeans: 1, cargo: 1, skirt: 1, cap: 2, beanie: 2, tote: 2 };
 
   const CATS = {
@@ -944,7 +846,9 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     pick: { n: 'Punto de recogida', d: 'Más de 3.000 puntos en España', price: 1.95, free: true, days: [3, 5] }
   };
   const PAYS = { card: ['Tarjeta', 'Visa, Mastercard o American Express'], bizum: ['Bizum', 'Confirmas el pago en la app de tu banco'], paypal: ['PayPal', 'Pagas con tu cuenta de PayPal'] };
-  const PROMOS = { ASFALTO10: { pct: 10, n: '10% en todo' }, BIENVENIDA: { pct: 15, n: '15% en tu primera compra' } };
+  // Códigos de reserva: solo se usan si la tienda no está conectada a Firebase.
+  const PROMOS = { ASFALTO10: { tipo: 'porcentaje', valor: 10 }, BIENVENIDA: { tipo: 'porcentaje', valor: 15 } };
+  const promoName = pr => pr.tipo === 'importe' ? `${eur(pr.valor)} de descuento` : `${pr.valor}% de descuento`;
   const PROVS = ['Álava', 'Albacete', 'Alicante', 'Almería', 'Ávila', 'Badajoz', 'Baleares', 'Barcelona', 'Burgos', 'Cáceres', 'Cádiz', 'Castellón', 'Ciudad Real', 'Córdoba', 'A Coruña', 'Cuenca', 'Girona', 'Granada', 'Guadalajara', 'Gipuzkoa', 'Huelva', 'Huesca', 'Jaén', 'León', 'Lleida', 'La Rioja', 'Lugo', 'Madrid', 'Málaga', 'Murcia', 'Navarra', 'Ourense', 'Asturias', 'Palencia', 'Las Palmas', 'Pontevedra', 'Salamanca', 'Santa Cruz de Tenerife', 'Cantabria', 'Segovia', 'Sevilla', 'Soria', 'Tarragona', 'Teruel', 'Toledo', 'Valencia', 'Valladolid', 'Bizkaia', 'Zamora', 'Zaragoza', 'Ceuta', 'Melilla'];
   const PROVS_AZ = [...PROVS].sort((a, b) => a.localeCompare(b, 'es'));
   const TRENDS = ['sudadera', 'cargo', 'jeans baggy', 'plumífero', 'gorro', 'negro', 'manga larga'];
@@ -1224,14 +1128,15 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   const favs = new Set((load('asfalto-favs', []) || []).filter(id => byId[id]));
   let recent = (load('asfalto-recent', []) || []).filter(id => byId[id]);
   let orders = load('asfalto-orders', []) || [];
-  let promo = load('asfalto-promo', null); if (promo && !PROMOS[promo]) promo = null;
+  let promo = load('asfalto-promo', null); if (!promo || typeof promo !== 'object' || !promo.code) promo = null;
   const selC = {};
   const pdp = { p: null, ci: 0, size: null, notify: null, need: false, fresh: true };
   let view = null, curKey = null, navigating = false, navCount = 0;
   const pos = {};
 
   /* ================= Barra superior ================= */
-  const TOPMSG = ['Envío gratis a partir de 29,90 €', 'Devoluciones gratis durante 30 días', '-15% en tu primera compra con la newsletter'];
+  const defaultMsgs = () => [`Envío gratis a partir de ${eur(FREE)}`, 'Devoluciones gratis durante 30 días', '-15% en tu primera compra con la newsletter'];
+  let TOPMSG = defaultMsgs();
   let topI = 0;
   if (!reduced) setInterval(() => {
     const s = $('#topmsg'); s.style.opacity = 0;
@@ -1243,12 +1148,17 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   const pct = p => p.old ? `-${Math.round((1 - p.price / p.old) * 100)}%` : '';
   const priceHTML = p => p.old ? `<span class="now sale">${eur(p.price)}</span><span class="old">${eur(p.old)}</span><span class="pct">${pct(p)}</span>` : `<span class="now">${eur(p.price)}</span>`;
   const sizeLabel = s => s === 'Única' ? 'Talla única' : 'Talla ' + s;
+  function quickHTML(p, ci) {
+    if (p.sizes.length === 1) return isOut(p, ci, p.sizes[0])
+      ? `<button class="sold" disabled>Agotado en este color</button>`
+      : `<button data-quick="${p.id}" data-size="${p.sizes[0]}">Añadir · talla única</button>`;
+    return p.sizes.map(s => `<button data-quick="${p.id}" data-size="${s}"${isOut(p, ci, s) ? ' disabled aria-label="' + s + ', agotada"' : ''}>${s}</button>`).join('');
+  }
   function cardHTML(p) {
     const ci = selC[p.id] || 0, col = C[p.colors[ci]];
-    const flag = p.tag ? `<p class="card-flag">${p.tag}</p>` : '';
-    const quick = p.sizes.length === 1
-      ? `<button data-quick="${p.id}" data-size="${p.sizes[0]}">Añadir · talla única</button>`
-      : p.sizes.map(s => `<button data-quick="${p.id}" data-size="${s}"${(p.out || []).includes(s) ? ' disabled aria-label="' + s + ', agotada"' : ''}>${s}</button>`).join('');
+    const tag = allOut(p) ? 'Agotado' : p.tag;
+    const flag = tag ? `<p class="card-flag">${esc(tag)}</p>` : '';
+    const quick = quickHTML(p, ci);
     return `<article class="card" data-card="${p.id}">
       <div class="media">
         <button class="tile card-img" style="--tile-bg:${p.bg}" data-open="${p.id}" aria-label="Ver ${esc(p.name)}, ${col.n}">
@@ -1302,7 +1212,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     return `<section class="sec wrap" id="asfaltostyle" aria-labelledby="style-t" style="scroll-margin-top:calc(var(--head-h) + 12px)"><div class="sec-head"><h2 class="sec-title" id="style-t">#asfaltostyle</h2><span class="note">Sube tu foto con #asfaltostyle</span></div>
       <div class="looks-grid">${LOOKS.map(L => {
         const pics = L.items.map(([id, ci, l, t, w]) => `<span class="p" style="left:${l}%;top:${t}%;width:${w}%">${art(byId[id], ci, false, true)}</span>`).join('');
-        const rows = L.items.map(([id, ci]) => { const p = byId[id]; return `<li><button data-open="${id}" data-ci="${ci}"><span class="li-name">${esc(p.name)} · ${C[p.colors[ci]].n}</span><span class="li-price">${eur(p.price)}</span></button></li>`; }).join('');
+        const rows = L.items.filter(([id]) => shown(id)).map(([id, ci]) => { const p = byId[id]; return `<li><button data-open="${id}" data-ci="${ci}"><span class="li-name">${esc(p.name)} · ${C[p.colors[ci]].n}</span><span class="li-price">${eur(p.price)}</span></button></li>`; }).join('');
         return `<article class="look"><div class="tile look-img" style="--tile-bg:${L.bg}">${pics}<span class="look-tagline">${L.title} · ${L.place}</span></div><ul class="look-items">${rows}</ul></article>`;
       }).join('')}</div></section>`;
   }
@@ -1311,7 +1221,8 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     const mine = P.filter(p => inGender(p, g));
     const fresh = [...mine].sort((a, b) => (b.tag === 'Nuevo') - (a.tag === 'Nuevo') || a.idx - b.idx).slice(0, 8);
     const best = [...mine].sort((a, b) => (!!b.best) - (!!a.best) || b.idx - a.idx).slice(0, 8);
-    const rec = recent.length ? `<section class="sec wrap" aria-labelledby="rec-t"><div class="sec-head"><h2 class="sec-title" id="rec-t">Vistos recientemente</h2></div><div class="mini-row">${recent.map(id => miniHTML(byId[id])).join('')}</div></section>` : '';
+    const seen = recent.filter(shown);
+    const rec = seen.length ? `<section class="sec wrap" aria-labelledby="rec-t"><div class="sec-head"><h2 class="sec-title" id="rec-t">Vistos recientemente</h2></div><div class="mini-row">${seen.map(id => miniHTML(byId[id])).join('')}</div></section>` : '';
     $('#home').innerHTML = campHTML(camps[0]) + railHTML('Novedades', 'novedades', fresh) + campHTML(camps[1]) + catsHTML() + campHTML(camps[2]) + railHTML('Lo más vendido', 'mas-vendidos', best) + styleHTML() + rec;
   }
 
@@ -1412,7 +1323,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     if (h === curKey) return;
     if (curKey !== null) pos[curKey] = window.scrollY || 0;
     curKey = h;
-    const p = bySlug[h]; let m;
+    const p = bySlug[h] && bySlug[h].visible !== false ? bySlug[h] : null; let m;
     if (p) { show('pdp'); setupPDP(p); renderPDP(); try { document.title = `${p.name} · Asfalto`; } catch (e) { } }
     else if ((m = h.match(/^(mujer|hombre)(?:-([a-z-]+))?$/))) {
       setG(m[1]);
@@ -1449,8 +1360,10 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   const count = () => cart.reduce((s, it) => s + it.qty, 0);
   const subtotal = () => cart.reduce((s, it) => s + byId[it.id].price * it.qty, 0);
   function totals(method = 'std') {
-    const sub = subtotal(), pc = promo ? PROMOS[promo].pct : 0;
-    const disc = Math.round(sub * pc) / 100;
+    const sub = subtotal();
+    let disc = 0;
+    if (promo && sub >= (promo.minimo || 0)) disc = promo.tipo === 'importe' ? Math.min(sub, promo.valor) : Math.round(sub * promo.valor) / 100;
+    disc = Math.round(disc * 100) / 100;
     const m = SHIP[method];
     const ship = (m.free && sub >= FREE) ? 0 : m.price;
     return { sub, disc, ship, total: Math.max(0, sub - disc + ship) };
@@ -1509,7 +1422,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     const look = completeLook(p);
     $('#pdp-look').innerHTML = look.map(cardHTML).join('');
     $('#pdp-sim').innerHTML = similar(p, look.map(q => q.id)).map(cardHTML).join('');
-    const rec = recent.filter(id => id !== p.id);
+    const rec = recent.filter(id => id !== p.id && shown(id));
     $('#pdp-recent-sec').hidden = !rec.length;
     $('#pdp-recent').innerHTML = rec.map(id => miniHTML(byId[id])).join('');
   }
@@ -1532,13 +1445,13 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     const p = pdp.p, col = C[p.colors[pdp.ci]], box = $('#pdp-info');
     const openD = pdp.fresh ? ['pd-desc'] : [...box.querySelectorAll('details[open]')].map(d => d.id);
     pdp.fresh = false;
-    const table = tableFor(p), outs = p.out || [], uni = p.sizes.length === 1;
+    const table = tableFor(p), outs = p.sizes.filter(s => isOut(p, pdp.ci, s)), uni = p.sizes.length === 1, uniOut = uni && outs.length > 0;
     const sizes = p.sizes.map(s => { const o = outs.includes(s); return `<button class="size${o ? ' out' : ''}" data-psize="${s}" aria-pressed="${(o ? pdp.notify : pdp.size) === s}"${o ? ` aria-label="${s}, agotada. Avísame cuando vuelva"` : ''}>${s}</button>`; }).join('');
     const care = careList(p.care);
     keepFocus(box, () => {
       box.innerHTML = `
         <div>
-          ${p.old ? `<p class="pdp-flag sale">Rebajado</p>` : p.tag ? `<p class="pdp-flag">${p.tag}</p>` : ''}
+          ${allOut(p) ? `<p class="pdp-flag">Agotado</p>` : p.old ? `<p class="pdp-flag sale">Rebajado</p>` : p.tag ? `<p class="pdp-flag">${esc(p.tag)}</p>` : ''}
           <h1 class="pdp-name">${esc(p.name)}</h1>
           <p class="price pdp-price">${priceHTML(p)}</p>
           <p class="pdp-ref">Ref. ${p.ref}/${p.mod}/${col.c}</p>
@@ -1551,16 +1464,17 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
           <p class="opt-label"><span>${uni ? 'Talla única' : 'Selecciona tu talla'}</span>${table ? `<button class="linkish" data-act="size-guide" style="font-size:12px">Guía de tallas</button>` : `<span class="note">${p.fit}</span>`}</p>
           ${uni ? '' : `<div class="sizes" role="group" aria-label="Tallas">${sizes}</div>`}
           ${pdp.need && !pdp.size ? `<p class="need" role="alert">Elige una talla para añadirla a la cesta.</p>` : ''}
-          ${pdp.size && (p.low || []).includes(pdp.size) ? `<p class="stock">Quedan pocas unidades en talla ${pdp.size}</p>` : ''}
-          ${pdp.notify ? `<form class="notify" id="notify-form" novalidate><p>La talla <b>${pdp.notify}</b> está agotada. Déjanos tu email y te avisamos si vuelve.</p><div class="inline-form"><label for="notify-email" class="sr">Tu email</label><input id="notify-email" type="email" placeholder="tu@email.com" autocomplete="email"><button class="pill pill-dark" type="submit">Avísame</button></div><p class="note" id="notify-msg" aria-live="polite"></p></form>` : (outs.length ? `<p class="note" style="margin-top:10px">Tachadas: agotadas. Tócalas para que te avisemos si vuelven.</p>` : '')}
+          ${pdp.size && !uniOut && isLow(p, pdp.ci, pdp.size) ? `<p class="stock">${uni ? 'Quedan pocas unidades' : `Quedan pocas unidades en talla ${pdp.size}`}</p>` : ''}
+          ${uniOut && !pdp.notify ? `<p class="stock">Agotado en ${col.n.toLowerCase()}. <button class="linkish" data-psize="${p.sizes[0]}">Avísame si vuelve</button></p>` : ''}
+          ${pdp.notify ?`<form class="notify" id="notify-form" novalidate><p>${uni ? `El color <b>${col.n.toLowerCase()}</b> está agotado` : `La talla <b>${pdp.notify}</b> está agotada`}. Déjanos tu email y te avisamos si vuelve.</p><div class="inline-form"><label for="notify-email" class="sr">Tu email</label><input id="notify-email" type="email" placeholder="tu@email.com" autocomplete="email"><button class="pill pill-dark" type="submit">Avísame</button></div><p class="note" id="notify-msg" aria-live="polite"></p></form>` : (outs.length && !uni ? `<p class="note" style="margin-top:10px">Tachadas: agotadas. Tócalas para que te avisemos si vuelven.</p>` : '')}
           ${modelLine(p) ? `<p class="model">${modelLine(p)}</p>` : ''}
         </div>
         <div class="buy-row">
-          <button class="btn-block" id="pdp-add" data-act="pdp-add">Añadir a la cesta</button>
+          <button class="btn-block" id="pdp-add" data-act="pdp-add"${uniOut ? ' disabled' : ''}>${uniOut ? 'Agotado' : 'Añadir a la cesta'}</button>
           <button class="fav-big" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}" aria-label="Guardar en favoritos">${HEART}</button>
         </div>
         <ul class="deliv">
-          <li>${ICON_TRUCK}<span><b>${p.price >= FREE ? 'Envío gratis' : 'Envío gratis a partir de 29,90 €'}</b><br><span class="note">${eta('std')} con el envío estándar</span></span></li>
+          <li>${ICON_TRUCK}<span><b>${p.price >= FREE ? 'Envío gratis' : `Envío gratis a partir de ${eur(FREE)}`}</b><br><span class="note">${eta('std')} con el envío estándar</span></span></li>
           <li>${ICON_BOX}<span><b>Recogida en punto</b><br><span class="note">Más de 3.000 puntos en España</span></span></li>
           <li>${ICON_RET}<span><b>Devolución gratis en 30 días</b></span></li>
         </ul>
@@ -1583,7 +1497,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     $('#bb-thumb').innerHTML = thumb(p, pdp.ci);
     $('#bb-name').textContent = p.name;
     $('#bb-price').textContent = `${eur(p.price)} · ${C[p.colors[pdp.ci]].n}${pdp.size && p.sizes.length > 1 ? ' · ' + pdp.size : ''}`;
-    $('#bb-btn').textContent = pdp.size ? 'Añadir' : 'Elegir talla';
+    $('#bb-btn').textContent = pdp.size ? (isOut(p, pdp.ci, pdp.size) ? 'Agotado' : 'Añadir') : 'Elegir talla';
   }
   let barRaf = 0;
   function checkBar() {
@@ -1602,7 +1516,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   }
   function pickSize(s) {
     const p = pdp.p;
-    if ((p.out || []).includes(s)) { pdp.notify = pdp.notify === s ? null : s; renderInfo(); const n = $('#notify-email'); if (n) n.focus(); }
+    if (isOut(p, pdp.ci, s)) { pdp.notify = pdp.notify === s ? null : s; renderInfo(); const n = $('#notify-email'); if (n) n.focus(); }
     else { pdp.size = s; pdp.notify = null; pdp.need = false; renderInfo(); }
   }
 
@@ -1651,7 +1565,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   function renderSearch() {
     const q = $('#q').value.trim(), box = $('#search-body');
     if (!q) {
-      const rec = recent.slice(0, 6);
+      const rec = recent.filter(shown).slice(0, 6);
       box.innerHTML = `<div><p class="sub-label">Tendencias</p><div class="opts">${TRENDS.map(t => `<button class="opt" data-trend="${t}">${t}</button>`).join('')}</div></div>
         ${rec.length ? `<div><p class="sub-label">Vistos recientemente</p><div class="mini-row" style="margin-top:10px">${rec.map(id => miniHTML(byId[id])).join('')}</div></div>` : ''}`;
       return;
@@ -1675,15 +1589,18 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       $('#cart-foot').innerHTML = ''; $('#cart-foot').hidden = true; return;
     }
     $('#cart-foot').hidden = false;
+    const probs = cartProblems();
     $('#cart-list').innerHTML = cart.map((it, k) => {
-      const p = byId[it.id], col = C[p.colors[it.ci]];
+      const p = byId[it.id], col = C[p.colors[it.ci]], left = stockOf(p, it.ci, it.size);
+      const warn = p.visible === false ? 'Ya no está disponible' : left <= 0 ? 'Se ha agotado' : it.qty > left ? (left === 1 ? 'Solo queda 1' : `Solo quedan ${left}`) : '';
       return `<div class="ci">
         <button class="tile" style="--tile-bg:${p.bg}" data-open="${p.id}" data-ci="${it.ci}" aria-label="Ver ${esc(p.name)}">${art(p, it.ci)}</button>
         <div style="min-width:0">
           <p class="ci-name">${esc(p.name)}</p>
           <p class="ci-meta">${col.n} · ${sizeLabel(it.size)}</p>
+          ${warn ? `<p class="ci-meta" style="color:var(--err);font-weight:600">${warn}</p>` : ''}
           <div class="ci-ctrl">
-            <div class="qty"><button data-act="qty" data-k="${k}" data-n="-1" aria-label="Quitar una unidad">−</button><span>${it.qty}</span><button data-act="qty" data-k="${k}" data-n="1" aria-label="Añadir una unidad">+</button></div>
+            <div class="qty"><button data-act="qty" data-k="${k}" data-n="-1" aria-label="Quitar una unidad">−</button><span>${it.qty}</span><button data-act="qty" data-k="${k}" data-n="1" aria-label="Añadir una unidad"${it.qty >= maxQty(p, it.ci, it.size) ? ' disabled' : ''}>+</button></div>
             <button class="ci-rm" data-act="rm" data-k="${k}">Eliminar</button>
             <button class="ci-rm" data-act="to-fav" data-k="${k}">Mover a favoritos</button>
           </div>
@@ -1692,24 +1609,30 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       </div>`;
     }).join('');
     $('#cart-foot').innerHTML = `
-      ${promo ? `<div class="promo-on"><span>Código <b>${promo}</b> · ${PROMOS[promo].n}</span><button class="ci-rm" data-act="promo-off">Quitar</button></div>`
+      ${promo ? `<div class="promo-on"><span>Código <b>${esc(promo.code)}</b> · ${promoName(promo)}${promo.minimo && t.sub < promo.minimo ? `<br><span class="note">Se aplica en pedidos desde ${eur(promo.minimo)}</span>` : ''}</span><button class="ci-rm" data-act="promo-off">Quitar</button></div>`
         : `<form class="promo-form" id="promo-form" novalidate><label for="promo-in" class="sr">Código promocional</label><input id="promo-in" placeholder="Código promocional" autocomplete="off" autocapitalize="characters"><button type="submit">Aplicar</button></form><p class="note" id="promo-msg" aria-live="polite" hidden></p>`}
       <div class="row"><span>Subtotal</span><span class="num">${eur(t.sub)}</span></div>
       ${t.disc ? `<div class="row disc"><span>Descuento</span><span class="num">−${eur(t.disc)}</span></div>` : ''}
       <div class="row"><span>Envío estándar</span><span class="num">${t.ship ? eur(t.ship) : 'Gratis'}</span></div>
       <div class="row total"><span>Total <span class="note" style="font-weight:400">IVA incluido</span></span><span class="num">${eur(t.total)}</span></div>
-      <button class="btn-block" data-act="checkout">Tramitar pedido</button>`;
+      ${probs.length ? `<p class="note" style="color:var(--err)">Hay prendas agotadas o sin unidades suficientes. Quítalas o baja la cantidad para seguir.</p>` : ''}
+      <button class="btn-block" data-act="checkout"${probs.length ? ' disabled' : ''}>Tramitar pedido</button>`;
   }
+  // Líneas de la cesta que piden más unidades de las que quedan
+  const cartProblems = () => cart.filter(it => it.qty > stockOf(byId[it.id], it.ci, it.size));
   function saveCart() { save('asfalto-cart', cart); updateBadges(); renderCart(); }
   function bump() { const b = $('#cart-badge'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
   function addToCart(p, ci, size) {
     const hit = cart.find(it => it.id === p.id && it.ci === ci && it.size === size);
+    const max = maxQty(p, ci, size), have = hit ? hit.qty : 0;
+    if (max <= 0) { toast(p, ci, size, 'Agotado', 'Esta talla se acaba de agotar'); if (view === 'pdp') renderInfo(); return; }
+    if (have + 1 > max) { toast(p, ci, size, 'No quedan más', max < MAX_UDS ? (max === 1 ? 'Solo queda 1 y ya la tienes en la cesta' : `Solo quedan ${max} y ya las tienes en la cesta`) : `Máximo ${MAX_UDS} unidades por prenda`); return; }
     hit ? hit.qty++ : cart.push({ id: p.id, ci, size, qty: 1 });
     saveCart(); bump(); toast(p, ci, size);
   }
   let toastT;
-  function toast(p, ci, size) {
-    $('#toast').innerHTML = `${thumb(p, ci)}<span class="toast-txt"><b>Añadido a la cesta</b><small>${esc(p.name)} · ${sizeLabel(size)}</small></span><button data-act="toast-cart">Ver cesta</button>`;
+  function toast(p, ci, size, title = 'Añadido a la cesta', sub = '') {
+    $('#toast').innerHTML = `${thumb(p, ci)}<span class="toast-txt"><b>${title}</b><small>${esc(sub || p.name + ' · ' + sizeLabel(size))}</small></span><button data-act="toast-cart">Ver cesta</button>`;
     $('#toast').classList.add('on');
     clearTimeout(toastT); toastT = setTimeout(() => $('#toast').classList.remove('on'), 3600);
   }
@@ -2068,7 +1991,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
         <div class="recap"><div><p class="label">Enviar a</p><p>${esc(d.nombre)} ${esc(d.apellidos)}<br>${addrLine(d)}<br>${esc(d.cp)} ${esc(d.ciudad)} (${esc(d.prov)})</p></div><button class="linkish" data-co-step="1" style="font-size:13px">Cambiar</button></div>
         <form id="co-form" novalidate>
           <fieldset class="choices"><legend class="sub-label">Elige cómo lo quieres recibir</legend>
-            ${Object.entries(SHIP).map(([k, m]) => { const pr = shipPrice(k); return `<label class="choice"><input type="radio" name="ship" value="${k}"${co.method === k ? ' checked' : ''}><span><b>${m.n}</b><span class="s">${m.d}${m.free && pr ? ' · gratis desde 29,90 €' : ''}</span><span class="eta">${eta(k)}</span></span><span class="pr">${pr ? eur(pr) : 'Gratis'}</span></label>`; }).join('')}
+            ${Object.entries(SHIP).map(([k, m]) => { const pr = shipPrice(k); return `<label class="choice"><input type="radio" name="ship" value="${k}"${co.method === k ? ' checked' : ''}><span><b>${m.n}</b><span class="s">${m.d}${m.free && pr ? ` · gratis desde ${eur(FREE)}` : ''}</span><span class="eta">${eta(k)}</span></span><span class="pr">${pr ? eur(pr) : 'Gratis'}</span></label>`; }).join('')}
           </fieldset>
           <div class="co-actions" style="margin-top:22px"><button type="button" class="linkish" data-co-step="1">← Volver</button><button class="btn-block" type="submit">Continuar al pago</button></div>
         </form>`;
@@ -2083,6 +2006,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
           <div class="demo-box" style="margin-top:14px">Modo demo: no se cobra nada. En la tienda real, al pulsar «Pagar» se abriría la pasarela segura (por ejemplo Stripe o Redsys) para meter los datos de pago.</div>
           <label class="check" style="margin-top:16px"><input type="checkbox" id="co-terms" aria-describedby="err-terms"><span>He leído y acepto las condiciones de compra y la política de privacidad.</span></label>
           <p class="err" id="err-terms" aria-live="polite"></p>
+          <p class="err" id="err-order" role="alert">${co.err ? esc(co.err) : ''}</p>
           <div class="co-actions" style="margin-top:18px"><button type="button" class="linkish" data-co-step="2">← Volver</button><button class="btn-block" type="submit">Pagar ${eur(t.total)}</button></div>
         </form>`;
     } else {
@@ -2107,20 +2031,108 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       <p class="sub-label">Resumen · ${count()} ${count() === 1 ? 'artículo' : 'artículos'}</p>
       <div class="sum-items">${cart.map(itemRow).join('')}</div>
       <div class="row"><span>Subtotal</span><span class="num">${eur(t.sub)}</span></div>
-      ${t.disc ? `<div class="row disc"><span>Descuento ${promo}</span><span class="num">−${eur(t.disc)}</span></div>` : ''}
+      ${t.disc ? `<div class="row disc"><span>Descuento ${esc(promo.code)}</span><span class="num">−${eur(t.disc)}</span></div>` : ''}
       <div class="row"><span>${SHIP[co.method].n}</span><span class="num">${t.ship ? eur(t.ship) : 'Gratis'}</span></div>
       <div class="row total"><span>Total <span class="note" style="font-weight:400">IVA incluido</span></span><span class="num">${eur(t.total)}</span></div>
     </aside>`;
   }
-  function gotoStep(s) { co.step = s; renderCheckout(); $('#co-scroll').scrollTop = 0; const h = $('#co-main .co-h'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
-  function placeOrder() {
-    const t = totals(co.method), now = new Date();
-    const n = `AS${String(now.getFullYear()).slice(2)}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${Math.floor(1000 + Math.random() * 9000)}`;
-    co.order = { n, date: now.toISOString(), items: cart.map(it => ({ ...it })), total: t.total, method: co.method, eta: eta(co.method), name: co.data.nombre, city: co.data.ciudad };
+  function gotoStep(s) { if (s !== co.step) co.err = ''; co.step = s; renderCheckout(); $('#co-scroll').scrollTop = 0; const h = $('#co-main .co-h'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
+  /* Firebase (si está configurado). Si no carga en 8 s, la tienda sigue sola. */
+  function getFB() {
+    const ready = window.asfaltoFBListo;
+    if (!ready) return Promise.resolve(null);
+    return Promise.race([ready, new Promise(r => setTimeout(() => r(null), 8000))]).catch(() => null);
+  }
+  function checkPromo(code, c) {
+    if (!c || c.activo === false) return null;
+    if (c.caduca && new Date(c.caduca + 'T23:59:59') < new Date()) return { msg: `El código «${code}» ha caducado.` };
+    const valor = +c.valor || 0;
+    if (valor <= 0) return null;
+    return { ok: true, promo: { code, tipo: c.tipo === 'importe' ? 'importe' : 'porcentaje', valor, minimo: +c.minimo || 0 } };
+  }
+  async function findPromo(code) {
+    const fb = await getFB();
+    if (fb) {
+      try { return checkPromo(code, await fb.codigo(code)); }
+      catch (e) { return { msg: 'No hemos podido comprobar el código. Inténtalo otra vez.' }; }
+    }
+    return checkPromo(code, PROMOS[code]);
+  }
+  const orderErr = msg => { co.err = msg; const e = $('#err-order'); if (e) e.textContent = msg; };
+  async function placeOrder() {
+    if (co.busy) return;
+    co.busy = true; co.err = '';
+    const btn = $('#co-form [type="submit"]'), label = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Procesando…'; }
+    const fail = msg => { co.busy = false; if (btn && btn.isConnected) { btn.disabled = false; btn.textContent = label; } orderErr(msg); };
+    const fb = await getFB();
+    // El código puede haberse desactivado o caducado mientras comprabas
+    if (promo) {
+      const r = await findPromo(promo.code);
+      if (!r || !r.ok) { promo = null; save('asfalto-promo', null); renderCart(); co.busy = false; renderCheckout(); orderErr('El código de descuento ya no es válido y lo hemos quitado. Revisa el total y vuelve a pulsar Pagar.'); return; }
+      promo = r.promo; save('asfalto-promo', promo);
+    }
+    if (cartProblems().length) { co.busy = false; renderCart(); fail('Alguna prenda se ha agotado mientras comprabas. Revisa la cesta.'); return; }
+    const t = totals(co.method), now = new Date(), d = co.data;
+    const n = `AS${String(now.getFullYear()).slice(2)}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${Math.floor(100000 + Math.random() * 900000)}`;
+    if (fb) {
+      const pedido = {
+        numero: n, estado: 'nuevo',
+        cliente: { nombre: d.nombre, apellidos: d.apellidos, email: d.email, tel: d.tel },
+        direccion: { calle: d.dirFmt, piso: d.piso || '', cp: d.cp, ciudad: d.ciudad, provincia: d.prov },
+        envio: { metodo: co.method, nombre: SHIP[co.method].n, precio: t.ship },
+        pago: co.pay,
+        articulos: cart.map(it => { const p = byId[it.id]; return { id: p.id, nombre: p.name, color: C[p.colors[it.ci]].n, colorId: p.colors[it.ci], talla: it.size, cantidad: it.qty, precio: p.price }; }),
+        subtotal: t.sub, descuento: t.disc, codigo: promo ? promo.code : null, total: t.total
+      };
+      // Solo se descuentan las combinaciones que tienen stock apuntado en Firebase
+      const cambios = cart.filter(it => LIVE.stock && LIVE.stock[skey(byId[it.id], it.ci, it.size)] != null).map(it => ({ key: skey(byId[it.id], it.ci, it.size), qty: it.qty }));
+      try { await fb.guardarPedido(pedido, cambios); }
+      catch (e) {
+        console.warn('No se pudo guardar el pedido', e);
+        if (e && e.code === 'permission-denied') { try { await fb.recargar(); } catch (er) { } renderCart(); fail('Alguna prenda se ha agotado mientras comprabas. Revisa la cesta y vuelve a intentarlo.'); }
+        else fail('No hemos podido guardar el pedido. Revisa tu conexión y vuelve a intentarlo.');
+        return;
+      }
+    }
+    co.order = { n, date: now.toISOString(), items: cart.map(it => ({ ...it })), total: t.total, method: co.method, eta: eta(co.method), name: d.nombre, city: d.ciudad };
     orders = [co.order, ...orders].slice(0, 20); save('asfalto-orders', orders);
     cart = []; promo = null; save('asfalto-promo', null); saveCart();
+    co.busy = false;
     gotoStep('done');
   }
+
+  /* Datos en vivo desde Firebase (firebase-tienda.js lanza este evento) */
+  function applyLive(dt) {
+    if (!dt) return;
+    LIVE.on = true;
+    if (dt.productos) for (const [id, v] of Object.entries(dt.productos)) {
+      const p = byId[id]; if (!p || !v) continue;
+      if (typeof v.precio === 'number' && v.precio > 0) p.price = v.precio;
+      if ('precioAntes' in v) p.old = typeof v.precioAntes === 'number' && v.precioAntes > p.price ? v.precioAntes : undefined;
+      if ('etiqueta' in v) p.tag = v.etiqueta || undefined;
+      p.visible = v.visible !== false;
+    }
+    P = ALL.filter(p => p.visible !== false);
+    if ('stock' in dt) LIVE.stock = dt.stock;
+    const a = dt.ajustes;
+    if (a) {
+      if (typeof a.envioGratisDesde === 'number' && a.envioGratisDesde >= 0) FREE = a.envioGratisDesde;
+      if (a.envios) for (const k of Object.keys(SHIP)) if (typeof a.envios[k] === 'number' && a.envios[k] >= 0) SHIP[k].price = a.envios[k];
+      if (typeof a.pocasUnidades === 'number') LIVE.low = a.pocasUnidades;
+      const ms = Array.isArray(a.mensajes) ? a.mensajes.map(s => String(s || '').trim()).filter(Boolean) : [];
+      TOPMSG = ms.length ? ms : defaultMsgs();
+    } else TOPMSG = defaultMsgs();
+    topI = topI % TOPMSG.length;
+    $('#topmsg').textContent = TOPMSG[topI];
+    $$('[data-free]').forEach(el => { el.textContent = eur(FREE); });
+    // Si estás en una ficha que se acaba de ocultar, vuelves a la portada
+    if (view === 'pdp' && pdp.p && pdp.p.visible === false) { nav(st.g); return; }
+    if (view === 'pdp' && pdp.p && pdp.size && pdp.p.sizes.length > 1 && isOut(pdp.p, pdp.ci, pdp.size)) pdp.size = null;
+    rerender(); updateBadges(); renderCart();
+    if (openId === 'checkout' && !co.busy && co.step !== 'done' && co.step !== 'check') renderSummary();
+  }
+  window.addEventListener('asfalto:datos', e => applyLive(e.detail));
 
   /* ================= Cuenta ================= */
   const acc = { tab: 'login' };
@@ -2148,7 +2160,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   const COPY = v => `<div class="copy-row"><span>${v}</span><button data-copy="${v}">Copiar</button></div>`;
   const INFO = {
     envios: ['Envíos y entregas', () => `<p>Enviamos a la Península y Baleares. Para Canarias, Ceuta y Melilla, escríbenos antes de comprar.</p>
-      ${tableHTML({ head: ['Método', 'Plazo', 'Precio'], rows: Object.values(SHIP).map(m => [m.n, m.days[0] === m.days[1] ? m.days[0] + ' día laborable' : m.days[0] + '–' + m.days[1] + ' días laborables', eur(m.price) + (m.free ? ' · gratis desde 29,90 €' : '')]) })}
+      ${tableHTML({ head: ['Método', 'Plazo', 'Precio'], rows: Object.values(SHIP).map(m => [m.n, m.days[0] === m.days[1] ? m.days[0] + ' día laborable' : m.days[0] + '–' + m.days[1] + ' días laborables', eur(m.price) + (m.free ? ` · gratis desde ${eur(FREE)}` : '')]) })}
       <p>Cuando el pedido sale del almacén te mandamos un email con el número de seguimiento.</p>`],
     devoluciones: ['Devoluciones', () => `<p>Tienes 30 días desde que recibes el pedido para devolverlo. La ropa tiene que estar sin usar y con la etiqueta puesta.</p>
       <h3>Cómo devolver</h3><ol><li>Entra en Mi cuenta, abre el pedido y elige las prendas.</li><li>Llévalo a un punto de recogida (gratis) o pide que pasemos a por él a casa (2,95 €).</li><li>Cuando nos llegue, te devolvemos el dinero en un máximo de 14 días, por el mismo método con el que pagaste.</li></ol>
@@ -2231,9 +2243,17 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
         break;
       }
       case 'promo-form': {
-        const v = $('#promo-in').value.trim().toUpperCase(), msg = $('#promo-msg');
-        if (PROMOS[v]) { promo = v; save('asfalto-promo', promo); renderCart(); }
-        else { msg.hidden = false; msg.style.color = 'var(--err)'; msg.textContent = v ? `El código «${v}» no existe o ha caducado.` : 'Escribe un código.'; }
+        const v = $('#promo-in').value.trim().toUpperCase().replace(/\s+/g, ''), msg = $('#promo-msg'), b = f.querySelector('button');
+        msg.hidden = false;
+        if (!v) { msg.style.color = 'var(--err)'; msg.textContent = 'Escribe un código.'; break; }
+        if (!/^[A-Z0-9_-]{2,30}$/.test(v)) { msg.style.color = 'var(--err)'; msg.textContent = `El código «${v}» no existe o ha caducado.`; break; }
+        msg.style.color = ''; msg.textContent = 'Comprobando…'; if (b) b.disabled = true;
+        findPromo(v).then(r => {
+          if (r && r.ok) { promo = r.promo; save('asfalto-promo', promo); renderCart(); if (openId === 'checkout') renderSummary(); return; }
+          if (b) b.disabled = false;
+          const m = $('#promo-msg'); if (!m) return;
+          m.style.color = 'var(--err)'; m.textContent = (r && r.msg) || `El código «${v}» no existe o ha caducado.`;
+        });
         break;
       }
       case 'notify-form': {
@@ -2246,7 +2266,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
         if (!(v >= 40 && v <= 170)) { out.innerHTML = '<p class="note" style="color:var(--err)">Escribe tu medida en centímetros, por ejemplo 92.</p>'; break; }
         const s = recommend(p, v);
         if (!s) { out.innerHTML = '<p>Tu medida es más grande que nuestra talla más grande. Si el corte es oversize, prueba con la XL.</p>'; break; }
-        const sold = (p.out || []).includes(s);
+        const sold = isOut(p, pdp.ci, s);
         out.innerHTML = `<p>Te recomendamos la talla <b>${s}</b>.${/oversize|boxy|baggy|wide/i.test(p.fit) ? ' Este corte ya es ancho: si lo quieres más suelto, coge una más.' : ''}${sold ? ' Ahora mismo está agotada.' : ''}</p><button class="btn-block" data-pick-size="${s}">${sold ? 'Avisarme cuando vuelva la ' + s : 'Elegir talla ' + s}</button>`;
         break;
       }
@@ -2292,6 +2312,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       $$(`[data-card="${p.id}"]`).forEach(card => {
         card.querySelector('.view.front').innerHTML = art(p, i);
         card.querySelector('.view.back').innerHTML = art(p, i, true);
+        card.querySelector('.qs').innerHTML = quickHTML(p, i);
         card.querySelector('.card-img').setAttribute('aria-label', `Ver ${p.name}, ${C[p.colors[i]].n}`);
         card.querySelectorAll('.sw').forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
       });
@@ -2301,7 +2322,11 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     if (d.fit != null) { st.fit = d.fit || null; renderPLP(); return; }
     if (d.colsm) { st.colsM = +d.colsm; renderPLP(); return; }
     if (d.colsd) { st.colsD = +d.colsd; renderPLP(); return; }
-    if (d.pcol) { pdp.ci = +d.pcol; selC[pdp.p.id] = pdp.ci; renderGallery(); renderInfo(); return; }
+    if (d.pcol) {
+      pdp.ci = +d.pcol; selC[pdp.p.id] = pdp.ci; pdp.notify = null;
+      if (pdp.size && pdp.p.sizes.length > 1 && isOut(pdp.p, pdp.ci, pdp.size)) pdp.size = null;
+      renderGallery(); renderInfo(); return;
+    }
     if (d.psize) { pickSize(d.psize); return; }
     if (d.pickSize) { closeLayer(true); pickSize(d.pickSize); const s = $('#pdp-sizes'); if (s) s.scrollIntoView({ behavior: smooth(), block: 'center' }); return; }
     if (d.zoom) { openZoom(+d.zoom); return; }
@@ -2346,11 +2371,15 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       case 'zoom-prev': stepZoom(-1); break;
       case 'zoom-next': stepZoom(1); break;
       case 'toast-cart': $('#toast').classList.remove('on'); renderCart(); openLayer('cart'); break;
-      case 'qty': { const it = cart[+d.k]; if (!it) break; it.qty += +d.n; if (it.qty <= 0) cart.splice(+d.k, 1); saveCart(); break; }
+      case 'qty': {
+        const it = cart[+d.k]; if (!it) break;
+        if (+d.n > 0 && it.qty + 1 > maxQty(byId[it.id], it.ci, it.size)) break;
+        it.qty += +d.n; if (it.qty <= 0) cart.splice(+d.k, 1); saveCart(); break;
+      }
       case 'rm': cart.splice(+d.k, 1); saveCart(); break;
       case 'to-fav': { const it = cart[+d.k]; if (!it) break; if (!favs.has(it.id)) toggleFav(it.id); cart.splice(+d.k, 1); saveCart(); break; }
       case 'promo-off': promo = null; save('asfalto-promo', null); renderCart(); break;
-      case 'checkout': if (count()) { co.step = 1; co.order = null; loadCP(); renderCheckout(); openLayer('checkout'); } break;
+      case 'checkout': if (count() && !cartProblems().length) { co.err = ''; co.step = 1; co.order = null; loadCP(); renderCheckout(); openLayer('checkout'); } break;
       case 'co-confirm': gotoStep(2); break;
       case 'use-cp': co.data.cp = d.cp; co.data.prov = provOf(d.cp) || co.data.prov; co.step = 1; renderCheckout(); loadCP().then(() => { cpHint(d.cp); submitStep1(); }); break;
       case 'co-finish': nav(st.g); break;

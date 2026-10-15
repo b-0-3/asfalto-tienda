@@ -1,0 +1,121 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Reglas de seguridad de Asfalto
+//  Dónde van: Firebase → Firestore Database → pestaña «Reglas».
+//  Borra lo que haya, pega TODO este archivo y pulsa «Publicar».
+//
+//  Resumen:
+//   · La tienda (cualquiera) puede LEER precios, stock y ajustes, comprobar un
+//     código de descuento y CREAR su pedido restando el stock que compra.
+//   · Solo las cuentas del equipo (colección «admins») pueden ver pedidos y
+//     cambiar precios, stock y códigos. Ajustes y equipo, solo el dueño.
+//   · La primera cuenta que se crea en el panel se convierte en dueño. Después
+//     queda cerrado: nadie más puede hacerse dueño por su cuenta.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logueado() {
+      return request.auth != null;
+    }
+    function esAdmin() {
+      return logueado() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function esDueno() {
+      return esAdmin() && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.rol == 'dueno';
+    }
+
+    // La primera cuenta del panel se hace dueña (solo si aún no hay dueño)
+    function primerDueno(uid) {
+      return logueado()
+        && request.auth.uid == uid
+        && request.resource.data.rol == 'dueno'
+        && !exists(/databases/$(database)/documents/config/iniciado)
+        && getAfter(/databases/$(database)/documents/config/iniciado).data.uid == uid;
+    }
+
+    // Prendas: precio, rebaja, etiqueta y si se ven en la tienda.
+    match /productos/{id} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+
+    // Ajustes de la tienda: envíos, mensajes de la barra, aviso de pocas unidades.
+    match /ajustes/{id} {
+      allow read: if true;
+      allow write: if esDueno();
+    }
+
+    // Stock: un documento por prenda + color + talla, con el número de unidades (n).
+    match /stock/{id} {
+      // Un cliente solo puede RESTAR unidades (como mucho 10), nunca dejarlas en
+      // negativo, y solo a la vez que crea un pedido nuevo con ese número.
+      function compraValida() {
+        let antes = resource.data.n;
+        let despues = request.resource.data.n;
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['n', 'ultimoPedido'])
+          && despues is int
+          && despues >= 0
+          && despues < antes
+          && antes - despues <= 10
+          && request.resource.data.ultimoPedido is string
+          && !exists(/databases/$(database)/documents/pedidos/$(request.resource.data.ultimoPedido))
+          && existsAfter(/databases/$(database)/documents/pedidos/$(request.resource.data.ultimoPedido));
+      }
+
+      allow read: if true;
+      allow create, delete: if esAdmin();
+      allow update: if esAdmin() || compraValida();
+    }
+
+    // Códigos de descuento: la tienda puede consultar UNO por su nombre,
+    // pero no puede ver la lista de todos.
+    match /codigos/{codigo} {
+      allow get: if true;
+      allow list: if esAdmin();
+      allow write: if esAdmin();
+    }
+
+    // Pedidos: cualquiera puede crear el suyo (en estado «nuevo»).
+    // Solo el equipo los ve y les cambia el estado. Borrar, solo el dueño.
+    match /pedidos/{numero} {
+      function pedidoValido() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['numero', 'fecha', 'estado', 'cliente', 'direccion', 'envio', 'pago', 'articulos', 'subtotal', 'descuento', 'codigo', 'total'])
+          && d.numero == numero
+          && d.estado == 'nuevo'
+          && d.fecha == request.time
+          && d.articulos is list
+          && d.articulos.size() > 0
+          && d.articulos.size() <= 30
+          && d.total is number
+          && d.total >= 0
+          && d.total < 10000
+          && d.cliente is map
+          && d.direccion is map
+          && d.envio is map;
+      }
+
+      allow create: if pedidoValido();
+      allow read, update: if esAdmin();
+      allow delete: if esDueno();
+    }
+
+    // Cuentas del equipo. El id del documento es el uid de Firebase Authentication.
+    match /admins/{uid} {
+      allow read: if logueado() && (request.auth.uid == uid || esAdmin());
+      allow create: if (esDueno() && request.resource.data.rol == 'empleado') || primerDueno(uid);
+      allow update, delete: if esDueno() && uid != request.auth.uid;
+    }
+
+    // Marca de «ya hay dueño». Se crea una sola vez, junto con la cuenta del dueño.
+    match /config/iniciado {
+      allow read: if true;
+      allow create: if logueado()
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(/databases/$(database)/documents/admins/$(request.auth.uid)).data.rol == 'dueno';
+    }
+  }
+}
