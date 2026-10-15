@@ -421,6 +421,13 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
 .field [aria-invalid="true"]{border-color:var(--err)}
 .err{font-size:12px;color:var(--err)}
 .err:empty{display:none}
+.combo{position:relative}
+.ac{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:6;background:var(--bg);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.14);list-style:none;margin:0;padding:4px;max-height:300px;overflow-y:auto}
+.ac li{padding:10px 12px;border-radius:6px;cursor:pointer;display:grid;gap:1px}
+.ac li[aria-selected="true"],.ac li:hover{background:var(--surface)}
+.ac li b{font-weight:600;font-size:14px}
+.ac li small{font-size:12px;color:var(--muted)}
+.ac li.ac-head{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:6px 12px 4px;cursor:default;background:none}
 .hint{font-size:12px;color:var(--ok)}
 .hint:empty{display:none}
 .fix{font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--fg);margin-left:4px}
@@ -1840,6 +1847,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     try { return await cartoLookup(d); } catch (e) { return { status: 'skip' }; }
   }
   async function submitStep1() {
+    closeAC();
     const keys = ['email', 'nombre', 'apellidos', 'tel', 'cp', 'ciudad', 'prov', 'dir', 'piso'], vals = {};
     keys.forEach(k => { const el = $('#co-' + k); vals[k] = el ? el.value.trim() : ''; });
     co.data = { ...co.data, ...vals };
@@ -1870,7 +1878,64 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   }
   const fld = (id, label, o = {}) => `<div class="field${o.full ? ' full' : ''}"><label for="co-${id}">${label}</label>${o.select
     ? `<select id="co-${id}" name="${id}" autocomplete="${o.ac || 'off'}" aria-describedby="err-${id}"><option value="">Elige…</option>${o.select.map(v => `<option${co.data[id] === v ? ' selected' : ''}>${v}</option>`).join('')}</select>`
-    : `<input id="co-${id}" name="${id}" type="${o.type || 'text'}" value="${esc(co.data[id] || '')}" autocomplete="${o.ac || 'off'}"${o.im ? ` inputmode="${o.im}"` : ''}${o.ph ? ` placeholder="${o.ph}"` : ''}${o.max ? ` maxlength="${o.max}"` : ''}${o.list ? ` list="${o.list}"` : ''} aria-describedby="err-${id}${o.hint ? ' hint-' + id : ''}">`}${o.hint ? `<p class="hint" id="hint-${id}" aria-live="polite"></p>` : ''}<p class="err" id="err-${id}" aria-live="polite"></p></div>`;
+    : (o.combo ? '<div class="combo">' : '') + `<input id="co-${id}" name="${id}" type="${o.type || 'text'}" value="${esc(co.data[id] || '')}" autocomplete="${o.combo ? 'off' : (o.ac || 'off')}"${o.im ? ` inputmode="${o.im}"` : ''}${o.ph ? ` placeholder="${o.ph}"` : ''}${o.max ? ` maxlength="${o.max}"` : ''}${o.list ? ` list="${o.list}"` : ''}${o.combo ? ` role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac-${id}"` : ''} aria-describedby="err-${id}${o.hint ? ' hint-' + id : ''}">` + (o.combo ? `<ul class="ac" id="ac-${id}" role="listbox" aria-label="Calles que coinciden" hidden></ul></div>` : '')}${o.hint ? `<p class="hint" id="hint-${id}" aria-live="polite"></p>` : ''}<p class="err" id="err-${id}" aria-live="polite"></p></div>`;
+
+  /* Sugerencias de calles mientras se escribe (CartoCiudad, filtrado por código postal) */
+  const ac = { items: [], idx: -1, seq: 0, timer: 0, cache: {} };
+  const streetPart = v => v.replace(/[,\s]+(?:n[º°o.]?\s*)?(?:\d|s\/?n\b).*$/i, '').trim();
+  async function streetSuggest(q, cp) {
+    const okCp = !!provOf(cp), key = (okCp ? cp : '') + '|' + norm(q);
+    if (ac.cache[key]) return ac.cache[key];
+    const list = await cartoGet('/candidates?limit=12&no_process=municipio,provincia,poblacion,toponimo,carretera&q=' + encodeURIComponent(q) + (okCp ? '&cod_postal_filter=' + cp : ''));
+    const seen = new Set(), out = [];
+    (Array.isArray(list) ? list : []).forEach(c => {
+      if (c.type !== 'callejero' && c.type !== 'portal') return;
+      const name = cartoName(c), k = norm(name) + '|' + (c.postalCode || '');
+      if (!c.address || seen.has(k)) return;
+      seen.add(k); out.push({ name, cp: String(c.postalCode || (okCp ? cp : '')), muni: c.muni ? titleCase(c.muni) : '' });
+    });
+    return (ac.cache[key] = out.slice(0, 6));
+  }
+  function closeAC() {
+    clearTimeout(ac.timer); ac.seq++; ac.items = []; ac.idx = -1;
+    const ul = $('#ac-dir'), el = $('#co-dir');
+    if (ul) { ul.hidden = true; ul.innerHTML = ''; }
+    if (el) { el.setAttribute('aria-expanded', 'false'); el.removeAttribute('aria-activedescendant'); }
+  }
+  const acOpen = () => { const ul = $('#ac-dir'); return !!(ul && !ul.hidden && ac.items.length); };
+  function renderAC() {
+    const ul = $('#ac-dir'), el = $('#co-dir'); if (!ul || !el) return;
+    if (!ac.items.length) { closeAC(); return; }
+    ul.innerHTML = `<li class="ac-head" role="presentation">Calles del callejero oficial</li>` + ac.items.map((it, i) =>
+      `<li id="ac-opt-${i}" role="option" data-ac="${i}" aria-selected="${i === ac.idx}"><b>${esc(it.name)}</b><small>${esc([it.cp, it.muni].filter(Boolean).join(' · '))}</small></li>`).join('');
+    ul.hidden = false; el.setAttribute('aria-expanded', 'true');
+    if (ac.idx >= 0) { el.setAttribute('aria-activedescendant', 'ac-opt-' + ac.idx); const o = $('#ac-opt-' + ac.idx); if (o && o.scrollIntoView) o.scrollIntoView({ block: 'nearest' }); }
+    else el.removeAttribute('aria-activedescendant');
+  }
+  function scheduleAC() {
+    clearTimeout(ac.timer);
+    const el = $('#co-dir'); if (!el) return;
+    const q = streetPart(el.value);
+    if (q.replace(/[^\p{L}]/gu, '').length < 3) { closeAC(); return; }
+    const seq = ++ac.seq;
+    ac.timer = setTimeout(async () => {
+      let items = [];
+      try { items = await streetSuggest(q, ($('#co-cp') || {}).value || ''); } catch (e) { items = []; }
+      if (seq !== ac.seq || document.activeElement !== el) return;
+      ac.items = items; ac.idx = -1; renderAC();
+    }, 250);
+  }
+  function selectAC(i) {
+    const it = ac.items[i], el = $('#co-dir'); if (!it || !el) return;
+    const tail = el.value.slice(streetPart(el.value).length).replace(/^[,\s]+/, '').trim();
+    el.value = it.name + ' ' + tail;
+    if (!tail) el.value = it.name + ' ';
+    el.removeAttribute('aria-invalid'); $('#err-dir').textContent = '';
+    const cpEl = $('#co-cp');
+    if (cpEl && !provOf(cpEl.value) && /^\d{5}$/.test(it.cp)) { cpEl.value = it.cp; cpEl.dispatchEvent(new Event('input', { bubbles: true })); }
+    closeAC(); el.focus();
+    try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) { }
+  }
   function shipPrice(m) { const sub = subtotal(); return (SHIP[m].free && sub >= FREE) ? 0 : SHIP[m].price; }
   const itemRow = it => { const p = byId[it.id]; return `<div class="sum-it">${thumb(p, it.ci)}<span>${esc(p.name)}<br><span class="note">${C[p.colors[it.ci]].n} · ${sizeLabel(it.size)} · ${it.qty} ud.</span></span><span class="num">${eur(p.price * it.qty)}</span></div>`; };
   function renderCheckout() {
@@ -1892,7 +1957,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
             ${fld('cp', 'Código postal', { ac: 'postal-code', im: 'numeric', max: 5, ph: '28013', hint: true })}
             ${fld('ciudad', 'Población', { ac: 'address-level2', list: 'dl-ciudad' })}
             ${fld('prov', 'Provincia', { full: true, select: PROVS_AZ, ac: 'address-level1' })}
-            ${fld('dir', 'Calle y número', { full: true, ac: 'address-line1', ph: 'Calle Mayor 10' })}
+            ${fld('dir', 'Calle y número', { full: true, ac: 'address-line1', ph: 'Empieza a escribir tu calle…', combo: true })}
             ${fld('piso', 'Piso, puerta o escalera (opcional)', { full: true, ac: 'address-line2', ph: '3º B' })}
           </div>
           <datalist id="dl-ciudad"></datalist>
@@ -2070,6 +2135,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
         if (pr) { const s = $('#co-prov'); s.value = pr; s.removeAttribute('aria-invalid'); $('#err-prov').textContent = ''; }
         if (v.length === 5) loadCP().then(() => cpHint(v));
       }
+      if (t.id === 'co-dir') scheduleAC();
     }
   });
   document.addEventListener('change', e => {
@@ -2220,7 +2286,26 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   });
   function selectNear(btn) { const s = btn.parentElement.querySelector('span'); if (!s) return; const r = document.createRange(); r.selectNodeContents(s); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); btn.textContent = 'Selecciónalo y copia'; }
 
+  document.addEventListener('mousedown', e => {
+    const li = e.target.closest && e.target.closest('[data-ac]');
+    if (li) { e.preventDefault(); selectAC(+li.dataset.ac); }
+  });
+  document.addEventListener('click', e => {
+    const li = e.target.closest && e.target.closest('[data-ac]');
+    if (li && ac.items.length) selectAC(+li.dataset.ac);
+  });
+  document.addEventListener('focusout', e => { if (e.target && e.target.id === 'co-dir') setTimeout(() => { if (document.activeElement !== $('#co-dir')) closeAC(); }, 150); });
   document.addEventListener('keydown', e => {
+    if (e.target && e.target.id === 'co-dir' && acOpen()) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const n = ac.items.length;
+        ac.idx = e.key === 'ArrowDown' ? (ac.idx + 1) % n : (ac.idx <= 0 ? n - 1 : ac.idx - 1);
+        renderAC(); return;
+      }
+      if (e.key === 'Enter' && ac.idx >= 0) { e.preventDefault(); selectAC(ac.idx); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeAC(); return; }
+    }
     if (e.key === 'Escape') { if (openId) closeLayer(); return; }
     if (openId === 'zoom' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { stepZoom(e.key === 'ArrowLeft' ? -1 : 1); return; }
     if (e.key === 'Tab' && openId) {
