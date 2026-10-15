@@ -428,7 +428,9 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
 .ac li b{font-weight:600;font-size:14px}
 .ac li small{font-size:12px;color:var(--muted)}
 .ac li.ac-head{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:6px 12px 4px;cursor:default;background:none}
+.pair{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px}
 .hint{font-size:12px;color:var(--ok)}
+.hint.warn{color:var(--warn)}
 .hint:empty{display:none}
 .fix{font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--fg);margin-left:4px}
 .verify{border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:14px}
@@ -1778,9 +1780,11 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     else if (names) { city = cityMatch(v.ciudad, names); if (!city) { err.ciudad = `El ${v.cp} es de ${orList(names.slice(0, 4))}, no de «${v.ciudad}».`; fix.ciudad = names.slice(0, 4); } }
     if (pr && v.prov !== pr) { err.prov = `El ${v.cp} es de la provincia de ${pr}.`; fix.prov = [pr]; }
     else if (!pr && !v.prov) err.prov = 'Elige tu provincia.';
-    const st = parseStreet(v.dir);
-    if (!/\p{L}{2,}/u.test(st.name)) err.dir = 'Escribe la calle y el número, por ejemplo «Calle Mayor 10».';
-    else if (!st.num) err.dir = 'Falta el número del portal. Si no tiene número, escribe «s/n».';
+    const numIn = (v.num || '').replace(/\s+/g, '').replace(/^n[º°o.]?/i, '');
+    const st = parseStreet(v.dir + (numIn ? ' ' + numIn : ''));
+    if (!/\p{L}{2,}/u.test(st.name)) err.dir = 'Escribe el nombre de la calle, por ejemplo «Calle Mayor».';
+    else if (numIn && !/^(\d{1,4}[a-z]?|s\/?n)$/i.test(numIn)) err.num = 'Solo cifras y, como mucho, una letra (por ejemplo 10 o 10B).';
+    else if (!st.num) err.num = 'Pon el número del portal. Si no tiene, escribe «s/n».';
     return { err, fix, tel, city: city || v.ciudad, st };
   }
   function cpHint(cp) {
@@ -1848,7 +1852,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
   }
   async function submitStep1() {
     closeAC();
-    const keys = ['email', 'nombre', 'apellidos', 'tel', 'cp', 'ciudad', 'prov', 'dir', 'piso'], vals = {};
+    const keys = ['email', 'nombre', 'apellidos', 'tel', 'cp', 'ciudad', 'prov', 'dir', 'num', 'piso'], vals = {};
     keys.forEach(k => { const el = $('#co-' + k); vals[k] = el ? el.value.trim() : ''; });
     co.data = { ...co.data, ...vals };
     const btn = $('#co-form [type="submit"]');
@@ -1858,7 +1862,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     if (co.step !== 1) return;
     const r = checkAddress(vals);
     let first = null;
-    keys.slice(0, 8).forEach(k => {
+    keys.slice(0, 9).forEach(k => {
       const el = $('#co-' + k), er = $('#err-' + k), msg = r.err[k];
       if (!el || !er) return;
       if (msg) {
@@ -1868,8 +1872,8 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       } else { el.removeAttribute('aria-invalid'); er.textContent = ''; }
     });
     if (first) { first.focus(); return; }
-    co.typed = { dir: vals.dir, ciudad: vals.ciudad };
-    co.data = { ...vals, tel: r.tel, ciudad: r.city, piso: pisoFmt(vals.piso || r.st.rest), via: r.st.via, calle: r.st.name, num: r.st.num, dirFmt: fmtStreet(r.st) };
+    co.typed = { dir: [vals.dir, vals.num].filter(Boolean).join(' '), ciudad: vals.ciudad };
+    co.data = { ...vals, dir: [r.st.via, r.st.name].filter(Boolean).join(' '), tel: r.tel, ciudad: r.city, piso: pisoFmt(vals.piso || r.st.rest), via: r.st.via, calle: r.st.name, num: r.st.num, dirFmt: fmtStreet(r.st) };
     co.step = 'check'; renderCheckout();
     co.verify = await checkStreet(co.data);
     if (co.step !== 'check') return;
@@ -1891,8 +1895,9 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     (Array.isArray(list) ? list : []).forEach(c => {
       if (c.type !== 'callejero' && c.type !== 'portal') return;
       const name = cartoName(c), k = norm(name) + '|' + (c.postalCode || '');
-      if (!c.address || seen.has(k)) return;
-      seen.add(k); out.push({ name, cp: String(c.postalCode || (okCp ? cp : '')), muni: c.muni ? titleCase(c.muni) : '' });
+      const num = c.type === 'portal' && c.portalNumber ? String(c.portalNumber) : '';
+      if (!c.address || seen.has(k + num)) return;
+      seen.add(k + num); out.push({ name, num, cp: String(c.postalCode || (okCp ? cp : '')), muni: c.muni ? titleCase(c.muni) : '' });
     });
     return (ac.cache[key] = out.slice(0, 6));
   }
@@ -1907,7 +1912,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     const ul = $('#ac-dir'), el = $('#co-dir'); if (!ul || !el) return;
     if (!ac.items.length) { closeAC(); return; }
     ul.innerHTML = `<li class="ac-head" role="presentation">Calles del callejero oficial</li>` + ac.items.map((it, i) =>
-      `<li id="ac-opt-${i}" role="option" data-ac="${i}" aria-selected="${i === ac.idx}"><b>${esc(it.name)}</b><small>${esc([it.cp, it.muni].filter(Boolean).join(' · '))}</small></li>`).join('');
+      `<li id="ac-opt-${i}" role="option" data-ac="${i}" aria-selected="${i === ac.idx}"><b>${esc(it.name + (it.num ? ', ' + it.num : ''))}</b><small>${esc([it.cp, it.muni].filter(Boolean).join(' · '))}</small></li>`).join('');
     ul.hidden = false; el.setAttribute('aria-expanded', 'true');
     if (ac.idx >= 0) { el.setAttribute('aria-activedescendant', 'ac-opt-' + ac.idx); const o = $('#ac-opt-' + ac.idx); if (o && o.scrollIntoView) o.scrollIntoView({ block: 'nearest' }); }
     else el.removeAttribute('aria-activedescendant');
@@ -1926,15 +1931,38 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
     }, 250);
   }
   function selectAC(i) {
-    const it = ac.items[i], el = $('#co-dir'); if (!it || !el) return;
+    const it = ac.items[i], el = $('#co-dir'), numEl = $('#co-num'); if (!it || !el) return;
     const tail = el.value.slice(streetPart(el.value).length).replace(/^[,\s]+/, '').trim();
-    el.value = it.name + ' ' + tail;
-    if (!tail) el.value = it.name + ' ';
+    const typedNum = (tail.match(/^(?:n[º°o.]?\s*)?(\d{1,4}\s?[a-z]?|s\/?n)\b/i) || [])[1] || '';
+    el.value = it.name;
     el.removeAttribute('aria-invalid'); $('#err-dir').textContent = '';
+    if (numEl) {
+      const n = it.num || typedNum.replace(/\s/g, '');
+      if (n) { numEl.value = n; numEl.removeAttribute('aria-invalid'); $('#err-num').textContent = ''; }
+    }
     const cpEl = $('#co-cp');
     if (cpEl && !provOf(cpEl.value) && /^\d{5}$/.test(it.cp)) { cpEl.value = it.cp; cpEl.dispatchEvent(new Event('input', { bubbles: true })); }
-    closeAC(); el.focus();
-    try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) { }
+    closeAC();
+    if (numEl && !numEl.value) numEl.focus();
+    else { const p = $('#co-piso'); if (p) p.focus(); }
+    schedulePortal();
+  }
+  /* Comprobación del número de portal mientras se escribe */
+  const pc = { timer: 0, seq: 0 };
+  function schedulePortal() {
+    clearTimeout(pc.timer); pc.seq++;
+    const h = $('#hint-num'); if (h) { h.textContent = ''; h.className = 'hint'; }
+    const dir = ($('#co-dir') || {}).value || '', num = (($('#co-num') || {}).value || '').replace(/\s+/g, ''), cp = ($('#co-cp') || {}).value || '';
+    if (!provOf(cp) || streetPart(dir).replace(/[^\p{L}]/gu, '').length < 3 || !/^\d{1,4}[a-z]?$/i.test(num)) return;
+    const seq = pc.seq;
+    pc.timer = setTimeout(async () => {
+      const st = parseStreet(streetPart(dir) + ' ' + num);
+      let res = null;
+      try { res = await cartoGet('/find?q=' + encodeURIComponent(`${[st.via, st.name].filter(Boolean).join(' ')} ${st.num}, ${cp}`)); } catch (e) { return; }
+      const hh = $('#hint-num'); if (seq !== pc.seq || !hh) return;
+      if (res && res.type === 'portal' && String(res.postalCode) === cp) { hh.className = 'hint'; hh.textContent = '✓ Este portal existe'; }
+      else if (res && (res.type === 'callejero' || res.type === 'portal')) { hh.className = 'hint warn'; hh.textContent = `No encontramos el nº ${st.num} en esta calle. Revísalo.`; }
+    }, 500);
   }
   function shipPrice(m) { const sub = subtotal(); return (SHIP[m].free && sub >= FREE) ? 0 : SHIP[m].price; }
   const itemRow = it => { const p = byId[it.id]; return `<div class="sum-it">${thumb(p, it.ci)}<span>${esc(p.name)}<br><span class="note">${C[p.colors[it.ci]].n} · ${sizeLabel(it.size)} · ${it.qty} ud.</span></span><span class="num">${eur(p.price * it.qty)}</span></div>`; };
@@ -1957,8 +1985,11 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
             ${fld('cp', 'Código postal', { ac: 'postal-code', im: 'numeric', max: 5, ph: '28013', hint: true })}
             ${fld('ciudad', 'Población', { ac: 'address-level2', list: 'dl-ciudad' })}
             ${fld('prov', 'Provincia', { full: true, select: PROVS_AZ, ac: 'address-level1' })}
-            ${fld('dir', 'Calle y número', { full: true, ac: 'address-line1', ph: 'Empieza a escribir tu calle…', combo: true })}
-            ${fld('piso', 'Piso, puerta o escalera (opcional)', { full: true, ac: 'address-line2', ph: '3º B' })}
+            ${fld('dir', 'Calle', { full: true, ac: 'address-line1', ph: 'Empieza a escribir tu calle…', combo: true })}
+            <div class="pair">
+              ${fld('num', 'Número', { ph: '10', hint: true, max: 8 })}
+              ${fld('piso', 'Piso y puerta (opcional)', { ac: 'address-line2', ph: '3º B' })}
+            </div>
           </div>
           <datalist id="dl-ciudad"></datalist>
           <div class="co-actions" style="margin-top:22px"><button class="btn-block" type="submit">Comprobar dirección</button></div>
@@ -2135,7 +2166,8 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
         if (pr) { const s = $('#co-prov'); s.value = pr; s.removeAttribute('aria-invalid'); $('#err-prov').textContent = ''; }
         if (v.length === 5) loadCP().then(() => cpHint(v));
       }
-      if (t.id === 'co-dir') scheduleAC();
+      if (t.id === 'co-dir') { scheduleAC(); schedulePortal(); }
+      if (t.id === 'co-num') schedulePortal();
     }
   });
   document.addEventListener('change', e => {
@@ -2240,7 +2272,7 @@ table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:v
       const el = $('#co-' + d.fix); if (el) { el.value = d.val; el.removeAttribute('aria-invalid'); $('#err-' + d.fix).textContent = ''; el.focus(); }
       return;
     }
-    if (d.street) { co.data.dir = d.street + ' ' + (co.data.num || ''); co.step = 1; renderCheckout(); submitStep1(); return; }
+    if (d.street) { co.data.dir = d.street; co.step = 1; renderCheckout(); submitStep1(); return; }
     if (d.acc) { acc.tab = d.acc; renderAccount(); return; }
     if (d.info) { openInfo(d.info); return; }
     if (d.copy) {
