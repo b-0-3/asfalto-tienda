@@ -1,0 +1,2243 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Asfalto Streetwear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: tienda de moda minimal en blanco y negro — campañas a sangre, rejilla de producto pegada, texto pequeño; el color lo ponen las prendas. Un solo tema claro, como la tienda de referencia. */
+:root{
+  color-scheme:light;
+  --bg:#ffffff;
+  --fg:#000000;
+  --muted:#6f6f6f;
+  --line:#e5e5e5;
+  --surface:#f4f4f4;
+  --sale:#d6001c;
+  --ok:#11823b;
+  --warn:#a14a0c;
+  --err:#c4141f;
+  --overlay:rgba(0,0,0,.4);
+  --tile-ink:#000000;
+  --tile-chip:#ffffff;
+  --font-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --head-h:100px;
+  --lift:0px;
+  --bar:0px;
+}
+html.lock{overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+button:disabled{cursor:not-allowed}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{padding:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+@media (min-width:900px){.wrap{padding-left:max(28px, env(safe-area-inset-left,0px));padding-right:max(28px, env(safe-area-inset-right,0px))}}
+.mono{font-family:var(--font-mono)}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.muted{color:var(--muted)}
+.linkish{text-decoration:underline;text-underline-offset:3px}
+.note{color:var(--muted);font-size:12px}
+.hide-sm{display:none !important}
+@media (min-width:760px){.hide-sm{display:inline-flex !important}.only-sm{display:none !important}}
+
+/* Barra superior y cabecera */
+.topbar{background:var(--fg);color:var(--bg);text-align:center;padding-block:7px;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.topbar span{transition:opacity .3s ease}
+.site-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);border-bottom:1px solid var(--line)}
+.head-row{display:grid;grid-template-columns:1fr auto;align-items:center;height:56px;gap:8px}
+@media (min-width:760px){.head-row{grid-template-columns:1fr auto 1fr}}
+.h-left,.h-right{display:flex;align-items:center;gap:2px;min-width:0}
+.h-right{justify-content:flex-end;gap:4px}
+.h-gender{display:none;gap:22px}
+@media (min-width:760px){.h-gender{display:flex}}
+.h-gender button{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 0;border-bottom:2px solid transparent;color:var(--muted)}
+.h-gender button[aria-pressed="true"]{color:var(--fg);border-color:var(--fg)}
+.logo{font-family:var(--font-display);font-weight:900;font-stretch:125%;font-size:20px;line-height:1;letter-spacing:.01em;text-transform:uppercase;padding:8px 6px}
+.icon-btn{width:40px;height:40px;display:inline-grid;place-items:center;position:relative;border-radius:999px;flex:none}
+.icon-btn:hover{background:var(--surface)}
+.icon-btn svg{width:22px;height:22px}
+.txt-btn{font-size:13px;padding:8px 10px;white-space:nowrap}
+.txt-btn:hover{text-decoration:underline;text-underline-offset:3px}
+.search-pill{align-items:center;gap:8px;height:36px;width:200px;padding:0 14px;border-radius:999px;background:var(--surface);color:var(--muted);font-size:13px}
+.search-pill svg{width:16px;height:16px}
+.badge{position:absolute;top:3px;right:1px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--fg);color:var(--bg);font:600 10px/17px var(--font-body);text-align:center}
+.badge.bump{animation:bump .4s ease}
+@keyframes bump{40%{transform:scale(1.35)}}
+.pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:0 10px}
+.pills::-webkit-scrollbar{display:none}
+.pill-link{flex:none;height:32px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;white-space:nowrap;display:inline-flex;align-items:center}
+.pill-link:hover{border-color:var(--fg)}
+.pill-link[aria-current="page"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.pill-link.sale{color:var(--sale);border-color:color-mix(in srgb,var(--sale) 35%,var(--line))}
+.pill-link.sale[aria-current="page"]{background:var(--sale);color:#fff;border-color:var(--sale)}
+
+/* Botones */
+.pill{height:46px;padding:0 24px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.02em;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:transform .15s ease}
+.pill:active{transform:scale(.97)}
+.pill-dark{background:var(--fg);color:var(--bg)}
+.pill-line{box-shadow:inset 0 0 0 1px var(--fg)}
+.btn-block{height:50px;border-radius:999px;background:var(--fg);color:var(--bg);font-size:14px;font-weight:600;width:100%;margin-top:6px;display:grid;place-items:center;padding-inline:16px}
+.btn-block:disabled{background:var(--surface);color:var(--muted)}
+
+/* Entrada Mujer / Hombre */
+.gate{min-height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:grid;grid-template-rows:auto 1fr auto}
+.gate-top{display:flex;justify-content:center;padding-block:18px}
+.gate-split{display:grid;grid-template-rows:1fr 1fr;gap:2px;min-height:0}
+@media (min-width:760px){.gate-split{grid-template-rows:none;grid-template-columns:1fr 1fr}}
+.gate-half{position:relative;overflow:hidden;background:var(--cbg);min-height:260px;display:block;width:100%}
+.gate-half .cp{position:absolute;left:var(--l);top:var(--t);width:var(--w);transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.gate-half:hover .cp{transform:scale(1.04)}
+.gate-label{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-family:var(--font-display);font-weight:900;font-stretch:112%;font-size:clamp(34px,7vw,72px);text-transform:uppercase;letter-spacing:-.01em;line-height:1;z-index:2;color:#000}
+.gate-foot{display:flex;justify-content:center;gap:14px;padding-block:14px;color:var(--muted)}
+
+/* Campañas */
+.camp{position:relative;overflow:hidden;background:var(--cbg);color:var(--cink);width:100%;aspect-ratio:4/5;max-height:calc(100svh - var(--head-h))}
+.camp .cp{position:absolute;left:var(--lm);top:var(--tm);width:var(--wm)}
+.cp svg{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 22px rgba(0,0,0,.18))}
+.camp-text{position:absolute;left:0;bottom:0;z-index:3;padding-block:24px;display:grid;gap:10px;justify-items:start;max-width:min(560px,70%)}
+.camp-title{font-family:var(--font-display);font-weight:900;font-stretch:112%;text-transform:uppercase;font-size:clamp(38px,9vw,112px);line-height:.88;letter-spacing:-.02em;text-wrap:balance}
+.camp-btn{background:var(--cink);color:var(--cbg);height:42px}
+@media (min-width:760px){
+  .camp{aspect-ratio:auto;max-height:none;height:clamp(460px,calc(100svh - var(--head-h) - 24px),820px)}
+  .camp .cp{left:var(--ld);top:var(--td);width:var(--wd)}
+  .camp-text{padding-block:40px;max-width:44%}
+}
+
+/* Secciones de portada */
+.sec{padding-top:44px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+.sec-title{font-family:var(--font-display);font-weight:800;font-stretch:105%;font-size:clamp(18px,2.4vw,24px);text-transform:uppercase;letter-spacing:.01em}
+.rail-wrap{position:relative}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:46%;gap:4px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail > *{scroll-snap-align:start}
+@media (min-width:760px){.rail{grid-auto-columns:calc((100% - 16px) / 5)}}
+.rail-arrow{display:none}
+@media (hover:hover) and (min-width:760px){
+  .rail-arrow{display:grid;place-items:center;position:absolute;top:36%;z-index:5;width:40px;height:40px;border-radius:999px;background:var(--bg);box-shadow:0 2px 10px rgba(0,0,0,.15);font-size:20px}
+  .rail-arrow.prev{left:-8px}.rail-arrow.next{right:-8px}
+}
+.cat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 4px}
+@media (min-width:760px){.cat-grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.cat-tile{text-align:left;min-width:0}
+.cat-tile .tile{aspect-ratio:4/5}
+.cat-name{display:block;font-size:13px;font-weight:600;margin-top:8px;text-transform:uppercase;letter-spacing:.03em}
+.cat-tile:hover .cat-name{text-decoration:underline;text-underline-offset:3px}
+.looks-grid{display:grid;gap:30px 4px}
+@media (min-width:760px){.looks-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.look{min-width:0}
+.look-img{aspect-ratio:4/5}
+.look-tagline{position:absolute;left:10px;bottom:10px;z-index:2;background:var(--tile-chip);color:var(--tile-ink);padding:4px 9px;border-radius:999px;font-size:11px}
+.look-items{list-style:none;margin:10px 0 0;padding:0}
+.look-items button{width:100%;display:flex;justify-content:space-between;gap:12px;padding-block:9px;border-top:1px solid var(--line);font-size:12.5px}
+.look-items button:hover .li-name{text-decoration:underline;text-underline-offset:3px}
+.li-name{min-width:0}
+.li-price{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini-row{display:grid;grid-auto-flow:column;grid-auto-columns:clamp(110px,28vw,160px);gap:4px;overflow-x:auto;scrollbar-width:none}
+.mini-row::-webkit-scrollbar{display:none}
+.mini{text-align:left;min-width:0}
+.mini .tile{aspect-ratio:4/5}
+.mini-name{font-size:12px;line-height:1.3;margin-top:6px}
+.mini-price{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* Listado de categoría */
+.plp-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-top:22px}
+.plp-title{font-family:var(--font-display);font-weight:800;font-stretch:105%;font-size:clamp(24px,4vw,40px);text-transform:uppercase;line-height:1;margin-top:4px;overflow-wrap:anywhere}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:14px 2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:32px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;white-space:nowrap}
+.chip:hover{border-color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.toolbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--head-h));z-index:30;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:10px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.tool{display:inline-flex;align-items:center;gap:8px;height:34px;font-size:13px;font-weight:600}
+.tool svg{width:18px;height:18px}
+.fcount{min-width:18px;height:18px;border-radius:999px;background:var(--fg);color:var(--bg);font-size:10px;line-height:18px;text-align:center;padding:0 4px}
+.views{display:flex;gap:2px}
+.views button{width:34px;height:34px;display:grid;place-items:center;border-radius:6px;color:var(--muted)}
+.views button[aria-pressed="true"]{color:var(--fg);background:var(--surface)}
+.views svg{width:18px;height:18px}
+.vd{display:none !important}
+@media (min-width:720px){.vm{display:none !important}.vd{display:grid !important}}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 4px}
+.grid.m1{grid-template-columns:minmax(0,1fr)}
+@media (min-width:720px){.grid,.grid.m1{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.d6{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.plp-end{text-align:center;padding-block:36px 8px}
+.empty{grid-column:1/-1;padding:56px 0;text-align:center;color:var(--muted);display:grid;gap:14px;justify-items:center}
+
+/* Foto de producto (simulada) */
+.tile{position:relative;display:block;width:100%;overflow:hidden;background:var(--tile-bg,#ecebe7)}
+.tile::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 28%,rgba(255,255,255,.6),rgba(255,255,255,0) 62%);pointer-events:none}
+.tile::after{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");opacity:.14;mix-blend-mode:multiply;pointer-events:none;z-index:1}
+.tile > svg{position:absolute;left:6%;top:6%;width:88%;height:88%}
+.tile.full > svg{left:0;top:0;width:100%;height:100%}
+.tile .p{position:absolute;display:block}
+.tile .p svg{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 14px rgba(0,0,0,.16))}
+.card{position:relative;min-width:0}
+.media{position:relative;aspect-ratio:4/5}
+.media .card-img{position:absolute;inset:0;height:100%}
+.view{position:absolute;inset:6%;transition:opacity .35s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.view svg{display:block;width:100%;height:100%}
+.view.back{opacity:0}
+.fav{position:absolute;right:2px;top:2px;z-index:3;width:40px;height:40px;display:grid;place-items:center;color:var(--tile-ink);border-radius:999px}
+.fav svg{width:20px;height:20px;transition:transform .2s ease}
+.fav[aria-pressed="true"] svg path{fill:currentColor}
+.fav:active svg{transform:scale(.85)}
+.quick{display:none}
+@media (hover:hover) and (min-width:720px){
+  .card:hover .view.front{opacity:0}
+  .card:hover .view.back{opacity:1;transform:scale(1.03)}
+  .quick{display:grid;gap:6px;position:absolute;left:6px;right:6px;bottom:6px;z-index:3;background:var(--tile-chip);color:var(--tile-ink);border-radius:6px;padding:8px;opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+  .card:hover .quick,.card:focus-within .quick{opacity:1;transform:none;pointer-events:auto}
+}
+.quick .label{font-size:10px}
+.qs{display:flex;flex-wrap:wrap;gap:4px}
+.qs button{min-width:34px;height:30px;padding:0 7px;border-radius:4px;border:1px solid rgba(0,0,0,.16);font-size:12px;font-variant-numeric:tabular-nums}
+.qs button:hover:not(:disabled){background:var(--tile-ink);color:var(--tile-chip);border-color:var(--tile-ink)}
+.qs button:disabled{opacity:.35;text-decoration:line-through}
+.card-info{padding:8px 2px 0;display:grid;gap:2px}
+.card-flag{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.card-flag.sale{color:var(--sale)}
+.card-name{font-size:12.5px;font-weight:400;line-height:1.3}
+.price{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.old{color:var(--muted);text-decoration:line-through;font-weight:400}
+.now.sale{color:var(--sale)}
+.pct{color:var(--sale);font-weight:600;font-size:12px}
+.swatches{display:flex;gap:0;margin-top:2px;margin-left:-4px;flex-wrap:wrap}
+.sw{width:22px;height:22px;border-radius:50%;border:5px solid var(--bg);background:var(--c);box-shadow:0 0 0 1px var(--line)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 1.5px var(--fg)}
+.grid.d6 .swatches{display:none}
+
+/* Ficha de producto */
+.pdp{padding-bottom:24px}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;padding-block:12px;color:var(--muted);font-size:12px}
+.crumbs button:hover{color:var(--fg);text-decoration:underline;text-underline-offset:3px}
+.crumbs [aria-current]{color:var(--fg)}
+.crumbs .back-btn{color:var(--fg);margin-right:6px;font-weight:600}
+.pdp-grid{display:grid;align-items:start}
+.pdp-gal{position:relative;min-width:0;margin-left:calc(-1 * max(16px, env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px, env(safe-area-inset-right,0px)))}
+.shots{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.shots::-webkit-scrollbar{display:none}
+.shot{flex:0 0 100%;scroll-snap-align:start;aspect-ratio:4/5;cursor:zoom-in}
+.shot-chip{position:absolute;left:10px;bottom:10px;z-index:3;background:var(--tile-chip);color:var(--tile-ink);padding:3px 9px;border-radius:999px;font-size:10px}
+.gal-count{position:absolute;right:10px;bottom:10px;z-index:4;background:var(--tile-ink);color:var(--tile-chip);padding:3px 9px;border-radius:999px;font-size:10px;pointer-events:none}
+.pdp-info{display:grid;gap:22px;align-content:start;min-width:0;padding-block:20px 8px}
+@media (min-width:900px){
+  .pdp-grid{grid-template-columns:minmax(0,1.5fr) minmax(330px,1fr);gap:40px}
+  .pdp-gal{margin:0}
+  .shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;overflow:visible}
+  .gal-count{display:none}
+  .pdp-info{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--head-h) + 12px);max-height:calc(100vh - var(--head-h) - 24px);overflow-y:auto;scrollbar-width:thin;padding:4px 6px 16px 2px}
+}
+.pdp-flag{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.pdp-flag.sale{color:var(--sale)}
+.pdp-name{font-size:clamp(18px,2vw,22px);font-weight:600;line-height:1.2;text-wrap:balance;margin-top:4px}
+.pdp-price{font-size:17px;margin-top:8px;align-items:center}
+.pdp-ref{color:var(--muted);font-size:11px;margin-top:6px}
+.opt-label{font-size:13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.cthumbs{display:flex;gap:6px;flex-wrap:wrap}
+.cthumb{width:56px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.cthumb .tile{aspect-ratio:4/5}
+.cthumb[aria-pressed="true"]{box-shadow:0 0 0 2px var(--fg)}
+.sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:6px}
+.size{height:44px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-variant-numeric:tabular-nums;text-align:center}
+.size:hover{border-color:var(--fg)}
+.size[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.size.out{color:var(--muted);text-decoration:line-through;background:var(--surface)}
+.size.out[aria-pressed="true"]{background:var(--surface);color:var(--fg);border-color:var(--fg)}
+.stock{font-size:12px;color:var(--warn);margin-top:10px;display:flex;align-items:center;gap:6px}
+.stock::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.need{font-size:12px;color:var(--err);margin-top:10px}
+.model{margin-top:12px;color:var(--muted);font-size:12px}
+.notify{display:grid;gap:10px;padding:14px;border:1px dashed #bdbdbd;border-radius:10px;margin-top:10px;font-size:13px}
+.inline-form{display:flex;gap:8px;flex-wrap:wrap}
+.inline-form input{flex:1 1 200px;min-width:0;height:46px;border:1px solid var(--fg);background:var(--bg);color:var(--fg);border-radius:999px;padding:0 18px;font:inherit;font-size:16px}
+.inline-form input:focus{outline:none;box-shadow:0 0 0 1px var(--fg)}
+.buy-row{display:flex;gap:8px;align-items:center}
+.buy-row .btn-block{margin-top:0;flex:1}
+.fav-big{width:50px;height:50px;border-radius:999px;border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.fav-big svg{width:22px;height:22px}
+.fav-big[aria-pressed="true"] svg path{fill:currentColor}
+.deliv{list-style:none;margin:0;padding:14px 0;border-block:1px solid var(--line);display:grid;gap:10px;font-size:13px}
+.deliv li{display:flex;gap:10px;align-items:flex-start}
+.deliv svg{width:18px;height:18px;flex:none;margin-top:1px}
+.deliv b{font-weight:600}
+details{border-top:1px solid var(--line)}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{list-style:none;display:flex;justify-content:space-between;gap:12px;padding-block:14px;cursor:pointer;font-size:13px;font-weight:600}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-weight:400;font-size:16px;line-height:1}
+details[open] summary::after{content:"–"}
+.acc-body{padding-bottom:16px;display:grid;gap:12px;font-size:13px}
+.acc-body p{max-width:62ch}
+.det{margin:0;padding-left:18px;display:grid;gap:4px}
+.care{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.care li{display:flex;gap:12px;align-items:center}
+.care svg{width:28px;height:28px;flex:none}
+.sub-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.pdp-sec{padding-top:48px}
+.tbl-wrap{overflow-x:auto}
+table.sz{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+table.sz th,table.sz td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.sz th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:400}
+
+/* Barra fija de compra (móvil) */
+.buybar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--bg);border-top:1px solid var(--line);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));display:flex;gap:12px;align-items:center;transform:translateY(110%);transition:transform .3s ease}
+.buybar.on{transform:none}
+.buybar .tile{width:40px;aspect-ratio:4/5;flex:none;border-radius:3px}
+.bb-txt{min-width:0;flex:1;display:grid;font-size:13px;line-height:1.3}
+.bb-txt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.bb-txt span{font-size:12px;color:var(--muted)}
+.buybar .btn-block{width:auto;margin:0;height:44px;padding-inline:22px;flex:none}
+@media (min-width:900px){.buybar{display:none}}
+
+/* Footer */
+.foot{margin-top:64px;border-top:1px solid var(--line)}
+.foot-news{display:grid;gap:14px;padding-block:36px;border-bottom:1px solid var(--line)}
+@media (min-width:860px){.foot-news{grid-template-columns:1fr 1fr;align-items:center;gap:40px}}
+.foot-news h2{font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.foot-news p{color:var(--muted);margin-top:6px;max-width:48ch;font-size:13px}
+.form-note{color:var(--muted);margin-top:8px;font-size:12px;min-height:1.4em}
+.foot-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 20px;padding-block:36px}
+@media (min-width:760px){.foot-cols{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.foot h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.foot ul{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px;font-size:13px;color:#333}
+.foot ul button:hover{text-decoration:underline;text-underline-offset:3px}
+.foot-legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;padding-block:18px 24px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+
+/* Capas */
+.backdrop{position:fixed;inset:0;background:var(--overlay);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s;z-index:60}
+.backdrop.on{opacity:1;visibility:visible}
+.drawer{position:fixed;top:0;bottom:0;width:min(440px,100vw);background:var(--bg);z-index:70;display:flex;flex-direction:column;visibility:hidden;transition:transform .34s cubic-bezier(.2,.7,.2,1),visibility .34s;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer-right{right:0;transform:translateX(100%);padding-right:env(safe-area-inset-right,0px)}
+.drawer-left{left:0;transform:translateX(-100%);padding-left:env(safe-area-inset-left,0px)}
+.drawer.open{transform:none;visibility:visible}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;padding-inline:20px;border-bottom:1px solid var(--line);flex:none}
+.drawer-title{font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.drawer-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:20px}
+.seg{display:flex;gap:22px}
+.seg button{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 0;border-bottom:2px solid transparent;color:var(--muted)}
+.seg button[aria-pressed="true"]{color:var(--fg);border-color:var(--fg)}
+.menu-list{display:grid;align-content:start;padding:16px 20px 8px}
+.menu-list button{font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;padding-block:9px;text-align:left}
+.menu-list button:hover{text-decoration:underline;text-underline-offset:4px}
+.menu-list .sale{color:var(--sale)}
+.menu-sub{display:grid;padding:8px 20px 20px}
+.menu-sub button{display:flex;justify-content:space-between;align-items:center;padding-block:11px;border-top:1px solid var(--line);font-size:13px}
+.menu-foot{padding:14px 20px;border-top:1px solid var(--line);color:var(--muted);flex:none;font-size:12px}
+.ship{padding:14px 20px;border-bottom:1px solid var(--line);font-size:13px;flex:none}
+.bar{height:3px;background:var(--surface);border-radius:3px;margin-top:9px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--p,0%);background:var(--fg);transition:width .4s ease}
+.cart-list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:0 20px}
+.ci{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;padding-block:16px;border-bottom:1px solid var(--line)}
+.ci .tile{aspect-ratio:4/5}
+.ci-name{font-size:13px;line-height:1.3}
+.ci-meta{color:var(--muted);font-size:12px;margin-top:3px}
+.ci-ctrl{display:flex;align-items:center;gap:6px 14px;margin-top:10px;flex-wrap:wrap}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;height:32px}
+.qty button{width:32px;height:30px;display:grid;place-items:center}
+.qty span{min-width:18px;text-align:center;font-size:12px;font-variant-numeric:tabular-nums}
+.ci-rm{font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.ci-price{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cart-foot{border-top:1px solid var(--line);padding:14px 20px 16px;display:grid;gap:8px;flex:none}
+.promo-form{display:flex;gap:6px;margin-bottom:6px}
+.promo-form input{flex:1;min-width:0;height:40px;border:1px solid var(--line);border-radius:999px;padding:0 14px;background:var(--bg);color:var(--fg);font:inherit;font-size:16px;text-transform:uppercase}
+.promo-form input:focus{outline:none;border-color:var(--fg)}
+.promo-form button{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--fg);font-size:12px;font-weight:600}
+.promo-on{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--ok);margin-bottom:4px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.row .num{font-variant-numeric:tabular-nums}
+.row.disc{color:var(--ok)}
+.row.total{font-weight:700;font-size:15px;padding-top:4px}
+.cart-empty{padding:56px 0;text-align:center;display:grid;gap:14px;justify-items:center;color:var(--muted)}
+.f-sec{padding:18px 20px;border-bottom:1px solid var(--line)}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.opt{height:36px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;display:inline-flex;align-items:center;gap:8px}
+.opt:hover{border-color:var(--fg)}
+.opt[aria-pressed="true"]{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+.opt .dot{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.f-foot{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);flex:none}
+.f-foot .pill{height:50px;flex:none}
+.f-foot .btn-block{margin:0;flex:1}
+
+/* Buscador */
+.search-layer{position:fixed;left:0;right:0;top:0;z-index:72;background:var(--bg);max-height:100%;overflow-y:auto;overscroll-behavior:contain;transform:translateY(-12px);opacity:0;visibility:hidden;transition:opacity .2s ease,transform .25s ease,visibility .25s;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.search-layer.open{transform:none;opacity:1;visibility:visible}
+.search-top{display:flex;align-items:center;gap:12px;height:64px;border-bottom:1px solid var(--line)}
+.search-box{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.search-box svg{width:20px;height:20px;flex:none}
+.search-box input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:16px;color:var(--fg);height:44px}
+.search-box input:focus{outline:none}
+.search-body{padding-block:20px;display:grid;gap:18px}
+
+/* Zoom */
+.zoom{position:fixed;inset:0;z-index:85;background:var(--bg);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.zoom.open{opacity:1;visibility:visible}
+.zoom-head{display:flex;justify-content:space-between;align-items:center;gap:12px;height:56px;flex:none}
+.zoom-stage{flex:1;position:relative;overflow:hidden;display:grid;place-items:center;padding:4px 8px 8px;min-height:0}
+.zoom-img{height:100%;max-height:100%;width:auto;aspect-ratio:4/5;max-width:100%;transition:transform .25s ease;cursor:zoom-in}
+.zoom-img.zoomed{transform:scale(2.2);cursor:zoom-out}
+.zoom-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:46px;height:46px;border-radius:999px;background:var(--bg);box-shadow:0 0 0 1px var(--line);display:grid;place-items:center;font-size:22px}
+.zoom-nav.prev{left:max(12px, env(safe-area-inset-left,0px))}
+.zoom-nav.next{right:max(12px, env(safe-area-inset-right,0px))}
+.zoom-hint{text-align:center;color:var(--muted);padding-bottom:12px;flex:none;font-size:12px}
+
+/* Compra */
+.co{position:fixed;inset:0;z-index:75;background:var(--bg);display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .25s ease,transform .3s ease,visibility .3s;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.co.open{opacity:1;visibility:visible;transform:none}
+.co-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;border-bottom:1px solid var(--line);flex:none}
+.co-head .back{font-size:13px;justify-self:start;padding:8px 0}
+.co-secure{justify-self:end;display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.co-secure svg{width:14px;height:14px}
+.co-steps{list-style:none;margin:0;padding-block:14px;display:flex;justify-content:center;align-items:center;gap:8px;border-bottom:1px solid var(--line);flex:none}
+.step{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--muted)}
+.step[aria-current="step"]{color:var(--fg)}
+.step .n{width:22px;height:22px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;font-size:11px}
+.step.done{color:var(--fg)}
+.step.done .n{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.step-sep{width:22px;height:1px;background:var(--line)}
+.co-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.co-grid{display:grid;gap:28px;padding-block:24px 56px;max-width:1120px;margin-inline:auto}
+.co-main{min-width:0;display:grid;gap:22px;align-content:start}
+@media (min-width:900px){.co-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:56px;padding-block:36px 64px}}
+.co-h{font-size:clamp(20px,3vw,26px);font-weight:700;text-transform:uppercase;letter-spacing:.01em;line-height:1.1}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+.field{display:grid;gap:6px;min-width:0;align-content:start}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;color:var(--muted)}
+.field input,.field select{height:48px;border:1px solid #cfcfcf;border-radius:6px;padding:0 14px;background:var(--bg);color:var(--fg);font:inherit;font-size:16px;width:100%;min-width:0}
+.field input:focus,.field select:focus{outline:none;border-color:var(--fg)}
+.field [aria-invalid="true"]{border-color:var(--err)}
+.err{font-size:12px;color:var(--err)}
+.err:empty{display:none}
+.hint{font-size:12px;color:var(--ok)}
+.hint:empty{display:none}
+.fix{font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px;color:var(--fg);margin-left:4px}
+.verify{border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:14px}
+.v-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.v-title.ok{color:var(--ok)}
+.v-title.warn{color:var(--warn)}
+.v-addr{font-size:14px;line-height:1.6}
+.v-checks{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid var(--line);display:grid;gap:8px;font-size:13px}
+.v-checks li{display:flex;gap:8px;align-items:flex-start}
+.v-checks li::before{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px}
+.v-checks li.ok::before{content:"✓";background:#e3f3e8;color:var(--ok)}
+.v-checks li.warn::before{content:"!";background:#fbeee2;color:var(--warn)}
+.v-checks li.info::before{content:"i";background:var(--surface);color:var(--muted)}
+.v-sugs{display:flex;flex-wrap:wrap;gap:6px}
+.checking{display:flex;align-items:center;gap:12px;font-size:14px;padding:24px 0}
+.spin{width:22px;height:22px;border:2px solid var(--line);border-top-color:var(--fg);border-radius:50%;animation:turn .8s linear infinite}
+@keyframes turn{to{transform:rotate(360deg)}}
+@media (max-width:520px){.fields{grid-template-columns:1fr}}
+.choices{display:grid;gap:10px}
+.choice{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;padding:16px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.choice:has(input:checked){border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.choice input{accent-color:#000;width:18px;height:18px;margin:1px 0 0}
+.choice b{display:block;font-size:14px}
+.choice .s{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.choice .eta{display:block;font-size:12px;color:var(--ok);margin-top:4px}
+.choice .pr{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.recap{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:14px 16px;background:var(--surface);border-radius:8px;font-size:13px}
+.recap .label{color:var(--muted);margin-bottom:4px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13px}
+.check input{accent-color:#000;width:18px;height:18px;margin:1px 0 0;flex:none}
+.demo-box{padding:14px 16px;border:1px dashed #bdbdbd;border-radius:8px;font-size:13px;color:var(--muted)}
+.co-actions{display:flex;gap:10px 18px;align-items:center;flex-wrap:wrap}
+.co-actions .btn-block{width:auto;flex:1 1 240px;margin:0}
+.summary{background:var(--surface);border-radius:8px;padding:20px;display:grid;gap:10px;align-self:start;min-width:0}
+@media (min-width:900px){.summary{position:sticky;top:0}}
+.sum-items{display:grid;gap:12px;max-height:320px;overflow-y:auto;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.sum-it{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;font-size:12px}
+.sum-it .tile{aspect-ratio:4/5;border-radius:3px}
+.sum-it .num{font-variant-numeric:tabular-nums}
+.done-num{font-family:var(--font-mono);font-size:clamp(20px,4vw,26px);letter-spacing:.04em}
+
+/* Cuenta y ayuda */
+.prose{display:grid;gap:14px;font-size:14px;line-height:1.6;align-content:start}
+.prose h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
+.prose ol,.prose ul{padding-left:20px;margin:0;display:grid;gap:6px}
+.prose details p{color:var(--muted);padding-bottom:14px}
+.copy-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--surface);border-radius:8px}
+.copy-row span{font-family:var(--font-mono);font-size:13px;user-select:all;overflow-wrap:anywhere;min-width:0}
+.copy-row button{font-size:12px;font-weight:600;text-decoration:underline;text-underline-offset:3px;flex:none}
+.order{display:grid;gap:4px;padding:14px 0;border-bottom:1px solid var(--line);font-size:13px}
+.order .top{display:flex;justify-content:space-between;gap:12px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--warn)}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.toggle{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding-block:12px;border-bottom:1px solid var(--line)}
+.toggle input{accent-color:#000;width:20px;height:20px;flex:none;margin-top:2px}
+.finder{padding:16px;background:var(--surface);border-radius:10px;display:grid;gap:12px}
+.tabs-line{display:flex;gap:22px;border-bottom:1px solid var(--line)}
+.tabs-line button{font-size:13px;font-weight:600;padding:10px 0;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--muted)}
+.tabs-line button[aria-pressed="true"]{color:var(--fg);border-color:var(--fg)}
+
+/* Aviso y cookies */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px) + var(--lift) + var(--bar));transform:translate(-50%,16px);background:var(--fg);color:var(--bg);padding:10px;border-radius:12px;opacity:0;visibility:hidden;transition:opacity .25s,transform .25s,visibility .25s,bottom .25s;z-index:90;display:flex;gap:12px;align-items:center;width:max-content;max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.toast .tile{width:42px;flex:none;aspect-ratio:4/5;border-radius:3px}
+.toast-txt{display:grid;font-size:13px;line-height:1.3;min-width:0}
+.toast-txt small{opacity:.7;font-size:12px}
+.toast button{font-weight:700;font-size:13px;text-decoration:underline;text-underline-offset:3px;padding:6px 8px;white-space:nowrap}
+.cookies{position:fixed;left:0;right:0;bottom:0;z-index:80;background:var(--bg);border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.08);padding-top:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+@media (min-width:860px){.cookies{grid-template-columns:1fr auto;align-items:center;gap:32px}}
+.cookies p{font-size:13px;line-height:1.5;max-width:90ch}
+.cookies .btns{display:flex;flex-wrap:wrap;gap:8px}
+.cookies .pill{height:40px;font-size:12px}
+
+@media (prefers-reduced-motion: reduce){
+  .drawer,.backdrop,.toast,.co,.view,.buybar,.zoom,.zoom-img,.search-layer,.gate-half .cp{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="topbar" id="topbar" hidden><span id="topmsg">Envío gratis a partir de 29,90 €</span></div>
+
+<header class="site-head" id="head" hidden>
+  <div class="head-row wrap">
+    <div class="h-left">
+      <button class="icon-btn" data-act="menu" aria-label="Abrir menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg></button>
+      <button class="logo" data-act="logo" aria-label="Asfalto, ir a la portada">Asfalto</button>
+    </div>
+    <nav class="h-gender" aria-label="Sección">
+      <button data-gender="mujer" aria-pressed="true">Mujer</button>
+      <button data-gender="hombre" aria-pressed="false">Hombre</button>
+    </nav>
+    <div class="h-right">
+      <button class="search-pill hide-sm" data-act="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg>Buscar</button>
+      <button class="icon-btn only-sm" data-act="search" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg></button>
+      <button class="txt-btn hide-sm" data-act="account">Iniciar sesión</button>
+      <button class="icon-btn" data-act="favs" aria-label="Favoritos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z"/></svg><span class="badge" data-badge="favs" hidden></span></button>
+      <button class="icon-btn" data-act="cart" aria-label="Abrir cesta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="badge" id="cart-badge" hidden></span></button>
+    </div>
+  </div>
+  <nav class="pills wrap" id="pills" aria-label="Categorías"></nav>
+</header>
+
+<main>
+  <section id="gate" class="gate" hidden aria-label="Elige sección">
+    <div class="gate-top"><span class="logo" style="font-size:24px">Asfalto</span></div>
+    <div class="gate-split" id="gate-split"></div>
+    <p class="gate-foot label"><span>España</span><span>·</span><span>Español</span></p>
+  </section>
+
+  <div id="home" hidden></div>
+
+  <section id="plp" class="plp" hidden>
+    <div class="wrap plp-head">
+      <div><p class="label muted" id="plp-eyebrow">Mujer</p><h1 class="plp-title" id="plp-title">Novedades</h1></div>
+      <span class="label muted" id="plp-count"></span>
+    </div>
+    <div class="wrap"><div class="chips" id="plp-chips" role="group" aria-label="Corte"></div></div>
+    <div class="toolbar wrap">
+      <button class="tool" data-act="filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Filtrar y ordenar<span class="fcount" id="fcount" hidden></span></button>
+      <div class="views" role="group" aria-label="Vista de la rejilla">
+        <button class="vm" data-colsm="2" aria-label="Ver 2 por fila"><svg viewBox="0 0 18 18" fill="currentColor"><rect x="1" y="1" width="7" height="16" rx="1"/><rect x="10" y="1" width="7" height="16" rx="1"/></svg></button>
+        <button class="vm" data-colsm="1" aria-label="Ver 1 por fila"><svg viewBox="0 0 18 18" fill="currentColor"><rect x="3" y="1" width="12" height="16" rx="1"/></svg></button>
+        <button class="vd" data-colsd="4" aria-label="Ver 4 por fila"><svg viewBox="0 0 18 18" fill="currentColor"><rect x="1" y="1" width="7" height="7" rx="1"/><rect x="10" y="1" width="7" height="7" rx="1"/><rect x="1" y="10" width="7" height="7" rx="1"/><rect x="10" y="10" width="7" height="7" rx="1"/></svg></button>
+        <button class="vd" data-colsd="6" aria-label="Ver 6 por fila"><svg viewBox="0 0 18 18" fill="currentColor"><rect x="1" y="1" width="4" height="7" rx=".8"/><rect x="7" y="1" width="4" height="7" rx=".8"/><rect x="13" y="1" width="4" height="7" rx=".8"/><rect x="1" y="10" width="4" height="7" rx=".8"/><rect x="7" y="10" width="4" height="7" rx=".8"/><rect x="13" y="10" width="4" height="7" rx=".8"/></svg></button>
+      </div>
+    </div>
+    <div class="wrap"><div class="grid" id="grid"></div></div>
+    <p class="plp-end label muted" id="plp-end"></p>
+  </section>
+
+  <article id="pdp" class="pdp" hidden>
+    <nav class="crumbs wrap" id="pdp-crumbs" aria-label="Estás en"></nav>
+    <div class="pdp-grid wrap">
+      <div class="pdp-gal">
+        <div class="shots" id="pdp-shots" aria-label="Fotos del producto"></div>
+        <span class="gal-count" id="gal-count" aria-hidden="true">1 / 6</span>
+      </div>
+      <div class="pdp-info" id="pdp-info"></div>
+    </div>
+    <section class="pdp-sec wrap" aria-labelledby="look-title"><div class="sec-head"><h2 class="sec-title" id="look-title">Completa el look</h2></div><div class="grid" id="pdp-look"></div></section>
+    <section class="pdp-sec wrap" aria-labelledby="sim-title"><div class="sec-head"><h2 class="sec-title" id="sim-title">También te puede gustar</h2></div><div class="grid" id="pdp-sim"></div></section>
+    <section class="pdp-sec wrap" id="pdp-recent-sec" aria-labelledby="pr-title" hidden><div class="sec-head"><h2 class="sec-title" id="pr-title">Vistos recientemente</h2></div><div class="mini-row" id="pdp-recent"></div></section>
+  </article>
+</main>
+
+<footer class="foot" id="foot" hidden>
+  <div class="foot-news wrap">
+    <div>
+      <h2>Suscríbete a la newsletter</h2>
+      <p>Entérate antes que nadie de cada drop y llévate un 15% de descuento en tu primera compra.</p>
+    </div>
+    <div>
+      <form id="news-form" class="inline-form" novalidate>
+        <label for="email" class="sr">Tu email</label>
+        <input id="email" type="email" placeholder="Tu email" autocomplete="email">
+        <button class="pill pill-dark" type="submit">Suscribirme</button>
+      </form>
+      <p class="form-note" id="news-note" aria-live="polite"></p>
+    </div>
+  </div>
+  <div class="foot-cols wrap">
+    <div><h3>Ayuda</h3><ul>
+      <li><button data-info="envios">Envíos y entregas</button></li>
+      <li><button data-info="devoluciones">Devoluciones</button></li>
+      <li><button data-info="tallas">Guía de tallas</button></li>
+      <li><button data-info="pedido">Estado del pedido</button></li>
+      <li><button data-info="faq">Preguntas frecuentes</button></li>
+    </ul></div>
+    <div><h3>Asfalto</h3><ul>
+      <li><button data-info="nosotros">Sobre nosotros</button></li>
+      <li><button data-info="tiendas">Tiendas</button></li>
+      <li><button data-info="sostenibilidad">Sostenibilidad</button></li>
+      <li><button data-info="trabaja">Trabaja con nosotros</button></li>
+    </ul></div>
+    <div><h3>Síguenos</h3><ul>
+      <li>Instagram · @asfalto.mad</li><li>TikTok · @asfalto.mad</li><li>Pinterest · asfaltomad</li><li>Spotify · Asfalto Radio</li>
+    </ul></div>
+    <div><h3>Contacto</h3><ul>
+      <li><button data-info="contacto">hola@asfalto.es</button></li><li>Lun–Vie · 10:00–19:00</li>
+      <li><button data-info="cookies">Configurar cookies</button></li>
+      <li><button data-info="privacidad">Política de privacidad</button></li>
+    </ul></div>
+  </div>
+  <div class="foot-legal wrap"><span>España | Español</span><span>© 2026 Asfalto</span></div>
+</footer>
+
+<div class="buybar" id="buybar" aria-hidden="true">
+  <span id="bb-thumb"></span>
+  <div class="bb-txt"><b id="bb-name"></b><span id="bb-price"></span></div>
+  <button class="btn-block" data-act="bb-add" id="bb-btn" tabindex="-1">Añadir</button>
+</div>
+
+<div class="backdrop" id="backdrop" data-close></div>
+
+<aside class="drawer drawer-left" id="menu" aria-label="Menú" inert aria-hidden="true">
+  <div class="drawer-head">
+    <div class="seg" role="group" aria-label="Sección">
+      <button data-gender="mujer" aria-pressed="true">Mujer</button>
+      <button data-gender="hombre" aria-pressed="false">Hombre</button>
+    </div>
+    <button class="icon-btn" data-close aria-label="Cerrar menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" style="padding:0">
+    <nav class="menu-list" id="menu-list" aria-label="Categorías"></nav>
+    <div class="menu-sub">
+      <button data-act="account">Iniciar sesión <span aria-hidden="true">→</span></button>
+      <button data-act="favs">Favoritos <span data-badge-text="favs"></span></button>
+      <button data-info="faq">Ayuda <span aria-hidden="true">→</span></button>
+      <button data-info="pedido">Estado del pedido <span aria-hidden="true">→</span></button>
+    </div>
+  </div>
+  <p class="menu-foot">Envío gratis desde 29,90 € · Devoluciones gratis 30 días</p>
+</aside>
+
+<aside class="drawer drawer-right" id="cart" aria-label="Cesta" inert aria-hidden="true">
+  <div class="drawer-head">
+    <h2 class="drawer-title" id="cart-title">Cesta</h2>
+    <button class="icon-btn" data-close aria-label="Cerrar cesta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="ship" id="ship"></div>
+  <div class="cart-list" id="cart-list"></div>
+  <div class="cart-foot" id="cart-foot"></div>
+</aside>
+
+<aside class="drawer drawer-right" id="filters" aria-label="Filtrar y ordenar" inert aria-hidden="true">
+  <div class="drawer-head">
+    <h2 class="drawer-title">Filtrar y ordenar</h2>
+    <button class="icon-btn" data-close aria-label="Cerrar filtros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="f-body" style="padding:0"></div>
+  <div class="f-foot">
+    <button class="pill pill-line" data-act="f-clear">Borrar</button>
+    <button class="btn-block" data-act="f-apply" id="f-apply">Ver artículos</button>
+  </div>
+</aside>
+
+<aside class="drawer drawer-right" id="account" aria-label="Mi cuenta" inert aria-hidden="true">
+  <div class="drawer-head">
+    <h2 class="drawer-title">Mi cuenta</h2>
+    <button class="icon-btn" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="acc-body"></div>
+</aside>
+
+<aside class="drawer drawer-right" id="info" aria-labelledby="info-title" inert aria-hidden="true">
+  <div class="drawer-head">
+    <h2 class="drawer-title" id="info-title">Ayuda</h2>
+    <button class="icon-btn" data-close aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="drawer-body prose" id="info-body"></div>
+</aside>
+
+<div class="search-layer" id="search" role="dialog" aria-modal="true" aria-label="Buscar" inert aria-hidden="true">
+  <div class="search-top wrap">
+    <form class="search-box" id="search-form" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.8-4.8"/></svg>
+      <label for="q" class="sr">Buscar</label>
+      <input id="q" type="search" placeholder="Buscar sudaderas, jeans, gorros…" autocomplete="off">
+    </form>
+    <button class="txt-btn" data-close>Cerrar</button>
+  </div>
+  <div class="search-body wrap" id="search-body"></div>
+</div>
+
+<div class="zoom" id="zoom" role="dialog" aria-modal="true" aria-label="Fotos ampliadas" inert aria-hidden="true">
+  <div class="zoom-head wrap">
+    <span class="label" id="zoom-count">1 / 6 · Delante</span>
+    <button class="icon-btn" data-close aria-label="Cerrar fotos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="zoom-stage" id="zoom-stage"></div>
+  <button class="zoom-nav prev" data-act="zoom-prev" aria-label="Foto anterior">‹</button>
+  <button class="zoom-nav next" data-act="zoom-next" aria-label="Foto siguiente">›</button>
+  <p class="zoom-hint">Toca la foto para acercar · flechas para pasar</p>
+</div>
+
+<div class="co" id="checkout" role="dialog" aria-modal="true" aria-label="Tramitar pedido" inert aria-hidden="true">
+  <div class="co-head wrap">
+    <button class="back" data-close>← Seguir comprando</button>
+    <span class="logo" aria-hidden="true">Asfalto</span>
+    <span class="co-secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Pago seguro</span>
+  </div>
+  <ol class="co-steps wrap" id="co-steps"></ol>
+  <div class="co-scroll" id="co-scroll">
+    <div class="co-grid wrap">
+      <div class="co-main" id="co-main"></div>
+      <div id="co-sum"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="cookies wrap" id="cookies" role="region" aria-label="Aviso de cookies" hidden>
+  <p>Usamos cookies propias para que la tienda funcione y, si nos dejas, otras de análisis y publicidad para mejorar la web y enseñarte anuncios que te interesen. Puedes aceptarlas, rechazarlas o elegir cuáles.</p>
+  <div class="btns">
+    <button class="pill pill-dark" data-act="ck-all">Aceptar todas</button>
+    <button class="pill pill-line" data-act="ck-none">Rechazar</button>
+    <button class="pill pill-line" data-info="cookies">Configurar</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const FREE = 29.90;
+  const fmt = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+  const eur = n => fmt.format(n);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const smooth = () => reduced ? 'auto' : 'smooth';
+  const pad = n => String(n).padStart(2, '0');
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const GN = { mujer: 'Mujer', hombre: 'Hombre' };
+
+  /* ================= Catálogo ================= */
+  const C = {
+    negro: { n: 'Negro', h: '#1a1a1d', f: 'negro', c: 800 }, gris: { n: 'Gris jaspeado', h: '#bdbdc2', f: 'gris', c: 802 },
+    rosa: { n: 'Rosa chicle', h: '#f3b4c7', f: 'rosa', c: 620 }, blanco: { n: 'Blanco', h: '#f5f5f2', f: 'blanco', c: 250 },
+    klein: { n: 'Azul klein', h: '#2a36ff', f: 'azul', c: 410 }, caqui: { n: 'Caqui', h: '#86865a', f: 'verde', c: 505 },
+    rojo: { n: 'Rojo', h: '#b8261f', f: 'rosa', c: 600 }, plata: { n: 'Plata', h: '#cfd2d8', f: 'gris', c: 805 },
+    lavado: { n: 'Azul lavado', h: '#7f99ba', f: 'azul', c: 427 }, oscuro: { n: 'Azul oscuro', h: '#34476a', f: 'azul', c: 401 },
+    crudo: { n: 'Crudo', h: '#e7dfcd', f: 'blanco', c: 251 }, marron: { n: 'Marrón', h: '#6a4a36', f: 'marron', c: 700 },
+    bosque: { n: 'Verde bosque', h: '#2f4a3b', f: 'verde', c: 500 }, marino: { n: 'Azul marino', h: '#232f49', f: 'azul', c: 402 },
+    grisc: { n: 'Gris claro', h: '#cacac6', f: 'gris', c: 803 }, grisd: { n: 'Gris marengo', h: '#55565c', f: 'gris', c: 807 }
+  };
+  const FAMS = [
+    { k: 'negro', n: 'Negro', h: '#1a1a1d' }, { k: 'blanco', n: 'Blanco y crudo', h: '#f1ede3' }, { k: 'gris', n: 'Gris', h: '#a9a9ae' },
+    { k: 'azul', n: 'Azul', h: '#4a63b0' }, { k: 'verde', n: 'Verde', h: '#5f6b48' }, { k: 'rosa', n: 'Rosa y rojo', h: '#e48aa4' }, { k: 'marron', n: 'Marrón', h: '#6a4a36' }
+  ];
+  const ROPA = ['XS', 'S', 'M', 'L', 'XL'], P_MUJER = ['32', '34', '36', '38', '40', '42'], P_HOMBRE = ['38', '40', '42', '44', '46'], UNI = ['Única'];
+  const BGS = ['#ecebe7', '#e4e8ee', '#eee6e3', '#e6ebe3', '#e9e7f0', '#efebe2', '#e3e6e6', '#ece6ea'];
+
+  const P = [
+    { id: 'c01', g: 'mujer', name: 'Sudadera oversize con capucha', type: 'hoodie', cat: 'sudaderas', price: 29.99, tag: 'Nuevo', best: true, colors: ['gris', 'rosa', 'negro'], sizes: ROPA, out: ['XS'], low: ['M'], back: true, fit: 'Oversize', origin: 'Portugal', care: 'cotton30',
+      comp: ['Exterior: 80% algodón, 20% poliéster', 'Capucha forrada: 100% algodón'],
+      desc: 'Sudadera de felpa gordita con capucha forrada y bolsillo canguro. Es de corte oversize: si la quieres más ajustada, coge una talla menos.',
+      det: ['Capucha forrada con cordón plano', 'Bolsillo canguro', 'Puños y bajo de canalé', 'Hombro caído', 'Logo estampado en la espalda'],
+      meas: [['Largo', '70 cm'], ['Ancho de pecho', '64 cm'], ['Manga', '58 cm']] },
+    { id: 'c02', g: 'mujer', name: 'Falda mini cargo', type: 'skirt', cat: 'faldas', price: 22.99, colors: ['caqui', 'negro'], sizes: ROPA, fit: 'Tiro bajo', origin: 'Marruecos', care: 'cotton30',
+      comp: ['100% algodón (sarga)'],
+      desc: 'Minifalda de sarga con bolsillos de solapa a los lados. Va de tiro bajo y se cierra con cremallera y botón.',
+      det: ['Tiro bajo', 'Bolsillos cargo con solapa', 'Cremallera y botón delante', 'Trabillas para cinturón'],
+      meas: [['Cintura (en plano)', '37 cm'], ['Largo', '34 cm']] },
+    { id: 'c03', g: 'mujer', name: 'Top corsé satinado', type: 'top', cat: 'camisetas', price: 17.99, tag: 'Solo online', colors: ['negro', 'rojo'], sizes: ROPA, out: ['L'], fit: 'Ajustado', origin: 'Turquía', care: 'hand',
+      comp: ['Exterior: 97% poliéster, 3% elastano', 'Forro: 100% poliéster'],
+      desc: 'Top de satén con escote corazón, varillas cosidas y tirantes finos. Se ajusta al cuerpo y se cierra con cordón en la espalda.',
+      det: ['Escote corazón', 'Varillas interiores', 'Tirantes finos', 'Cordón cruzado en la espalda'],
+      meas: [['Largo', '34 cm'], ['Ancho de pecho', '40 cm']] },
+    { id: 'c04', g: 'mujer', name: 'Plumífero corto efecto brillo', type: 'puffer', cat: 'chaquetas', price: 49.99, tag: 'Nuevo', colors: ['negro', 'plata'], sizes: ROPA, low: ['S'], fit: 'Cropped', origin: 'China', care: 'synth30',
+      comp: ['Exterior: 100% poliamida', 'Relleno: 100% poliéster reciclado', 'Forro: 100% poliéster'],
+      desc: 'Plumífero corto con acabado brillante, cuello alto y cremallera hasta arriba. Abriga mucho y pesa poco.',
+      det: ['Acabado brillante', 'Cuello alto', 'Cremallera de doble cursor', 'Bolsillos con cremallera'],
+      meas: [['Largo', '50 cm'], ['Ancho de pecho', '62 cm'], ['Manga', '60 cm']] },
+    { id: 'c05', g: 'mujer', name: 'Jeans baggy tiro bajo', type: 'jeans', cat: 'pantalones', price: 35.99, best: true, colors: ['lavado', 'oscuro'], sizes: P_MUJER, out: ['32'], fit: 'Baggy', origin: 'Marruecos', care: 'denim',
+      comp: ['100% algodón (denim de 12 oz)'],
+      desc: 'Vaqueros anchos de tiro bajo con efecto lavado. Los bajos son largos para que caigan sobre la zapatilla.',
+      det: ['Tiro bajo', 'Pierna ancha', 'Cinco bolsillos', 'Cremallera y botón', 'Parche trasero'],
+      meas: [['Cintura (en plano)', '37 cm'], ['Tiro', '24 cm'], ['Largo', '106 cm'], ['Bajo', '25 cm']] },
+    { id: 'c06', g: 'mujer', name: 'Baby tee «Madrid»', type: 'tee', cat: 'camisetas', price: 12.99, old: 15.99, best: true, print: 'MADRID', colors: ['blanco', 'klein'], sizes: ROPA, fit: 'Cropped', origin: 'Portugal', care: 'cotton30',
+      comp: ['95% algodón, 5% elastano'],
+      desc: 'Camiseta corta y ajustada de punto elástico, con «Madrid» estampado en el pecho.',
+      det: ['Cuello redondo', 'Manga corta', 'Corte cropped', 'Estampado al agua'],
+      meas: [['Largo', '44 cm'], ['Ancho de pecho', '40 cm'], ['Manga', '12 cm']] },
+    { id: 'c07', g: 'mujer', name: 'Jersey de punto calado', type: 'sweater', cat: 'sudaderas', price: 27.99, colors: ['crudo', 'marron'], sizes: ROPA, fit: 'Relajado', origin: 'Turquía', care: 'hand',
+      comp: ['60% acrílico, 40% algodón'],
+      desc: 'Jersey de punto calado con caída suelta. Queda bien encima de un top de tirantes o de una manga larga.',
+      det: ['Punto calado', 'Cuello redondo', 'Hombro caído', 'Puños y bajo de canalé'],
+      meas: [['Largo', '60 cm'], ['Ancho de pecho', '56 cm'], ['Manga', '58 cm']] },
+    { id: 'c08', g: 'mujer', name: 'Vestido midi de punto canalé', type: 'dress', cat: 'faldas', price: 25.99, tag: 'Nuevo', colors: ['negro', 'marron', 'grisc'], sizes: ROPA, low: ['S', 'M'], fit: 'Ajustado', origin: 'Turquía', care: 'delicate30',
+      comp: ['70% viscosa, 30% poliamida'],
+      desc: 'Vestido hasta media pierna de punto canalé elástico. Se pega al cuerpo sin apretar.',
+      det: ['Punto canalé elástico', 'Tirantes anchos', 'Largo midi', 'Cremallera invisible en la espalda'],
+      meas: [['Largo', '118 cm'], ['Ancho de pecho', '38 cm'], ['Cintura (en plano)', '32 cm']] },
+    { id: 'c09', g: 'mujer', name: 'Camiseta manga larga ajustada', type: 'longsleeve', cat: 'camisetas', price: 9.99, old: 12.99, best: true, colors: ['blanco', 'negro', 'rosa'], sizes: ROPA, fit: 'Ajustado', origin: 'Portugal', care: 'cotton30',
+      comp: ['95% algodón, 5% elastano'],
+      desc: 'Básica de manga larga en algodón elástico. La que va debajo de todo.',
+      det: ['Cuello redondo', 'Manga larga', 'Corte ajustado', 'Algodón elástico'],
+      meas: [['Largo', '60 cm'], ['Ancho de pecho', '42 cm'], ['Manga', '62 cm']] },
+    { id: 'c10', g: 'mujer', name: 'Cazadora bomber cropped', type: 'bomber', cat: 'chaquetas', price: 39.99, colors: ['negro', 'caqui'], sizes: ROPA, low: ['M'], fit: 'Cropped', origin: 'China', care: 'synth30',
+      comp: ['Exterior: 100% poliéster', 'Relleno: 100% poliéster', 'Forro: 100% poliéster'],
+      desc: 'Bomber corta acolchada con canalé en cuello, puños y bajo. Lleva un bolsillo con cremallera en la manga.',
+      det: ['Largo cropped', 'Forro acolchado', 'Bolsillo con cremallera en la manga', 'Canalé en cuello, puños y bajo'],
+      meas: [['Largo', '48 cm'], ['Ancho de pecho', '58 cm'], ['Manga', '60 cm']] },
+    { id: 'h01', g: 'hombre', name: 'Sudadera con capucha básica', type: 'hoodie', cat: 'sudaderas', price: 29.99, best: true, colors: ['negro', 'bosque', 'gris'], sizes: ROPA, back: true, fit: 'Regular', origin: 'Portugal', care: 'cotton30',
+      comp: ['80% algodón, 20% poliéster'],
+      desc: 'Sudadera de felpa con capucha y el logo grande en la espalda. La que vas a llevar todo el invierno.',
+      det: ['Logo estampado en la espalda', 'Bolsillo canguro', 'Capucha con cordón', 'Puños y bajo de canalé'],
+      meas: [['Largo', '72 cm'], ['Ancho de pecho', '60 cm'], ['Manga', '64 cm']] },
+    { id: 'h02', g: 'hombre', name: 'Pantalón cargo parachute', type: 'cargo', cat: 'pantalones', price: 35.99, tag: 'Nuevo', best: true, colors: ['negro', 'caqui', 'grisc'], sizes: ROPA, out: ['XL'], low: ['L'], fit: 'Parachute', origin: 'China', care: 'synth30',
+      comp: ['100% poliamida'],
+      desc: 'Pantalón parachute de nailon ligero con bolsillos cargo. Los bajos llevan cordón para ajustarlos como quieras.',
+      det: ['Cintura elástica con cordón', 'Bolsillos cargo con solapa', 'Bajos ajustables con cordón', 'Tejido técnico ligero'],
+      meas: [['Cintura (en plano)', '38 cm'], ['Tiro', '30 cm'], ['Largo', '108 cm'], ['Bajo', '28 cm']] },
+    { id: 'h03', g: 'hombre', name: 'Camiseta boxy «Asfalto»', type: 'tee', cat: 'camisetas', price: 15.99, tag: 'Últimas unidades', best: true, print: 'ASFALTO', colors: ['negro', 'blanco'], sizes: ROPA, out: ['XS', 'S'], low: ['M', 'L'], back: true, fit: 'Boxy', origin: 'Portugal', care: 'cotton30',
+      comp: ['100% algodón (220 g/m²)'],
+      desc: 'Camiseta de algodón grueso, corta y ancha. Logo pequeño delante y grande detrás.',
+      det: ['Algodón grueso de 220 g/m²', 'Corte boxy', 'Cuello de canalé', 'Estampado delante y detrás'],
+      meas: [['Largo', '68 cm'], ['Ancho de pecho', '60 cm'], ['Manga', '24 cm']] },
+    { id: 'h04', g: 'hombre', name: 'Plumífero oversize mate', type: 'puffer', cat: 'chaquetas', price: 59.99, old: 69.99, colors: ['negro', 'marino'], sizes: ROPA, fit: 'Oversize', origin: 'China', care: 'synth30',
+      comp: ['Exterior: 100% poliéster', 'Relleno: 100% poliéster reciclado', 'Forro: 100% poliéster'],
+      desc: 'Plumífero grande y calentito con acabado mate y cuello alto. Para los días de 2 °C en la parada del bus.',
+      det: ['Acabado mate', 'Cuello alto', 'Bolsillo interior', 'Puños elásticos'],
+      meas: [['Largo', '72 cm'], ['Ancho de pecho', '68 cm'], ['Manga', '64 cm']] },
+    { id: 'h05', g: 'hombre', name: 'Jeans skater wide leg', type: 'jeans', cat: 'pantalones', price: 35.99, best: true, colors: ['lavado', 'grisd'], sizes: P_HOMBRE, fit: 'Wide leg', origin: 'Marruecos', care: 'denim',
+      comp: ['100% algodón (denim de 13 oz)'],
+      desc: 'Vaqueros de pierna ancha y tiro medio. El corte de siempre para patinar.',
+      det: ['Pierna ancha', 'Tiro medio', 'Cinco bolsillos', 'Parche trasero'],
+      meas: [['Cintura (en plano)', '42 cm'], ['Tiro', '30 cm'], ['Largo', '108 cm'], ['Bajo', '27 cm']] },
+    { id: 'h06', g: 'hombre', name: 'Jersey de punto grueso', type: 'sweater', cat: 'sudaderas', price: 29.99, colors: ['grisd', 'crudo'], sizes: ROPA, fit: 'Regular', origin: 'Turquía', care: 'hand',
+      comp: ['50% algodón, 50% acrílico'],
+      desc: 'Jersey de punto grueso y suave. Va bien solo o con una camisa debajo.',
+      det: ['Punto grueso', 'Cuello redondo de canalé', 'Hombro caído', 'Puños y bajo de canalé'],
+      meas: [['Largo', '68 cm'], ['Ancho de pecho', '60 cm'], ['Manga', '62 cm']] },
+    { id: 'h07', g: 'hombre', name: 'Gorra lavada con bordado', type: 'cap', cat: 'accesorios', price: 12.99, print: 'A', colors: ['negro', 'klein'], sizes: UNI, fit: 'Talla ajustable', origin: 'China', care: 'hand',
+      comp: ['100% algodón lavado'],
+      desc: 'Gorra de algodón lavado con la «A» bordada delante. Se ajusta con una hebilla detrás.',
+      det: ['Algodón lavado', 'Bordado delante', 'Visera curva', 'Cierre de hebilla'],
+      meas: [['Contorno', '56–60 cm'], ['Visera', '7 cm']] },
+    { id: 'h08', g: 'hombre', name: 'Bomber acolchada', type: 'bomber', cat: 'chaquetas', price: 45.99, tag: 'Nuevo', colors: ['bosque', 'negro'], sizes: ROPA, back: true, fit: 'Regular', origin: 'China', care: 'synth30',
+      comp: ['Exterior: 100% poliamida', 'Relleno: 100% poliéster reciclado'],
+      desc: 'Bomber de nailon con relleno ligero y el logo grande en la espalda.',
+      det: ['Relleno ligero', 'Logo en la espalda', 'Bolsillo en la manga', 'Canalé en cuello, puños y bajo'],
+      meas: [['Largo', '64 cm'], ['Ancho de pecho', '62 cm'], ['Manga', '64 cm']] },
+    { id: 'h09', g: 'hombre', name: 'Camiseta manga larga skater', type: 'longsleeve', cat: 'camisetas', price: 17.99, print: 'MAD', colors: ['grisc', 'negro'], sizes: ROPA, back: true, fit: 'Oversize', origin: 'Portugal', care: 'cotton30',
+      comp: ['100% algodón (200 g/m²)'],
+      desc: 'Manga larga de algodón con «MAD» delante y el logo en la espalda. Corte ancho.',
+      det: ['Estampado delante y detrás', 'Corte oversize', 'Puños de canalé', 'Algodón de 200 g/m²'],
+      meas: [['Largo', '72 cm'], ['Ancho de pecho', '58 cm'], ['Manga', '64 cm']] },
+    { id: 'h10', g: 'hombre', name: 'Jogger técnico con bolsillos', type: 'cargo', cat: 'pantalones', price: 29.99, old: 34.99, colors: ['grisd', 'negro'], sizes: ROPA, fit: 'Jogger', origin: 'China', care: 'synth30',
+      comp: ['92% poliéster, 8% elastano'],
+      desc: 'Jogger de tejido técnico que repele el agua, con bolsillos laterales y bajos con goma.',
+      det: ['Repele el agua', 'Cintura elástica', 'Bolsillos laterales con solapa', 'Bajos con goma'],
+      meas: [['Cintura (en plano)', '36 cm'], ['Tiro', '29 cm'], ['Largo', '100 cm']] },
+    { id: 'u01', g: 'ambos', name: 'Tote bag logo', type: 'tote', cat: 'accesorios', price: 9.99, tag: 'Unisex', colors: ['crudo', 'negro'], sizes: UNI, fit: '38 × 42 cm', origin: 'India', care: 'cotton30',
+      comp: ['100% algodón (lona de 280 g/m²)'],
+      desc: 'Bolsa de lona gruesa con el logo estampado. Cabe el portátil, el táper y lo que haga falta.',
+      det: ['Lona de 280 g/m²', 'Asas largas para llevar al hombro', 'Bolsillo interior', 'Logo estampado'],
+      meas: [['Alto', '42 cm'], ['Ancho', '38 cm'], ['Asas', '60 cm']] },
+    { id: 'u02', g: 'ambos', name: 'Gorro de punto con etiqueta', type: 'beanie', cat: 'accesorios', price: 9.99, tag: 'Unisex', best: true, print: 'ASF', colors: ['negro', 'klein', 'rosa'], sizes: UNI, fit: 'Talla única', origin: 'China', care: 'hand',
+      comp: ['100% acrílico'],
+      desc: 'Gorro de punto de doble vuelta con una etiqueta tejida delante.',
+      det: ['Doble vuelta', 'Etiqueta tejida', 'Punto canalé', 'Talla única elástica'],
+      meas: [['Alto', '24 cm'], ['Contorno', '52–60 cm']] }
+  ];
+  const slugOf = p => norm(p.name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + p.id;
+  P.forEach((p, i) => { p.bg = BGS[i % BGS.length]; p.ref = 4120 + i * 37; p.idx = i; p.mod = 300 + (i * 13) % 90; p.slug = slugOf(p); });
+  const byId = Object.fromEntries(P.map(p => [p.id, p]));
+  const bySlug = Object.fromEntries(P.map(p => [p.slug, p]));
+  const GROUP = { hoodie: 0, tee: 0, longsleeve: 0, sweater: 0, bomber: 0, puffer: 0, top: 0, dress: 0, jeans: 1, cargo: 1, skirt: 1, cap: 2, beanie: 2, tote: 2 };
+
+  const CATS = {
+    todo: { n: 'Ver todo', short: 'Ver todo' },
+    novedades: { n: 'Novedades' },
+    'mas-vendidos': { n: 'Lo más vendido' },
+    rebajas: { n: 'Rebajas', sale: true },
+    sudaderas: { n: 'Sudaderas y punto', short: 'Sudaderas' },
+    pantalones: { n: 'Pantalones y jeans', short: 'Pantalones' },
+    faldas: { n: 'Faldas y vestidos' },
+    camisetas: { n: 'Camisetas y tops', short: 'Camisetas' },
+    chaquetas: { n: 'Chaquetas y abrigos', short: 'Chaquetas' },
+    accesorios: { n: 'Accesorios' },
+    favoritos: { n: 'Favoritos' },
+    buscar: { n: 'Búsqueda' }
+  };
+  const CAT_ORDER = ['novedades', 'mas-vendidos', 'sudaderas', 'pantalones', 'faldas', 'camisetas', 'chaquetas', 'accesorios', 'rebajas'];
+  const inCat = (p, k) => k === 'todo' || (k === 'novedades' ? p.tag === 'Nuevo' : k === 'mas-vendidos' ? !!p.best : k === 'rebajas' ? !!p.old : p.cat === k);
+  const inGender = (p, g) => p.g === g || p.g === 'ambos';
+  const availCat = (g, k) => P.some(p => inGender(p, g) && inCat(p, k));
+
+  const LOOKS = [
+    { title: 'Domingo de skate', place: 'Madrid Río', bg: '#d7dbe5', items: [['h08', 0, 2, 4, 52], ['h02', 1, 42, 16, 56], ['u02', 1, 12, 60, 34]] },
+    { title: 'Viernes noche', place: 'Malasaña', bg: '#e8dcd6', items: [['c04', 0, 4, 4, 54], ['c05', 0, 42, 16, 56], ['c03', 1, 14, 56, 36]] },
+    { title: 'Tarde de vermú', place: 'Lavapiés', bg: '#dfe3d4', items: [['c06', 1, 6, 6, 50], ['c02', 0, 44, 22, 50], ['u01', 0, 10, 52, 40]] }
+  ];
+  const CAMPS = {
+    mujer: [
+      { title: 'Nueva colección', sub: 'Otoño–Invierno 26', cta: 'Ver novedades', cat: 'novedades', bg: '#e9e4dd', ink: '#000', items: [['c04', 1], ['c05', 0], ['u02', 2]] },
+      { title: 'Denim', sub: 'Baggy, tiro bajo y mini cargo', cta: 'Ver pantalones', cat: 'pantalones', bg: '#cfd8e3', ink: '#000', items: [['c06', 1], ['c05', 1], ['u01', 0]] },
+      { title: 'Abrígate', sub: 'Plumíferos y bombers', cta: 'Ver chaquetas', cat: 'chaquetas', bg: '#1d1d20', ink: '#fff', items: [['c04', 1], ['c02', 0], ['u02', 2]] }
+    ],
+    hombre: [
+      { title: 'Nueva colección', sub: 'Otoño–Invierno 26', cta: 'Ver novedades', cat: 'novedades', bg: '#e2e3dc', ink: '#000', items: [['h08', 0], ['h02', 0], ['u02', 1]] },
+      { title: 'Cargo & denim', sub: 'Parachute, wide leg y jogger', cta: 'Ver pantalones', cat: 'pantalones', bg: '#d9dde3', ink: '#000', items: [['h03', 0], ['h05', 0], ['h07', 1]] },
+      { title: 'Punto', sub: 'Jerséis y sudaderas', cta: 'Ver sudaderas', cat: 'sudaderas', bg: '#202124', ink: '#fff', items: [['h06', 1], ['h02', 2], ['u02', 1]] }
+    ]
+  };
+  const SLOT_M = { 0: [4, 3, 50], 1: [46, 6, 50], 2: [62, 52, 26] };
+  const SLOT_D = { 0: [44, 8, 22], 1: [64, 5, 22], 2: [86, 52, 11] };
+
+  const SIZE_TABLES = {
+    mujer: { head: ['Talla', 'Pecho', 'Cintura', 'Equivale'], rows: [['XS', '82–86', '64–68', '34'], ['S', '86–90', '68–72', '36'], ['M', '90–96', '72–78', '38'], ['L', '96–102', '78–84', '40'], ['XL', '102–108', '84–90', '42']] },
+    hombre: { head: ['Talla', 'Pecho', 'Cintura', 'Equivale'], rows: [['XS', '84–88', '70–74', '44'], ['S', '88–94', '74–80', '46'], ['M', '94–100', '80–86', '48'], ['L', '100–106', '86–92', '50'], ['XL', '106–112', '92–98', '52']] },
+    pmujer: { head: ['Talla', 'Cintura', 'Cadera', 'Letra'], rows: [['32', '60', '86', 'XXS'], ['34', '63', '89', 'XS'], ['36', '66', '92', 'S'], ['38', '70', '96', 'M'], ['40', '74', '100', 'L'], ['42', '78', '104', 'XL']] },
+    phombre: { head: ['Talla', 'Cintura', 'Cadera', 'Letra'], rows: [['38', '74', '92', 'XS'], ['40', '78', '96', 'S'], ['42', '82', '100', 'M'], ['44', '86', '104', 'L'], ['46', '90', '108', 'XL']] }
+  };
+  const tableHTML = t => `<div class="tbl-wrap"><table class="sz"><thead><tr>${t.head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${t.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const isPants = p => p.sizes === P_MUJER || p.sizes === P_HOMBRE;
+  const tableFor = p => p.sizes === P_MUJER ? SIZE_TABLES.pmujer : p.sizes === P_HOMBRE ? SIZE_TABLES.phombre : p.sizes === UNI ? null : SIZE_TABLES[p.g === 'hombre' ? 'hombre' : 'mujer'];
+  const measSize = p => p.sizes === UNI ? 'talla única' : p.sizes === P_MUJER ? 'talla 36' : p.sizes === P_HOMBRE ? 'talla 42' : 'talla M';
+  function modelLine(p) {
+    if (p.sizes === UNI || p.g === 'ambos') return '';
+    const s = p.g === 'mujer' ? (isPants(p) ? '36' : 'S') : (isPants(p) ? '42' : 'M');
+    return p.g === 'mujer' ? `La modelo mide 1,75 m y lleva una talla ${s}.` : `El modelo mide 1,86 m y lleva una talla ${s}.`;
+  }
+
+  const SHIP = {
+    std: { n: 'Estándar a domicilio', d: '2–4 días laborables', price: 3.95, free: true, days: [2, 4] },
+    exp: { n: 'Express 24 h', d: 'Si pides antes de las 14:00', price: 6.95, free: false, days: [1, 1] },
+    pick: { n: 'Punto de recogida', d: 'Más de 3.000 puntos en España', price: 1.95, free: true, days: [3, 5] }
+  };
+  const PAYS = { card: ['Tarjeta', 'Visa, Mastercard o American Express'], bizum: ['Bizum', 'Confirmas el pago en la app de tu banco'], paypal: ['PayPal', 'Pagas con tu cuenta de PayPal'] };
+  const PROMOS = { ASFALTO10: { pct: 10, n: '10% en todo' }, BIENVENIDA: { pct: 15, n: '15% en tu primera compra' } };
+  const PROVS = ['Álava', 'Albacete', 'Alicante', 'Almería', 'Ávila', 'Badajoz', 'Baleares', 'Barcelona', 'Burgos', 'Cáceres', 'Cádiz', 'Castellón', 'Ciudad Real', 'Córdoba', 'A Coruña', 'Cuenca', 'Girona', 'Granada', 'Guadalajara', 'Gipuzkoa', 'Huelva', 'Huesca', 'Jaén', 'León', 'Lleida', 'La Rioja', 'Lugo', 'Madrid', 'Málaga', 'Murcia', 'Navarra', 'Ourense', 'Asturias', 'Palencia', 'Las Palmas', 'Pontevedra', 'Salamanca', 'Santa Cruz de Tenerife', 'Cantabria', 'Segovia', 'Sevilla', 'Soria', 'Tarragona', 'Teruel', 'Toledo', 'Valencia', 'Valladolid', 'Bizkaia', 'Zamora', 'Zaragoza', 'Ceuta', 'Melilla'];
+  const PROVS_AZ = [...PROVS].sort((a, b) => a.localeCompare(b, 'es'));
+  const TRENDS = ['sudadera', 'cargo', 'jeans baggy', 'plumífero', 'gorro', 'negro', 'manga larga'];
+
+  /* ================= Cuidados ================= */
+  const CARE = {
+    cotton30: { wash: '30', iron: 2, clean: 'P', extra: 'Lavar del revés' },
+    synth30: { wash: '30', iron: 0, clean: 'no', extra: 'Cerrar las cremalleras antes de lavar' },
+    hand: { wash: 'hand', iron: 1, clean: 'P', extra: 'Secar en plano' },
+    denim: { wash: '30', iron: 2, clean: 'no', extra: 'Lavar del revés y con colores parecidos' },
+    delicate30: { wash: '30', iron: 1, clean: 'P', extra: 'Secar en plano' }
+  };
+  function careList(k) {
+    const c = CARE[k];
+    return [
+      ['wash', c.wash === 'hand' ? 'Lavar a mano, máx. 30 °C' : `Lavar a máquina a ${c.wash} °C`],
+      ['bleach', 'No usar lejía'],
+      ['iron' + c.iron, c.iron === 0 ? 'No planchar' : c.iron === 1 ? 'Planchar a baja temperatura, máx. 110 °C' : 'Planchar a temperatura media, máx. 150 °C'],
+      ['dry', 'No usar secadora'],
+      [c.clean === 'P' ? 'cleanP' : 'cleanNo', c.clean === 'P' ? 'Limpieza en seco con percloroetileno' : 'No limpiar en seco']
+    ];
+  }
+  function careInner(kind, wash) {
+    const X = '<path d="M6 6 L26 27 M26 6 L6 27"/>';
+    switch (kind) {
+      case 'wash': return '<path d="M4 11 L8 26 H24 L28 11"/><path d="M4 11 Q8 8 12 11 T20 11 T28 11"/>' + (wash === 'hand'
+        ? '<path d="M12 24 v-6 M14.5 24 v-8 M17 24 v-8 M19.5 24 v-6"/>'
+        : `<text x="16" y="23" font-size="8" text-anchor="middle" fill="currentColor" stroke="none" font-family="IBM Plex Mono, monospace">${wash}</text>`);
+      case 'bleach': return '<path d="M16 5 L29 27 H3 Z"/>' + X;
+      case 'iron0': case 'iron1': case 'iron2': {
+        const n = +kind.slice(4);
+        return '<path d="M5 23 H27 Q27 14 19 12 H11 Q8 12 7 15 Z"/><path d="M11 12 Q11 8 15 8 H23"/>'
+          + (n === 0 ? X : n === 1 ? '<circle cx="17" cy="18" r="1.3" fill="currentColor"/>' : '<circle cx="14" cy="18" r="1.3" fill="currentColor"/><circle cx="20" cy="18" r="1.3" fill="currentColor"/>');
+      }
+      case 'dry': return '<rect x="5" y="5" width="22" height="22"/><circle cx="16" cy="16" r="7"/>' + X;
+      case 'cleanP': return '<circle cx="16" cy="16" r="11"/><text x="16" y="20.5" font-size="12" text-anchor="middle" fill="currentColor" stroke="none" font-family="Archivo, Arial, sans-serif" font-weight="700">P</text>';
+      case 'cleanNo': return '<circle cx="16" cy="16" r="11"/>' + X;
+    }
+    return '';
+  }
+  const careIcon = (kind, wash) => `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">${careInner(kind, wash)}</svg>`;
+
+  /* ================= Dibujo de prendas ================= */
+  function lum(h) { const n = parseInt(h.slice(1), 16); return ((n >> 16 & 255) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) / 255; }
+  let uid = 0;
+  function garment(type, hex, print, opt = {}) {
+    const back = !!opt.back, bigBack = !!opt.bigBack;
+    const L = lum(hex), dk = L < .42;
+    const ln = dk ? 'rgba(255,255,255,.22)' : 'rgba(0,0,0,.2)';
+    const sh = dk ? 'rgba(0,0,0,.45)' : 'rgba(0,0,0,.16)';
+    const ink = L > .8 ? '#2a36ff' : (dk ? '#f5f5f2' : '#111114');
+    const S = (d, w = 1.5, x = '') => `<path d="${d}" fill="none" stroke="${ln}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"${x}/>`;
+    const F = (d, f = hex) => `<path d="${d}" fill="${f}"/>`;
+    const dash = ' stroke-dasharray="3 3"';
+    const txt = (x, y, size, t, len, fill = ink) => `<text x="${x}" y="${y}" text-anchor="middle" fill="${fill}" font-family="Archivo, 'Arial Black', Arial, sans-serif" font-weight="900" font-size="${size}" style="font-stretch:125%"${len ? ` textLength="${len}" lengthAdjust="spacingAndGlyphs"` : ''}>${t}</text>`;
+    const mono = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" fill="${ink}" font-family="IBM Plex Mono, monospace" font-size="7" letter-spacing="2">${t}</text>`;
+    const backPrint = bigBack ? txt(100, 134, 22, 'ASFALTO', 70) + mono(100, 150, 'DROP 01 · MADRID') : '';
+    let g = '', sy = 234, rx = 62, ty = 0;
+    switch (type) {
+      case 'tee':
+        g = F('M58 48 L84 36 Q100 50 116 36 L142 48 L178 80 L160 104 L142 92 L142 222 L58 222 L58 92 L40 104 L22 80 Z')
+          + S('M58 52 L58 92') + S('M142 52 L142 92') + S('M60 214 L140 214', 1.2, dash) + S('M27 86 L44 100', 1.2, dash) + S('M173 86 L156 100', 1.2, dash)
+          + (back ? F('M84 36 Q100 50 116 36 Z') + S('M84 36 Q100 42 116 36', 1.3) + backPrint
+            : F('M84 36 Q100 30 116 36 Q100 50 84 36 Z', sh) + S('M86 39 Q100 54 114 39', 1.3) + (print ? txt(100, 100, 14, print, print.length > 6 ? 60 : 52) : ''));
+        sy = 236; ty = -4; break;
+      case 'longsleeve':
+        g = F('M60 48 L84 36 Q100 50 116 36 L140 48 L160 76 L176 204 L156 208 L142 104 L142 222 L58 222 L58 104 L44 208 L24 204 L40 76 Z')
+          + S('M60 50 L58 104') + S('M140 50 L142 104') + S('M25 194 L45 198') + S('M155 198 L175 194') + S('M60 214 L140 214', 1.2, dash)
+          + (back ? F('M84 36 Q100 50 116 36 Z') + S('M84 36 Q100 42 116 36', 1.3) + backPrint
+            : F('M84 36 Q100 30 116 36 Q100 50 84 36 Z', sh) + S('M86 39 Q100 54 114 39', 1.3) + (print ? txt(100, 96, 12, print, print.length > 3 ? 44 : 30) : ''));
+        sy = 236; ty = -4; break;
+      case 'hoodie':
+        g = F('M60 58 L82 44 L118 44 L140 58 L162 80 L176 206 L154 210 L142 112 L142 224 L58 224 L58 112 L46 210 L24 206 L38 80 Z')
+          + S('M60 60 L58 112') + S('M140 60 L142 112') + S('M25 196 L47 200') + S('M153 200 L175 196') + S('M58 214 L142 214')
+          + (back ? F('M80 46 Q74 12 100 10 Q126 12 120 46 Q100 56 80 46 Z') + S('M100 11 L100 52', 1.2) + S('M80 46 Q100 56 120 46', 1.2) + backPrint
+            : F('M80 46 Q74 12 100 10 Q126 12 120 46 Q100 60 80 46 Z') + F('M88 44 Q90 22 100 21 Q110 22 112 44 Q100 52 88 44 Z', sh)
+              + S('M80 46 Q74 12 100 10 Q126 12 120 46', 1.2) + S('M94 52 L91 84', 1.4) + S('M106 52 L109 84', 1.4) + S('M70 170 L130 170 L138 206 L62 206 Z'));
+        sy = 238; ty = 2; break;
+      case 'sweater': {
+        let rib = '';
+        for (let x = 64; x <= 136; x += 6) rib += `M${x} 212 L${x} 222 `;
+        g = F('M60 58 L84 44 Q100 56 116 44 L140 58 L162 80 L176 206 L154 210 L142 112 L142 224 L58 224 L58 112 L46 210 L24 206 L38 80 Z')
+          + S('M60 60 L58 112') + S('M140 60 L142 112') + S('M58 210 L142 210') + S(rib, .9) + S('M26 192 L47 196') + S('M153 196 L174 192')
+          + (back ? F('M84 44 Q100 56 116 44 Z') + S('M84 44 Q100 50 116 44', 1.3) : F('M84 44 Q100 36 116 44 Q100 56 84 44 Z', sh) + S('M86 48 Q100 61 114 48', 1.3));
+        sy = 236; ty = -2; break;
+      }
+      case 'bomber': {
+        let rib = '';
+        for (let x = 60; x <= 140; x += 5) rib += `M${x} 190 L${x} 199 `;
+        g = F('M60 50 L84 38 L116 38 L140 50 L162 74 L178 196 L154 202 L144 108 L144 200 L56 200 L56 108 L46 202 L22 196 L38 74 Z')
+          + F('M56 188 L144 188 L144 200 L56 200 Z', sh) + S(rib, .8)
+          + F('M23 186 L47 191 L46 202 L22 196 Z', sh) + F('M177 186 L153 191 L154 202 L178 196 Z', sh)
+          + S('M60 52 L56 108') + S('M140 52 L144 108')
+          + (back ? F('M84 38 Q100 46 116 38 L114 33 Q100 40 86 33 Z', sh) + backPrint
+            : F('M84 38 Q100 58 116 38 L113 34 Q100 50 87 34 Z', sh) + S('M100 52 L100 188', 1.6) + S('M66 138 L74 166') + S('M134 138 L126 166') + S('M40 98 L54 98 L54 112 L40 112 Z', 1.2));
+        sy = 224; rx = 66; ty = 8; break;
+      }
+      case 'puffer': {
+        let q = '';
+        [76, 104, 132, 160, 188].forEach(y => { q += S(`M57 ${y} Q100 ${y + 7} 143 ${y}`, 1.4); });
+        g = F('M62 48 L82 34 L118 34 L138 48 L164 68 L178 198 L150 202 L144 112 L144 214 L56 214 L56 112 L50 202 L22 198 L36 68 Z')
+          + F('M80 38 L80 18 Q100 12 120 18 L120 38 Q100 44 80 38 Z')
+          + q + S('M33 100 L56 106') + S('M29 132 L55 138') + S('M26 164 L53 170')
+          + S('M167 100 L144 106') + S('M171 132 L145 138') + S('M174 164 L147 170') + S('M56 206 L144 206')
+          + (back ? S('M80 30 Q100 36 120 30', 1.2) : F('M86 21 Q100 17 114 21 L114 30 Q100 34 86 30 Z', sh) + S('M100 38 L100 214', 1.6));
+        sy = 232; rx = 68; ty = 2; break;
+      }
+      case 'cargo':
+        g = F('M64 26 L136 26 L142 60 L150 230 L112 230 L100 96 L88 230 L50 230 L58 60 Z')
+          + S('M64 38 L136 38') + S('M76 26 L76 38') + S('M124 26 L124 38') + S('M100 26 L100 38')
+          + S('M58 120 L82 120 L82 165 L56 165') + S('M58 129 L82 129') + S('M142 120 L118 120 L118 165 L144 165') + S('M142 129 L118 129')
+          + S('M52 220 L88 220', 1.2, dash) + S('M112 220 L148 220', 1.2, dash)
+          + (back ? S('M62 48 Q100 58 138 48') + S('M68 58 L88 58 L88 80 L68 80 Z') + S('M112 58 L132 58 L132 80 L112 80 Z')
+            : S('M100 38 L100 88', 1.2, dash) + S('M74 38 Q76 58 59 66') + S('M126 38 Q124 58 141 66'));
+        sy = 238; rx = 58; ty = -2; break;
+      case 'jeans':
+        g = F('M66 26 L134 26 L140 60 L156 230 L110 230 L100 100 L90 230 L44 230 L60 60 Z')
+          + S('M66 38 L134 38') + S('M46 222 L90 222', 1.2, dash) + S('M110 222 L154 222', 1.2, dash)
+          + (back ? S('M62 48 Q100 60 138 48') + S('M68 60 L90 58 L90 82 L80 88 L70 82 Z') + S('M132 60 L110 58 L110 82 L120 88 L130 82 Z') + F('M112 30 L128 30 L128 36 L112 36 Z', sh)
+            : `<circle cx="100" cy="32" r="2.5" fill="${ln}"/>` + S('M74 38 Q78 56 61 62') + S('M126 38 Q122 56 139 62') + S('M106 40 L106 78 Q106 88 100 94', 1.2, dash) + S('M100 38 L100 98', 1.2));
+        sy = 238; rx = 64; ty = -2; break;
+      case 'skirt':
+        g = F('M70 62 L130 62 L150 200 L50 200 Z') + S('M69 74 L131 74') + S('M53 192 L147 192', 1.2, dash)
+          + (back ? S('M100 74 L100 200', 1.2) + S('M74 86 L94 86 L94 106 L74 106 Z') + S('M126 86 L106 86 L106 106 L126 106 Z')
+            : S('M100 74 L100 200', 1.2, dash) + S('M61 128 L83 128 L83 160 L57 160') + S('M139 128 L117 128 L117 160 L143 160'));
+        sy = 208; rx = 56; ty = -6; break;
+      case 'top':
+        g = back
+          ? `<path d="M74 72 L120 36 M126 72 L80 36" stroke="${hex}" stroke-width="4" stroke-linecap="round"/>` + F('M64 76 L136 76 L138 160 Q100 170 62 160 Z')
+            + S('M94 84 L106 92 L94 100 L106 108 L94 116 L106 124 L94 132 L106 140', 1.2) + S('M64 150 Q100 160 136 150', 1.2, dash)
+          : `<path d="M74 70 L80 36 M126 70 L120 36" stroke="${hex}" stroke-width="4" stroke-linecap="round"/>` + F('M66 72 Q82 60 100 74 Q118 60 134 72 L138 160 Q100 170 62 160 Z')
+            + S('M84 76 L82 163') + S('M100 76 L100 166') + S('M116 76 L118 163') + S('M64 150 Q100 160 136 150', 1.2, dash);
+        sy = 206; rx = 46; ty = 22; break;
+      case 'dress': {
+        let rib = '';
+        for (let x = 78; x <= 122; x += 8) rib += S(`M${x} 56 L${(100 + (x - 100) * 1.43).toFixed(1)} 224`, .8);
+        g = F('M74 40 Q100 54 126 40 L134 48 L128 112 L140 228 L60 228 L72 112 L66 48 Z') + rib
+          + (back ? F('M74 40 Q100 54 126 40 Z') + S('M74 40 Q100 46 126 40', 1.2) + S('M100 46 L100 118', 1.4)
+            : F('M74 40 Q100 34 126 40 Q100 54 74 40 Z', sh));
+        sy = 226; rx = 52; ty = -6; break;
+      }
+      case 'cap':
+        if (back) {
+          g = F('M50 154 Q48 86 100 84 Q152 86 150 154 Z') + F('M84 154 Q84 130 100 128 Q116 130 116 154 Z', sh)
+            + S('M80 150 L120 150', 2) + S('M100 86 L100 128') + S('M100 86 Q76 110 70 154') + S('M100 86 Q124 110 130 154')
+            + `<circle cx="100" cy="84" r="5" fill="${hex}"/><circle cx="100" cy="84" r="5" fill="none" stroke="${ln}"/>`;
+        } else {
+          g = F('M120 152 Q170 140 196 158 Q172 170 126 162 Z') + F('M126 162 Q172 170 196 158 Q174 164 128 156 Z', sh)
+            + F('M48 152 Q46 84 104 82 Q158 84 156 150 Z') + S('M48 152 L156 150') + S('M104 84 Q90 112 92 151') + S('M104 84 Q128 108 134 150')
+            + `<circle cx="104" cy="82" r="5" fill="${hex}"/><circle cx="104" cy="82" r="5" fill="none" stroke="${ln}"/><circle cx="72" cy="114" r="2" fill="${ln}"/>`
+            + (print ? txt(116, 136, 20, print) : '');
+        }
+        sy = 184; rx = 74; ty = 4; break;
+      case 'beanie': {
+        let rib = '';
+        for (let x = 56; x <= 144; x += 6) rib += `M${x} 150 L${x} 178 `;
+        const patch = L > .5 ? '#111114' : '#f5f5f2', pink = patch === '#111114' ? '#f5f5f2' : '#111114';
+        g = F('M58 150 Q56 72 100 70 Q144 72 142 150 Z') + F('M52 146 L148 146 L150 182 L50 182 Z') + S(rib, .8)
+          + (back ? S('M100 72 L100 146') + S('M78 146 Q76 100 88 76') + S('M122 146 Q124 100 112 76')
+            : S('M78 148 Q76 100 88 76') + S('M100 148 L100 72') + S('M122 148 Q124 100 112 76')
+              + (print ? F('M84 156 L116 156 L116 172 L84 172 Z', patch) + txt(100, 168, 10, print, 24, pink) : ''));
+        sy = 198; rx = 56; ty = 0; break;
+      }
+      case 'tote':
+        g = `<path d="M74 92 Q74 34 100 34 Q126 34 126 92" fill="none" stroke="${hex}" stroke-width="7" stroke-linecap="round"/>`
+          + F('M50 90 L150 90 L158 222 L42 222 Z') + S('M50 102 L150 102', 1.2, dash)
+          + (back ? mono(100, 206, 'ASFALTO.ES') : txt(100, 160, 18, 'ASFALTO', 78) + mono(100, 178, 'MADRID · 26'));
+        sy = 236; rx = 66; ty = -4; break;
+    }
+    const shadow = (opt.float || opt.vb) ? '' : `<ellipse cx="100" cy="${sy}" rx="${rx}" ry="6" fill="#000" opacity=".1"/>`;
+    return `<svg viewBox="${opt.vb || '0 0 200 250'}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"${opt.vb ? ' preserveAspectRatio="xMidYMid slice"' : ''}>${shadow}<g transform="translate(0 ${ty})">${g}</g></svg>`;
+  }
+  const art = (p, ci, back, float) => garment(p.type, C[p.colors[ci]].h, p.print, { back, bigBack: back && p.back, float });
+  const thumb = (p, ci) => `<span class="tile" style="--tile-bg:${p.bg}">${art(p, ci)}</span>`;
+
+  /* Fotos extra de la ficha */
+  const VB = { tee: '48 22 104 130', longsleeve: '48 22 104 130', hoodie: '50 0 100 125', sweater: '50 30 100 125', bomber: '52 22 96 120', puffer: '50 6 100 125', jeans: '42 14 100 125', cargo: '36 92 100 125', skirt: '44 46 112 140', top: '58 52 84 105', dress: '58 30 84 105', cap: '72 70 104 130', beanie: '56 108 88 110', tote: '40 106 120 150' };
+  const FABRIC = { hoodie: 'jersey', tee: 'jersey', longsleeve: 'jersey', sweater: 'knit', dress: 'knit', beanie: 'knit', puffer: 'quilt', bomber: 'quilt', jeans: 'denim', cargo: 'nylon', skirt: 'twill', cap: 'twill', top: 'satin', tote: 'canvas' };
+  const FABRIC_NAME = { jersey: 'Felpa y punto', knit: 'Punto', quilt: 'Acolchado', denim: 'Denim', nylon: 'Tejido técnico', twill: 'Sarga', satin: 'Satén', canvas: 'Lona' };
+  function fabric(p, hex) {
+    const id = 'fx' + (++uid), L = lum(hex), dk = L < .42;
+    const hi = dk ? 'rgba(255,255,255,.13)' : 'rgba(255,255,255,.38)', lo = dk ? 'rgba(0,0,0,.4)' : 'rgba(0,0,0,.13)';
+    let defs = '', body = `<rect width="200" height="250" fill="url(#${id})"/>`, extra = '';
+    switch (FABRIC[p.type]) {
+      case 'denim':
+        defs = `<pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><rect width="6" height="6" fill="${hex}"/><rect width="2" height="6" fill="${hi}"/><rect x="3.5" width="1" height="6" fill="${lo}"/></pattern>`;
+        extra = `<path d="M-10 168 Q100 150 210 176" fill="none" stroke="#c98a2f" stroke-width="2" stroke-dasharray="6 4"/><path d="M-10 178 Q100 160 210 186" fill="none" stroke="#c98a2f" stroke-width="2" stroke-dasharray="6 4"/><circle cx="150" cy="82" r="9" fill="#a8844a"/><circle cx="150" cy="82" r="5" fill="#d8b878"/>`;
+        break;
+      case 'knit':
+        defs = `<pattern id="${id}" width="12" height="10" patternUnits="userSpaceOnUse"><rect width="12" height="10" fill="${hex}"/><path d="M0 0 L3 5 L6 0 M6 0 L9 5 L12 0" stroke="${lo}" stroke-width="1.3" fill="none"/><path d="M0 5 L3 10 L6 5 M6 5 L9 10 L12 5" stroke="${hi}" stroke-width="1.3" fill="none"/></pattern>`;
+        break;
+      case 'quilt':
+        defs = `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".32"/><stop offset=".45" stop-color="#fff" stop-opacity="${dk ? .14 : .34}"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></linearGradient><pattern id="${id}" width="200" height="50" patternUnits="userSpaceOnUse"><rect width="200" height="50" fill="${hex}"/><rect width="200" height="50" fill="url(#${id}g)"/><path d="M0 49.5 H200" stroke="${lo}" stroke-width="1" stroke-dasharray="2 2"/></pattern>`;
+        break;
+      case 'nylon':
+        defs = `<pattern id="${id}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="${hex}"/><path d="M0 .5 H14 M.5 0 V14" stroke="${lo}" stroke-width="1"/></pattern><linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity="${dk ? .12 : .28}"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>`;
+        extra = `<rect width="200" height="250" fill="url(#${id}g)"/>`;
+        break;
+      case 'twill':
+        defs = `<pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="5" height="5" fill="${hex}"/><rect width="1.5" height="5" fill="${lo}"/></pattern>`;
+        extra = `<path d="M-10 60 H210" stroke="${dk ? '#f5f5f2' : '#111114'}" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+        break;
+      case 'satin':
+        defs = `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${hex}"/><stop offset=".35" stop-color="${hex}"/><stop offset=".5" stop-color="#fff" stop-opacity="${dk ? .35 : .55}"/><stop offset=".62" stop-color="${hex}"/><stop offset="1" stop-color="${hex}"/></linearGradient>`;
+        body = `<rect width="200" height="250" fill="${hex}"/><rect width="200" height="250" fill="url(#${id})"/>`;
+        break;
+      case 'canvas':
+        defs = `<pattern id="${id}" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="4" fill="${hex}"/><path d="M0 .5 H4 M.5 0 V4" stroke="${lo}" stroke-width="1"/></pattern>`;
+        break;
+      default:
+        defs = `<filter id="${id}n"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0"/></filter><pattern id="${id}" width="6" height="250" patternUnits="userSpaceOnUse"><rect width="6" height="250" fill="${hex}"/></pattern>`;
+        extra = `<rect width="200" height="250" filter="url(#${id}n)"/><rect width="200" height="46" fill="${lo}"/>` + Array.from({ length: 34 }, (_, i) => `<path d="M${i * 6 + 3} 0 V46" stroke="${hi}" stroke-width="2"/>`).join('') + `<path d="M0 52 H200" stroke="${lo}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+    }
+    const vig = `<radialGradient id="${id}v" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></radialGradient>`;
+    return `<svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice"><defs>${defs}${vig}</defs>${body}${extra}<rect width="200" height="250" fill="url(#${id}v)"/></svg>`;
+  }
+  function wrapText(s, max) { const out = []; let line = ''; s.split(' ').forEach(w => { if ((line + ' ' + w).trim().length > max) { if (line) out.push(line); line = w; } else line = (line + ' ' + w).trim(); }); if (line) out.push(line); return out; }
+  function labelShot(p, ci) {
+    const hex = C[p.colors[ci]].h, ink = '#24242a';
+    const size = pdp.p === p && pdp.size ? pdp.size : p.sizes[Math.floor(p.sizes.length / 2)];
+    const lines = p.comp.flatMap(c => wrapText(c.toUpperCase(), 22)).slice(0, 7);
+    const icons = careList(p.care).map(([k], i) => `<svg x="${66 + (i % 3) * 24}" y="${168 + Math.floor(i / 3) * 22}" width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="${ink}" stroke-width="2" color="${ink}">${careInner(k, CARE[p.care].wash)}</svg>`).join('');
+    return `<svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
+      <rect width="200" height="250" fill="${hex}"/><rect width="200" height="250" fill="#000" opacity=".12"/>
+      <g transform="rotate(-4 100 125)">
+        <rect x="56" y="14" width="88" height="226" rx="2" fill="#f7f5ef"/>
+        <path d="M58 28 H142" stroke="#c9c4b6" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="100" y="48" text-anchor="middle" fill="${ink}" font-family="Archivo, 'Arial Black', sans-serif" font-weight="900" font-size="12" style="font-stretch:125%" textLength="60" lengthAdjust="spacingAndGlyphs">ASFALTO</text>
+        <text x="100" y="70" text-anchor="middle" fill="${ink}" font-family="Archivo, Arial, sans-serif" font-weight="700" font-size="${size.length > 3 ? 12 : 16}">${size === 'Única' ? 'T. ÚNICA' : size}</text>
+        <text x="100" y="86" text-anchor="middle" fill="${ink}" font-family="IBM Plex Mono, monospace" font-size="6" letter-spacing="1">HECHO EN ${p.origin.toUpperCase()}</text>
+        ${lines.map((l, i) => `<text x="100" y="${104 + i * 9}" text-anchor="middle" fill="${ink}" font-family="IBM Plex Mono, monospace" font-size="5.6">${esc(l)}</text>`).join('')}
+        ${icons}
+        <text x="100" y="228" text-anchor="middle" fill="${ink}" font-family="IBM Plex Mono, monospace" font-size="5.6" letter-spacing=".5">REF ${p.ref}/${p.mod}/${C[p.colors[ci]].c}</text>
+      </g></svg>`;
+  }
+  function completeLook(p) {
+    const L = LOOKS.find(l => l.items.some(i => i[0] === p.id));
+    const ids = L ? L.items.filter(i => i[0] !== p.id).map(i => i[0]) : [];
+    const pool = P.filter(q => q.id !== p.id && !ids.includes(q.id) && GROUP[q.type] !== GROUP[p.type] && (p.g === 'ambos' || inGender(q, p.g)) && !(p.type === 'dress' && GROUP[q.type] === 1));
+    let k = p.ref;
+    while (ids.length < 4 && pool.length) { ids.push(pool.splice(k % pool.length, 1)[0].id); k += 3; }
+    return ids.slice(0, 4).map(id => byId[id]);
+  }
+  function lookPicks(p) {
+    const used = new Set([GROUP[p.type]]), out = [];
+    for (const q of [...completeLook(p), ...P]) {
+      if (q.id === p.id || out.includes(q) || used.has(GROUP[q.type])) continue;
+      if (p.type === 'dress' && GROUP[q.type] === 1) continue;
+      if (p.g !== 'ambos' && !inGender(q, p.g)) continue;
+      used.add(GROUP[q.type]); out.push(q);
+      if (out.length === 2) break;
+    }
+    return out;
+  }
+  const SLOT = [[2, 4, 54], [42, 16, 56], [12, 58, 36]];
+  function lookShot(p, ci) {
+    return [[p, ci], ...lookPicks(p).map(q => [q, 0])].map(([q, c]) => { const [l, t, w] = SLOT[GROUP[q.type]]; return `<span class="p" style="left:${l}%;top:${t}%;width:${w}%">${art(q, c, false, true)}</span>`; }).join('');
+  }
+  function shots(p, ci) {
+    const hex = C[p.colors[ci]].h;
+    return [
+      { n: 'Delante', html: art(p, ci) },
+      { n: 'Espalda', html: art(p, ci, true) },
+      { n: 'Detalle', html: garment(p.type, hex, p.print, { vb: VB[p.type] }), full: true },
+      { n: 'Tejido · ' + FABRIC_NAME[FABRIC[p.type]], html: fabric(p, hex), full: true },
+      { n: 'Look', html: lookShot(p, ci) },
+      { n: 'Etiqueta', html: labelShot(p, ci), full: true }
+    ];
+  }
+
+  /* ================= Estado ================= */
+  function load(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
+  const savedG = load('asfalto-g', null);
+  const st = { g: savedG === 'hombre' ? 'hombre' : 'mujer', gChosen: savedG === 'mujer' || savedG === 'hombre', cat: 'novedades', q: '', sort: 'rec', colors: new Set(), price: 'all', fit: null, colsM: 2, colsD: 4 };
+  let cart = (load('asfalto-cart', []) || []).filter(it => it && byId[it.id] && byId[it.id].colors[it.ci] && it.qty > 0);
+  const favs = new Set((load('asfalto-favs', []) || []).filter(id => byId[id]));
+  let recent = (load('asfalto-recent', []) || []).filter(id => byId[id]);
+  let orders = load('asfalto-orders', []) || [];
+  let promo = load('asfalto-promo', null); if (promo && !PROMOS[promo]) promo = null;
+  const selC = {};
+  const pdp = { p: null, ci: 0, size: null, notify: null, need: false, fresh: true };
+  let view = null, curKey = null, navigating = false, navCount = 0;
+  const pos = {};
+
+  /* ================= Barra superior ================= */
+  const TOPMSG = ['Envío gratis a partir de 29,90 €', 'Devoluciones gratis durante 30 días', '-15% en tu primera compra con la newsletter'];
+  let topI = 0;
+  if (!reduced) setInterval(() => {
+    const s = $('#topmsg'); s.style.opacity = 0;
+    setTimeout(() => { topI = (topI + 1) % TOPMSG.length; s.textContent = TOPMSG[topI]; s.style.opacity = 1; }, 300);
+  }, 4200);
+
+  /* ================= Utilidades de tarjeta ================= */
+  const HEART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z"/></svg>';
+  const pct = p => p.old ? `-${Math.round((1 - p.price / p.old) * 100)}%` : '';
+  const priceHTML = p => p.old ? `<span class="now sale">${eur(p.price)}</span><span class="old">${eur(p.old)}</span><span class="pct">${pct(p)}</span>` : `<span class="now">${eur(p.price)}</span>`;
+  const sizeLabel = s => s === 'Única' ? 'Talla única' : 'Talla ' + s;
+  function cardHTML(p) {
+    const ci = selC[p.id] || 0, col = C[p.colors[ci]];
+    const flag = p.tag ? `<p class="card-flag">${p.tag}</p>` : '';
+    const quick = p.sizes.length === 1
+      ? `<button data-quick="${p.id}" data-size="${p.sizes[0]}">Añadir · talla única</button>`
+      : p.sizes.map(s => `<button data-quick="${p.id}" data-size="${s}"${(p.out || []).includes(s) ? ' disabled aria-label="' + s + ', agotada"' : ''}>${s}</button>`).join('');
+    return `<article class="card" data-card="${p.id}">
+      <div class="media">
+        <button class="tile card-img" style="--tile-bg:${p.bg}" data-open="${p.id}" aria-label="Ver ${esc(p.name)}, ${col.n}">
+          <span class="view front">${art(p, ci)}</span><span class="view back">${art(p, ci, true)}</span>
+        </button>
+        <button class="fav" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}" aria-label="Guardar ${esc(p.name)} en favoritos">${HEART}</button>
+        <div class="quick" role="group" aria-label="Añadir rápido ${esc(p.name)}"><span class="label">Añadir a la cesta</span><div class="qs">${quick}</div></div>
+      </div>
+      <div class="card-info">
+        ${flag}
+        <h3 class="card-name">${esc(p.name)}</h3>
+        <p class="price">${priceHTML(p)}</p>
+        <div class="swatches" role="group" aria-label="Colores">${p.colors.map((k, i) => `<button class="sw" style="--c:${C[k].h}" data-sw="${p.id}" data-i="${i}" aria-pressed="${i === ci}" aria-label="${C[k].n}" title="${C[k].n}"></button>`).join('')}</div>
+      </div>
+    </article>`;
+  }
+  const miniHTML = (p, ci = selC[p.id] || 0) => `<button class="mini" data-open="${p.id}" data-ci="${ci}">${thumb(p, ci)}<p class="mini-name">${esc(p.name)}</p><p class="mini-price">${eur(p.price)}</p></button>`;
+
+  /* ================= Entrada ================= */
+  const GATE = {
+    mujer: { bg: '#e9e4dd', items: [['c04', 0, 8, 8, 46], ['c05', 0, 48, 6, 44]] },
+    hombre: { bg: '#dde2e6', items: [['h08', 0, 8, 8, 46], ['h02', 0, 50, 6, 42]] }
+  };
+  $('#gate-split').innerHTML = ['mujer', 'hombre'].map(g => `<button class="gate-half" data-gate="${g}" style="--cbg:${GATE[g].bg}" aria-label="Entrar en ${GN[g]}">
+      ${GATE[g].items.map(([id, ci, l, t, w]) => `<span class="cp" style="--l:${l}%;--t:${t}%;--w:${w}%">${art(byId[id], ci, false, true)}</span>`).join('')}
+      <span class="gate-label">${GN[g]}</span></button>`).join('');
+  $$('#gate-split .cp svg').forEach(s => { s.style.filter = 'drop-shadow(0 18px 22px rgba(0,0,0,.18))'; });
+
+  /* ================= Portada ================= */
+  function campHTML(c) {
+    const items = c.items.map(([id, ci]) => {
+      const q = byId[id], gr = GROUP[q.type], m = SLOT_M[gr], d = SLOT_D[gr];
+      return `<span class="cp" style="--lm:${m[0]}%;--tm:${m[1]}%;--wm:${m[2]}%;--ld:${d[0]}%;--td:${d[1]}%;--wd:${d[2]}%">${art(q, ci, false, true)}</span>`;
+    }).join('');
+    return `<section class="camp" style="--cbg:${c.bg};--cink:${c.ink}" aria-label="${esc(c.title)}">${items}
+      <div class="camp-text wrap"><p class="label">${c.sub}</p><h2 class="camp-title">${c.title}</h2><button class="pill camp-btn" data-go="${st.g}-${c.cat}">${c.cta}</button></div></section>`;
+  }
+  function railHTML(title, cat, list) {
+    const id = 'rail-' + cat;
+    return `<section class="sec wrap" aria-labelledby="${id}-t"><div class="sec-head"><h2 class="sec-title" id="${id}-t">${title}</h2><button class="linkish" data-go="${st.g}-${cat}" style="font-size:13px">Ver todo</button></div>
+      <div class="rail-wrap"><button class="rail-arrow prev" data-rail="${id}" data-dir="-1" aria-label="Anteriores">‹</button><div class="rail" id="${id}">${list.map(cardHTML).join('')}</div><button class="rail-arrow next" data-rail="${id}" data-dir="1" aria-label="Siguientes">›</button></div></section>`;
+  }
+  function catsHTML() {
+    const ks = ['sudaderas', 'pantalones', 'faldas', 'camisetas', 'chaquetas', 'accesorios', 'rebajas'].filter(k => availCat(st.g, k)).slice(0, 6);
+    return `<section class="sec wrap" aria-labelledby="cats-t"><div class="sec-head"><h2 class="sec-title" id="cats-t">Categorías</h2></div><div class="cat-grid">${ks.map(k => {
+      const p = P.find(q => inGender(q, st.g) && inCat(q, k));
+      return `<button class="cat-tile" data-go="${st.g}-${k}"><span class="tile" style="--tile-bg:${p.bg};aspect-ratio:4/5">${art(p, 0)}</span><span class="cat-name">${CATS[k].short || CATS[k].n}</span></button>`;
+    }).join('')}</div></section>`;
+  }
+  function styleHTML() {
+    return `<section class="sec wrap" id="asfaltostyle" aria-labelledby="style-t" style="scroll-margin-top:calc(var(--head-h) + 12px)"><div class="sec-head"><h2 class="sec-title" id="style-t">#asfaltostyle</h2><span class="note">Sube tu foto con #asfaltostyle</span></div>
+      <div class="looks-grid">${LOOKS.map(L => {
+        const pics = L.items.map(([id, ci, l, t, w]) => `<span class="p" style="left:${l}%;top:${t}%;width:${w}%">${art(byId[id], ci, false, true)}</span>`).join('');
+        const rows = L.items.map(([id, ci]) => { const p = byId[id]; return `<li><button data-open="${id}" data-ci="${ci}"><span class="li-name">${esc(p.name)} · ${C[p.colors[ci]].n}</span><span class="li-price">${eur(p.price)}</span></button></li>`; }).join('');
+        return `<article class="look"><div class="tile look-img" style="--tile-bg:${L.bg}">${pics}<span class="look-tagline">${L.title} · ${L.place}</span></div><ul class="look-items">${rows}</ul></article>`;
+      }).join('')}</div></section>`;
+  }
+  function renderHome() {
+    const g = st.g, camps = CAMPS[g];
+    const mine = P.filter(p => inGender(p, g));
+    const fresh = [...mine].sort((a, b) => (b.tag === 'Nuevo') - (a.tag === 'Nuevo') || a.idx - b.idx).slice(0, 8);
+    const best = [...mine].sort((a, b) => (!!b.best) - (!!a.best) || b.idx - a.idx).slice(0, 8);
+    const rec = recent.length ? `<section class="sec wrap" aria-labelledby="rec-t"><div class="sec-head"><h2 class="sec-title" id="rec-t">Vistos recientemente</h2></div><div class="mini-row">${recent.map(id => miniHTML(byId[id])).join('')}</div></section>` : '';
+    $('#home').innerHTML = campHTML(camps[0]) + railHTML('Novedades', 'novedades', fresh) + campHTML(camps[1]) + catsHTML() + campHTML(camps[2]) + railHTML('Lo más vendido', 'mas-vendidos', best) + styleHTML() + rec;
+  }
+
+  /* ================= Listado ================= */
+  function baseList() {
+    if (st.cat === 'favoritos') return P.filter(p => favs.has(p.id));
+    if (st.cat === 'buscar') {
+      const q = norm(st.q.trim()); if (!q) return [];
+      const words = q.split(/\s+/);
+      return P.filter(p => { const hay = norm(p.name + ' ' + (CATS[p.cat].n) + ' ' + p.fit + ' ' + p.colors.map(k => C[k].n).join(' ')); return words.every(w => hay.includes(w)); })
+        .sort((a, b) => (inGender(b, st.g) - inGender(a, st.g)) || a.idx - b.idx);
+    }
+    return P.filter(p => inGender(p, st.g) && inCat(p, st.cat));
+  }
+  function applyFilters(list) {
+    let out = list;
+    if (st.fit) out = out.filter(p => p.fit === st.fit);
+    if (st.colors.size) out = out.filter(p => p.colors.some(k => st.colors.has(C[k].f)));
+    if (st.price !== 'all') out = out.filter(p => st.price === 'lt20' ? p.price < 20 : st.price === 'mid' ? p.price >= 20 && p.price <= 40 : p.price > 40);
+    if (st.sort === 'asc') out = [...out].sort((a, b) => a.price - b.price);
+    else if (st.sort === 'desc') out = [...out].sort((a, b) => b.price - a.price);
+    else if (st.sort === 'new') out = [...out].sort((a, b) => (b.tag === 'Nuevo') - (a.tag === 'Nuevo') || a.idx - b.idx);
+    return out;
+  }
+  const visible = () => applyFilters(baseList());
+  const filterCount = () => st.colors.size + (st.price !== 'all') + (st.sort !== 'rec');
+  function resetFilters() { st.colors.clear(); st.price = 'all'; st.sort = 'rec'; st.fit = null; }
+  function renderPLP() {
+    const base = baseList(), list = applyFilters(base), k = st.cat;
+    $('#plp-eyebrow').textContent = k === 'favoritos' ? 'Tu selección' : k === 'buscar' ? 'Resultados de búsqueda' : GN[st.g];
+    $('#plp-title').textContent = k === 'buscar' ? `«${st.q.trim()}»` : CATS[k].n;
+    $('#plp-count').textContent = `${list.length} ${list.length === 1 ? 'artículo' : 'artículos'}`;
+    const fits = [...new Set(base.map(p => p.fit))];
+    $('#plp-chips').innerHTML = fits.length > 1 ? [`<button class="chip" data-fit="" aria-pressed="${!st.fit}">Ver todo</button>`, ...fits.map(f => `<button class="chip" data-fit="${esc(f)}" aria-pressed="${st.fit === f}">${esc(f)}</button>`)].join('') : '';
+    $('#plp-chips').hidden = fits.length <= 1;
+    const fc = filterCount(); $('#fcount').hidden = !fc; $('#fcount').textContent = fc;
+    $$('[data-colsm]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.colsm === st.colsM)));
+    $$('[data-colsd]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.colsd === st.colsD)));
+    const grid = $('#grid');
+    grid.className = `grid m${st.colsM} d${st.colsD}`;
+    grid.innerHTML = list.length ? list.map(cardHTML).join('') :
+      `<div class="empty"><p>${k === 'favoritos' ? 'Aún no has guardado nada. Toca el corazón de cualquier prenda y aparecerá aquí.' : k === 'buscar' ? 'No hemos encontrado nada. Prueba con otra palabra, por ejemplo «sudadera» o «negro».' : 'No hay nada que encaje con estos filtros.'}</p>${fc || st.fit ? '<button class="pill pill-dark" data-act="f-clear">Quitar filtros</button>' : `<button class="pill pill-dark" data-go="${st.g}-novedades">Ver novedades</button>`}</div>`;
+    $('#plp-end').textContent = list.length ? `Has visto ${list.length} de ${list.length} artículos` : '';
+    if (openId === 'filters') renderFilters();
+  }
+  function renderFilters() {
+    const base = baseList();
+    const sorts = [['rec', 'Recomendado'], ['new', 'Novedades'], ['asc', 'Precio: de menos a más'], ['desc', 'Precio: de más a menos']];
+    const prices = [['all', 'Todos'], ['lt20', 'Menos de 20 €'], ['mid', '20–40 €'], ['gt40', 'Más de 40 €']];
+    const fams = FAMS.filter(f => base.some(p => p.colors.some(k => C[k].f === f.k)));
+    $('#f-body').innerHTML = `
+      <div class="f-sec"><p class="sub-label">Ordenar por</p><div class="opts">${sorts.map(([k, n]) => `<button class="opt" data-sort="${k}" aria-pressed="${st.sort === k}">${n}</button>`).join('')}</div></div>
+      <div class="f-sec"><p class="sub-label">Color</p><div class="opts">${fams.map(f => `<button class="opt" data-fcolor="${f.k}" aria-pressed="${st.colors.has(f.k)}"><span class="dot" style="--c:${f.h}"></span>${f.n}</button>`).join('')}</div></div>
+      <div class="f-sec"><p class="sub-label">Precio</p><div class="opts">${prices.map(([k, n]) => `<button class="opt" data-fprice="${k}" aria-pressed="${st.price === k}">${n}</button>`).join('')}</div></div>`;
+    const n = visible().length;
+    $('#f-apply').textContent = `Ver ${n} ${n === 1 ? 'artículo' : 'artículos'}`;
+  }
+
+  /* ================= Cabecera y menú ================= */
+  let menuG = null;
+  function renderPills() {
+    const ks = [...CAT_ORDER.filter(k => availCat(st.g, k)), 'todo'];
+    $('#pills').innerHTML = ks.map(k => `<button class="pill-link${CATS[k].sale ? ' sale' : ''}" data-go="${st.g}-${k}" aria-current="${view === 'plp' && st.cat === k ? 'page' : 'false'}">${CATS[k].short || CATS[k].n}</button>`).join('');
+    $$('.h-gender [data-gender]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gender === st.g)));
+    renderMenu();
+  }
+  function renderMenu() {
+    const g = menuG || st.g;
+    const ks = [...CAT_ORDER.filter(k => availCat(g, k)), 'todo'];
+    $('#menu-list').innerHTML = ks.map(k => `<button data-go="${g}-${k}"${CATS[k].sale ? ' class="sale"' : ''}>${CATS[k].n}</button>`).join('') + `<button data-act="go-style" data-g="${g}">#asfaltostyle</button>`;
+    $$('#menu [data-gender]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.gender === g)));
+  }
+  function measureHead() {
+    const h = $('#head');
+    document.documentElement.style.setProperty('--head-h', (h.hidden ? 0 : h.offsetHeight) + 'px');
+  }
+
+  /* ================= Navegación ================= */
+  function setHash(h) { try { if (decodeURIComponent(location.hash.slice(1)) !== h) location.hash = h; } catch (e) { } }
+  function nav(h) {
+    if (openId) closeLayer(true);
+    navigating = true;
+    if (h === curKey) { rerender(); window.scrollTo(0, 0); }
+    else { navCount++; setHash(h); route(h); }
+    navigating = false;
+  }
+  function rerender() { if (view === 'home') renderHome(); else if (view === 'plp') renderPLP(); else if (view === 'pdp') renderPDP(); renderPills(); }
+  function show(v) {
+    ['gate', 'home', 'plp', 'pdp'].forEach(x => { $('#' + x).hidden = x !== v; });
+    const chrome = v !== 'gate';
+    $('#topbar').hidden = !chrome; $('#head').hidden = !chrome; $('#foot').hidden = !chrome;
+    $('#pills').hidden = !(v === 'home' || v === 'plp');
+    view = v; renderPills(); measureHead();
+  }
+  function setG(g) { st.g = g; if (!st.gChosen || load('asfalto-g', null) !== g) { save('asfalto-g', g); st.gChosen = true; } }
+  function route(key) {
+    const h = key != null ? key : decodeURIComponent((location.hash || '').slice(1));
+    if (h === curKey) return;
+    if (curKey !== null) pos[curKey] = window.scrollY || 0;
+    curKey = h;
+    const p = bySlug[h]; let m;
+    if (p) { show('pdp'); setupPDP(p); renderPDP(); try { document.title = `${p.name} · Asfalto`; } catch (e) { } }
+    else if ((m = h.match(/^(mujer|hombre)(?:-([a-z-]+))?$/))) {
+      setG(m[1]);
+      if (m[2] && CATS[m[2]] && m[2] !== 'favoritos' && m[2] !== 'buscar') { if (st.cat !== m[2]) resetFilters(); st.cat = m[2]; show('plp'); renderPLP(); }
+      else { show('home'); renderHome(); }
+      try { document.title = 'Asfalto Streetwear'; } catch (e) { }
+    }
+    else if (h === 'favoritos' || h === 'buscar') { if (st.cat !== h) resetFilters(); st.cat = h; show('plp'); renderPLP(); }
+    else if (st.gChosen) { show('home'); renderHome(); }
+    else show('gate');
+    renderPills();
+    window.scrollTo(0, navigating ? 0 : (pos[h] || 0));
+    requestAnimationFrame(() => { measureHead(); checkBar(); });
+  }
+  window.addEventListener('hashchange', () => route());
+  function goBack() {
+    if (navCount > 0) {
+      navCount--;
+      const k = curKey;
+      try { history.back(); } catch (e) { }
+      setTimeout(() => { if (curKey === k) nav(st.g); }, 220);
+    } else nav(st.g);
+  }
+  function openProduct(id, ci) { if (ci != null) selC[id] = ci; nav(byId[id].slug); }
+
+  /* ================= Favoritos y contadores ================= */
+  function toggleFav(id) {
+    favs.has(id) ? favs.delete(id) : favs.add(id);
+    save('asfalto-favs', [...favs]);
+    $$(`[data-fav="${id}"]`).forEach(b => b.setAttribute('aria-pressed', String(favs.has(id))));
+    updateBadges();
+    if (view === 'plp' && st.cat === 'favoritos') renderPLP();
+  }
+  const count = () => cart.reduce((s, it) => s + it.qty, 0);
+  const subtotal = () => cart.reduce((s, it) => s + byId[it.id].price * it.qty, 0);
+  function totals(method = 'std') {
+    const sub = subtotal(), pc = promo ? PROMOS[promo].pct : 0;
+    const disc = Math.round(sub * pc) / 100;
+    const m = SHIP[method];
+    const ship = (m.free && sub >= FREE) ? 0 : m.price;
+    return { sub, disc, ship, total: Math.max(0, sub - disc + ship) };
+  }
+  function updateBadges() {
+    const n = count(), cb = $('#cart-badge');
+    cb.hidden = n === 0; cb.textContent = n;
+    $$('[data-badge="favs"]').forEach(b => { b.hidden = !favs.size; b.textContent = favs.size; });
+    $$('[data-badge-text="favs"]').forEach(b => { b.textContent = favs.size ? `(${favs.size})` : '→'; });
+  }
+
+  /* ================= Capas ================= */
+  let openId = null, lastFocus = null;
+  function openLayer(id) {
+    if (openId === id) return;
+    if (openId) closeLayer(true); else lastFocus = document.activeElement;
+    const el = document.getElementById(id);
+    el.classList.add('open'); el.removeAttribute('inert'); el.setAttribute('aria-hidden', 'false');
+    $('#backdrop').classList.add('on'); document.documentElement.classList.add('lock');
+    openId = id; checkBar();
+    setTimeout(() => { const f = id === 'search' ? $('#q') : el.querySelector('[data-close]'); if (f) f.focus({ preventScroll: true }); }, 60);
+  }
+  function closeLayer(silent) {
+    if (!openId) return;
+    const el = document.getElementById(openId);
+    el.classList.remove('open'); el.setAttribute('inert', ''); el.setAttribute('aria-hidden', 'true');
+    $('#backdrop').classList.remove('on'); document.documentElement.classList.remove('lock');
+    openId = null; checkBar();
+    if (!silent && lastFocus && lastFocus.isConnected) lastFocus.focus({ preventScroll: true });
+  }
+  function keepFocus(box, fn) {
+    const a = document.activeElement; let sel = null;
+    if (box.contains(a)) for (const at of ['data-psize', 'data-pcol', 'data-act', 'data-fav', 'id']) if (a.hasAttribute(at)) { sel = `[${at}="${a.getAttribute(at)}"]`; break; }
+    fn();
+    if (sel) { const n = box.querySelector(sel); if (n) n.focus({ preventScroll: true }); }
+  }
+
+  /* ================= Ficha de producto ================= */
+  function setupPDP(p) {
+    pdp.p = p; pdp.ci = selC[p.id] || 0; pdp.size = p.sizes.length === 1 ? p.sizes[0] : null; pdp.notify = null; pdp.need = false; pdp.fresh = true;
+    if (p.g !== 'ambos') st.g = p.g;
+    recent = [p.id, ...recent.filter(x => x !== p.id)].slice(0, 8); save('asfalto-recent', recent);
+  }
+  function similar(p, exclude) {
+    const g = p.g === 'ambos' ? st.g : p.g;
+    const score = q => (q.cat === p.cat) * 2 + (GROUP[q.type] === GROUP[p.type]);
+    return P.filter(q => q.id !== p.id && !exclude.includes(q.id) && inGender(q, g)).sort((a, b) => score(b) - score(a) || a.idx - b.idx).slice(0, 4);
+  }
+  function renderPDP() {
+    const p = pdp.p, cat = CATS[p.cat], g = p.g === 'ambos' ? st.g : p.g;
+    $('#pdp-crumbs').innerHTML = `<button class="back-btn" data-act="pdp-back">← Volver</button>
+      <button data-go="${g}">${GN[g]}</button><span aria-hidden="true">/</span>
+      <button data-go="${g}-${p.cat}">${cat.n}</button><span aria-hidden="true">/</span>
+      <span aria-current="page">${esc(p.name)}</span>`;
+    renderGallery(); renderInfo();
+    const look = completeLook(p);
+    $('#pdp-look').innerHTML = look.map(cardHTML).join('');
+    $('#pdp-sim').innerHTML = similar(p, look.map(q => q.id)).map(cardHTML).join('');
+    const rec = recent.filter(id => id !== p.id);
+    $('#pdp-recent-sec').hidden = !rec.length;
+    $('#pdp-recent').innerHTML = rec.map(id => miniHTML(byId[id])).join('');
+  }
+  function renderGallery() {
+    const p = pdp.p, list = shots(p, pdp.ci);
+    $('#pdp-shots').innerHTML = list.map((s, i) => `<button class="tile shot${s.full ? ' full' : ''}" style="--tile-bg:${p.bg}" data-zoom="${i}" aria-label="Ampliar foto ${i + 1} de ${list.length}: ${s.n}">${s.html}<span class="shot-chip">${s.n}</span></button>`).join('');
+    $('#pdp-shots').scrollLeft = 0;
+    $('#gal-count').textContent = `1 / ${list.length}`;
+  }
+  $('#pdp-shots').addEventListener('scroll', () => {
+    const g = $('#pdp-shots'), i = Math.round(g.scrollLeft / Math.max(1, g.clientWidth));
+    $('#gal-count').textContent = `${i + 1} / ${g.children.length}`;
+  }, { passive: true });
+
+  const ICON_TRUCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>';
+  const ICON_BOX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/></svg>';
+  const ICON_RET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>';
+
+  function renderInfo() {
+    const p = pdp.p, col = C[p.colors[pdp.ci]], box = $('#pdp-info');
+    const openD = pdp.fresh ? ['pd-desc'] : [...box.querySelectorAll('details[open]')].map(d => d.id);
+    pdp.fresh = false;
+    const table = tableFor(p), outs = p.out || [], uni = p.sizes.length === 1;
+    const sizes = p.sizes.map(s => { const o = outs.includes(s); return `<button class="size${o ? ' out' : ''}" data-psize="${s}" aria-pressed="${(o ? pdp.notify : pdp.size) === s}"${o ? ` aria-label="${s}, agotada. Avísame cuando vuelva"` : ''}>${s}</button>`; }).join('');
+    const care = careList(p.care);
+    keepFocus(box, () => {
+      box.innerHTML = `
+        <div>
+          ${p.old ? `<p class="pdp-flag sale">Rebajado</p>` : p.tag ? `<p class="pdp-flag">${p.tag}</p>` : ''}
+          <h1 class="pdp-name">${esc(p.name)}</h1>
+          <p class="price pdp-price">${priceHTML(p)}</p>
+          <p class="pdp-ref">Ref. ${p.ref}/${p.mod}/${col.c}</p>
+        </div>
+        <div>
+          <p class="opt-label"><span>Color: <b>${col.n}</b></span></p>
+          <div class="cthumbs" role="group" aria-label="Colores">${p.colors.map((k, i) => `<button class="cthumb" data-pcol="${i}" aria-pressed="${i === pdp.ci}" aria-label="${C[k].n}" title="${C[k].n}">${thumb(p, i)}</button>`).join('')}</div>
+        </div>
+        <div id="pdp-sizes">
+          <p class="opt-label"><span>${uni ? 'Talla única' : 'Selecciona tu talla'}</span>${table ? `<button class="linkish" data-act="size-guide" style="font-size:12px">Guía de tallas</button>` : `<span class="note">${p.fit}</span>`}</p>
+          ${uni ? '' : `<div class="sizes" role="group" aria-label="Tallas">${sizes}</div>`}
+          ${pdp.need && !pdp.size ? `<p class="need" role="alert">Elige una talla para añadirla a la cesta.</p>` : ''}
+          ${pdp.size && (p.low || []).includes(pdp.size) ? `<p class="stock">Quedan pocas unidades en talla ${pdp.size}</p>` : ''}
+          ${pdp.notify ? `<form class="notify" id="notify-form" novalidate><p>La talla <b>${pdp.notify}</b> está agotada. Déjanos tu email y te avisamos si vuelve.</p><div class="inline-form"><label for="notify-email" class="sr">Tu email</label><input id="notify-email" type="email" placeholder="tu@email.com" autocomplete="email"><button class="pill pill-dark" type="submit">Avísame</button></div><p class="note" id="notify-msg" aria-live="polite"></p></form>` : (outs.length ? `<p class="note" style="margin-top:10px">Tachadas: agotadas. Tócalas para que te avisemos si vuelven.</p>` : '')}
+          ${modelLine(p) ? `<p class="model">${modelLine(p)}</p>` : ''}
+        </div>
+        <div class="buy-row">
+          <button class="btn-block" id="pdp-add" data-act="pdp-add">Añadir a la cesta</button>
+          <button class="fav-big" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}" aria-label="Guardar en favoritos">${HEART}</button>
+        </div>
+        <ul class="deliv">
+          <li>${ICON_TRUCK}<span><b>${p.price >= FREE ? 'Envío gratis' : 'Envío gratis a partir de 29,90 €'}</b><br><span class="note">${eta('std')} con el envío estándar</span></span></li>
+          <li>${ICON_BOX}<span><b>Recogida en punto</b><br><span class="note">Más de 3.000 puntos en España</span></span></li>
+          <li>${ICON_RET}<span><b>Devolución gratis en 30 días</b></span></li>
+        </ul>
+        <div>
+          <details id="pd-desc"><summary>Descripción</summary><div class="acc-body"><p>${esc(p.desc)}</p><ul class="det">${p.det.map(d => `<li>${esc(d)}</li>`).join('')}</ul><p class="note">Corte: ${p.fit}</p></div></details>
+          <details id="pd-meas"><summary>Medidas de la prenda</summary><div class="acc-body"><p class="note">Medidas en ${measSize(p)}, con la prenda en plano.</p>${tableHTML({ head: ['Medida', 'Centímetros'], rows: p.meas })}</div></details>
+          <details id="pd-comp"><summary>Composición, cuidados y origen</summary><div class="acc-body">
+            <div><p class="sub-label">Composición</p>${p.comp.map(c => `<p>${esc(c)}</p>`).join('')}</div>
+            <div><p class="sub-label">Cuidados</p><ul class="care">${care.map(([k, t]) => `<li>${careIcon(k, CARE[p.care].wash)}<span>${t}</span></li>`).join('')}</ul><p class="note" style="margin-top:8px">${CARE[p.care].extra}.</p></div>
+            <div><p class="sub-label">Origen</p><p>Hecho en ${p.origin}.</p></div>
+          </div></details>
+          <details id="pd-ship"><summary>Envíos y devoluciones</summary><div class="acc-body">${tableHTML({ head: ['Envío', 'Plazo', 'Precio'], rows: Object.entries(SHIP).map(([k, m]) => [m.n, eta(k).replace('Llega ', ''), (m.free && p.price >= FREE) ? 'Gratis' : eur(m.price)]) })}<p>Tienes 30 días para devolverlo gratis en un punto de recogida, o a domicilio por 2,95 €.</p></div></details>
+        </div>`;
+      openD.forEach(id => { const d = document.getElementById(id); if (d) d.open = true; });
+    });
+    renderBuybar();
+  }
+  function renderBuybar() {
+    const p = pdp.p; if (!p) return;
+    $('#bb-thumb').innerHTML = thumb(p, pdp.ci);
+    $('#bb-name').textContent = p.name;
+    $('#bb-price').textContent = `${eur(p.price)} · ${C[p.colors[pdp.ci]].n}${pdp.size && p.sizes.length > 1 ? ' · ' + pdp.size : ''}`;
+    $('#bb-btn').textContent = pdp.size ? 'Añadir' : 'Elegir talla';
+  }
+  let barRaf = 0;
+  function checkBar() {
+    const bar = $('#buybar'); let on = false;
+    if (view === 'pdp' && !openId) { const b = $('#pdp-add'); if (b) { const r = b.getBoundingClientRect(); on = r.bottom < 70 || r.top > window.innerHeight - 10; } }
+    if (on !== bar.classList.contains('on')) {
+      bar.classList.toggle('on', on); bar.setAttribute('aria-hidden', String(!on)); $('#bb-btn').tabIndex = on ? 0 : -1;
+      document.documentElement.style.setProperty('--bar', on && bar.offsetHeight ? bar.offsetHeight + 'px' : '0px');
+    }
+  }
+  window.addEventListener('scroll', () => { cancelAnimationFrame(barRaf); barRaf = requestAnimationFrame(checkBar); }, { passive: true });
+  function needSize() {
+    pdp.need = true; renderInfo();
+    const s = $('#pdp-sizes'); if (s) s.scrollIntoView({ behavior: smooth(), block: 'center' });
+    const first = $('#pdp-info .size:not(.out)'); if (first) first.focus({ preventScroll: true });
+  }
+  function pickSize(s) {
+    const p = pdp.p;
+    if ((p.out || []).includes(s)) { pdp.notify = pdp.notify === s ? null : s; renderInfo(); const n = $('#notify-email'); if (n) n.focus(); }
+    else { pdp.size = s; pdp.notify = null; pdp.need = false; renderInfo(); }
+  }
+
+  /* Zoom */
+  const zm = { i: 0 };
+  function renderZoom() {
+    const p = pdp.p, list = shots(p, pdp.ci), s = list[zm.i];
+    $('#zoom-count').textContent = `${zm.i + 1} / ${list.length} · ${s.n}`;
+    $('#zoom-stage').innerHTML = `<div class="tile zoom-img${s.full ? ' full' : ''}" id="zoom-img" style="--tile-bg:${p.bg}" role="img" aria-label="${esc(p.name)}: ${s.n}">${s.html}</div>`;
+  }
+  function openZoom(i) { zm.i = i; renderZoom(); openLayer('zoom'); }
+  function stepZoom(d) { zm.i = (zm.i + d + 6) % 6; renderZoom(); }
+  $('#zoom-stage').addEventListener('click', e => {
+    const im = e.target.closest('#zoom-img'); if (!im) return;
+    const r = im.getBoundingClientRect();
+    im.style.transformOrigin = `${((e.clientX - r.left) / r.width * 100).toFixed(1)}% ${((e.clientY - r.top) / r.height * 100).toFixed(1)}%`;
+    im.classList.toggle('zoomed');
+  });
+  $('#zoom-stage').addEventListener('pointermove', e => {
+    const im = $('#zoom-img'); if (!im || !im.classList.contains('zoomed') || e.pointerType === 'touch') return;
+    const r = $('#zoom-stage').getBoundingClientRect();
+    im.style.transformOrigin = `${((e.clientX - r.left) / r.width * 100).toFixed(1)}% ${((e.clientY - r.top) / r.height * 100).toFixed(1)}%`;
+  });
+
+  /* Guía de tallas con buscador */
+  function recommend(p, v) {
+    const t = tableFor(p), pants = isPants(p);
+    for (const r of t.rows) { const top = pants ? +r[1] : +r[1].split('–')[1]; if (v <= top) return r[0]; }
+    return null;
+  }
+  function openSizeGuide(p) {
+    const t = tableFor(p), pants = isPants(p);
+    $('#info-title').textContent = 'Guía de tallas';
+    $('#info-body').innerHTML = `<p class="note">${esc(p.name)} · corte ${p.fit.toLowerCase()}</p>
+      <div class="finder"><p><b>Encuentra tu talla</b></p>
+        <form id="finder-form" class="inline-form" novalidate><label for="finder-in" class="sr">${pants ? 'Contorno de cintura' : 'Contorno de pecho'} en cm</label><input id="finder-in" type="text" inputmode="decimal" placeholder="${pants ? 'Tu cintura en cm, ej. 72' : 'Tu pecho en cm, ej. 92'}" autocomplete="off"><button class="pill pill-dark" type="submit">Calcular</button></form>
+        <div id="finder-out" aria-live="polite"></div></div>
+      <h3>Medidas del cuerpo</h3>${tableHTML(t)}
+      <h3>Cómo medirte</h3><ol>${pants ? '<li>Cintura: rodea la parte más estrecha de la cintura, sin apretar.</li><li>Cadera: rodea la parte más ancha del culo, con los pies juntos.</li>' : '<li>Pecho: pasa la cinta por debajo de las axilas, por la parte más ancha.</li><li>Cintura: rodea la parte más estrecha, sin apretar.</li>'}</ol>
+      <h3>Medidas de esta prenda (${measSize(p)})</h3>${tableHTML({ head: ['Medida', 'Centímetros'], rows: p.meas })}`;
+    $('#info-body').scrollTop = 0;
+    openLayer('info');
+  }
+
+  /* ================= Buscador ================= */
+  function renderSearch() {
+    const q = $('#q').value.trim(), box = $('#search-body');
+    if (!q) {
+      const rec = recent.slice(0, 6);
+      box.innerHTML = `<div><p class="sub-label">Tendencias</p><div class="opts">${TRENDS.map(t => `<button class="opt" data-trend="${t}">${t}</button>`).join('')}</div></div>
+        ${rec.length ? `<div><p class="sub-label">Vistos recientemente</p><div class="mini-row" style="margin-top:10px">${rec.map(id => miniHTML(byId[id])).join('')}</div></div>` : ''}`;
+      return;
+    }
+    st.q = q;
+    const saveCat = st.cat; st.cat = 'buscar'; const res = baseList(); st.cat = saveCat;
+    box.innerHTML = res.length
+      ? `<div class="sec-head" style="margin:0"><p class="sub-label" style="margin:0">${res.length} ${res.length === 1 ? 'resultado' : 'resultados'}</p>${res.length > 8 ? `<button class="linkish" data-act="search-all" style="font-size:13px">Ver todos</button>` : ''}</div><div class="grid">${res.slice(0, 8).map(cardHTML).join('')}</div>${res.length > 4 ? `<div style="text-align:center"><button class="pill pill-line" data-act="search-all">Ver los ${res.length} resultados</button></div>` : ''}`
+      : `<p class="note" style="font-size:14px">No hay nada con «${esc(q)}». Prueba con «sudadera», «cargo» o un color, como «negro».</p>`;
+  }
+
+  /* ================= Cesta ================= */
+  function renderCart() {
+    const n = count(), t = totals();
+    $('#cart-title').textContent = n ? `Cesta (${n})` : 'Cesta';
+    const left = Math.max(0, FREE - t.sub);
+    $('#ship').hidden = !n;
+    $('#ship').innerHTML = n ? `${left > 0 ? `Te faltan <b>${eur(left)}</b> para el envío gratis` : '<b>Tienes el envío gratis</b>'}<div class="bar"><i style="--p:${Math.min(100, t.sub / FREE * 100).toFixed(1)}%"></i></div>` : '';
+    if (!n) {
+      $('#cart-list').innerHTML = `<div class="cart-empty"><p style="font-size:16px;font-weight:700;color:var(--fg);text-transform:uppercase">Tu cesta está vacía</p><p>Échale un ojo a lo nuevo.</p><button class="pill pill-dark" data-act="shop">Ver novedades</button></div>`;
+      $('#cart-foot').innerHTML = ''; $('#cart-foot').hidden = true; return;
+    }
+    $('#cart-foot').hidden = false;
+    $('#cart-list').innerHTML = cart.map((it, k) => {
+      const p = byId[it.id], col = C[p.colors[it.ci]];
+      return `<div class="ci">
+        <button class="tile" style="--tile-bg:${p.bg}" data-open="${p.id}" data-ci="${it.ci}" aria-label="Ver ${esc(p.name)}">${art(p, it.ci)}</button>
+        <div style="min-width:0">
+          <p class="ci-name">${esc(p.name)}</p>
+          <p class="ci-meta">${col.n} · ${sizeLabel(it.size)}</p>
+          <div class="ci-ctrl">
+            <div class="qty"><button data-act="qty" data-k="${k}" data-n="-1" aria-label="Quitar una unidad">−</button><span>${it.qty}</span><button data-act="qty" data-k="${k}" data-n="1" aria-label="Añadir una unidad">+</button></div>
+            <button class="ci-rm" data-act="rm" data-k="${k}">Eliminar</button>
+            <button class="ci-rm" data-act="to-fav" data-k="${k}">Mover a favoritos</button>
+          </div>
+        </div>
+        <span class="ci-price">${eur(p.price * it.qty)}</span>
+      </div>`;
+    }).join('');
+    $('#cart-foot').innerHTML = `
+      ${promo ? `<div class="promo-on"><span>Código <b>${promo}</b> · ${PROMOS[promo].n}</span><button class="ci-rm" data-act="promo-off">Quitar</button></div>`
+        : `<form class="promo-form" id="promo-form" novalidate><label for="promo-in" class="sr">Código promocional</label><input id="promo-in" placeholder="Código promocional" autocomplete="off" autocapitalize="characters"><button type="submit">Aplicar</button></form><p class="note" id="promo-msg" aria-live="polite" hidden></p>`}
+      <div class="row"><span>Subtotal</span><span class="num">${eur(t.sub)}</span></div>
+      ${t.disc ? `<div class="row disc"><span>Descuento</span><span class="num">−${eur(t.disc)}</span></div>` : ''}
+      <div class="row"><span>Envío estándar</span><span class="num">${t.ship ? eur(t.ship) : 'Gratis'}</span></div>
+      <div class="row total"><span>Total <span class="note" style="font-weight:400">IVA incluido</span></span><span class="num">${eur(t.total)}</span></div>
+      <button class="btn-block" data-act="checkout">Tramitar pedido</button>`;
+  }
+  function saveCart() { save('asfalto-cart', cart); updateBadges(); renderCart(); }
+  function bump() { const b = $('#cart-badge'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
+  function addToCart(p, ci, size) {
+    const hit = cart.find(it => it.id === p.id && it.ci === ci && it.size === size);
+    hit ? hit.qty++ : cart.push({ id: p.id, ci, size, qty: 1 });
+    saveCart(); bump(); toast(p, ci, size);
+  }
+  let toastT;
+  function toast(p, ci, size) {
+    $('#toast').innerHTML = `${thumb(p, ci)}<span class="toast-txt"><b>Añadido a la cesta</b><small>${esc(p.name)} · ${sizeLabel(size)}</small></span><button data-act="toast-cart">Ver cesta</button>`;
+    $('#toast').classList.add('on');
+    clearTimeout(toastT); toastT = setTimeout(() => $('#toast').classList.remove('on'), 3600);
+  }
+
+  /* ================= Compra ================= */
+  const co = { step: 1, data: {}, method: 'std', pay: 'card', order: null };
+  const dfmt = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+  const dshort = d => dfmt.format(d).replace(',', '');
+  function addBiz(n) { const d = new Date(); let c = 0; while (c < n) { d.setDate(d.getDate() + 1); const w = d.getDay(); if (w && w !== 6) c++; } return d; }
+  function eta(m) { const [a, b] = SHIP[m].days; return a === b ? `Llega el ${dshort(addBiz(a))}` : `Llega entre el ${dshort(addBiz(a))} y el ${dshort(addBiz(b))}`; }
+  /* ---- Verificación de dirección ----
+     1) Código postal, población y provincia: lista oficial del INE (datos/codigos-postales.json).
+     2) Calle y número: CartoCiudad (IGN) a través de la función de Netlify «verificar-direccion».
+        En la vista previa esa función no existe y la web sigue solo con el punto 1. */
+  let CPDB = null, cpLoading = null;
+  function loadCP() {
+    if (CPDB) return Promise.resolve(CPDB);
+    if (!cpLoading) cpLoading = fetch('datos/codigos-postales.json').then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.m && j.c) CPDB = j; return CPDB; }).catch(() => null)
+      .then(x => { if (!CPDB) cpLoading = null; return x; });
+    return cpLoading;
+  }
+  const cpNames = cp => (CPDB && CPDB.c[cp]) ? CPDB.c[cp].map(i => CPDB.m[i]) : null;
+  const provOf = cp => /^\d{5}$/.test(cp) && +cp.slice(0, 2) >= 1 && +cp.slice(0, 2) <= 52 ? PROVS[+cp.slice(0, 2) - 1] : null;
+  const SMALL = new Set(['de', 'del', 'la', 'las', 'los', 'el', 'y', 'e', 'en', 'a', 'al', 'i', 'les', 'els', 'd', 'l', 'o', 'os', 'as']);
+  const cityKey = s => norm(s).replace(/['’]/g, ' ').replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(w => w && !SMALL.has(w));
+  function cityMatch(input, names) {
+    const a = cityKey(input); if (!a.length || !names) return null;
+    for (const n of names) for (const part of n.split('/')) {
+      const b = cityKey(part);
+      if (b.length && a.every(w => b.includes(w))) return n;
+    }
+    return null;
+  }
+  const orList = l => l.length < 2 ? (l[0] || '') : l.slice(0, -1).join(', ') + ' o ' + l[l.length - 1];
+  function titleCase(s, lowerFirstSmall) {
+    return s.toLowerCase().split(' ').filter(Boolean).map((w, i) => ((i || lowerFirstSmall) && SMALL.has(norm(w))) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+  const VIAS = [
+    [/^(c\/\s*|c\.\s*|cl\.?\s+|calle\s+)/i, 'Calle'], [/^(avda\.?\s*|avd\.?\s+|av\.?\s+|avenida\s+)/i, 'Avenida'],
+    [/^(pza\.?\s*|plza\.?\s*|pl\.?\s+|plaza\s+)/i, 'Plaza'], [/^(p[º°]\.?\s*|pso\.?\s+|ps\.?\s+|paseo\s+)/i, 'Paseo'],
+    [/^(ctra\.?\s*|carretera\s+)/i, 'Carretera'], [/^(trav\.?\s+|traves[ií]a\s+)/i, 'Travesía'], [/^(rda\.?\s+|ronda\s+)/i, 'Ronda'],
+    [/^(glta\.?\s*|glorieta\s+)/i, 'Glorieta'], [/^(cno\.?\s+|camino\s+)/i, 'Camino'], [/^(urb\.?\s+|urbanizaci[oó]n\s+)/i, 'Urbanización']
+  ];
+  function parseStreet(raw) {
+    let s = raw.replace(/\s+/g, ' ').trim(), via = '';
+    for (const [re, n] of VIAS) if (re.test(s)) { via = n; s = s.replace(re, '').trim(); break; }
+    const m = s.match(/^(.*?\p{L}.*?)[,\s]+(?:n[º°o.]?\s*)?(\d{1,4}\s?[a-z]?(?=$|[\s,])|s\/?n(?=$|[\s,]))(.*)$/iu);
+    if (!m) return { via, name: titleCase(s.replace(/,$/, ''), !!via), num: '', rest: '' };
+    let num = m[2].replace(/\s/g, '').toUpperCase(); if (/^S\/?N$/.test(num)) num = 's/n';
+    return { via, name: titleCase(m[1].replace(/,$/, '').trim(), !!via), num, rest: m[3].replace(/^[\s,]+/, '').trim() };
+  }
+  const fmtStreet = st => [st.via, st.name].filter(Boolean).join(' ') + ', ' + st.num;
+  const pisoFmt = s => (s || '').replace(/\s+/g, ' ').trim().replace(/(^|\s)([a-z])(?=$|\s)/g, (m, a, b) => a + b.toUpperCase());
+  const addrLine = d => esc(d.dirFmt) + (d.piso ? ', ' + esc(d.piso) : '');
+  function checkAddress(v) {
+    const err = {}, fix = {};
+    if (!EMAIL.test(v.email)) err.email = 'Escribe un email válido, por ejemplo nombre@gmail.com.';
+    if (!v.nombre) err.nombre = 'Falta tu nombre.';
+    if (!v.apellidos) err.apellidos = 'Faltan tus apellidos.';
+    const tel = v.tel.replace(/\D/g, '').replace(/^34(?=\d{9}$)/, '');
+    if (!/^[6789]\d{8}$/.test(tel)) err.tel = 'Escribe un teléfono de 9 cifras, por ejemplo 612 345 678.';
+    const pr = provOf(v.cp);
+    let names = null, city = null;
+    if (!pr) err.cp = 'El código postal tiene 5 cifras, por ejemplo 28013.';
+    else if (CPDB) { names = cpNames(v.cp); if (!names) err.cp = `El código postal ${v.cp} no existe. Revisa que esté bien escrito.`; }
+    if (!v.ciudad) { err.ciudad = 'Falta la población.'; if (names) fix.ciudad = names.slice(0, 4); }
+    else if (names) { city = cityMatch(v.ciudad, names); if (!city) { err.ciudad = `El ${v.cp} es de ${orList(names.slice(0, 4))}, no de «${v.ciudad}».`; fix.ciudad = names.slice(0, 4); } }
+    if (pr && v.prov !== pr) { err.prov = `El ${v.cp} es de la provincia de ${pr}.`; fix.prov = [pr]; }
+    else if (!pr && !v.prov) err.prov = 'Elige tu provincia.';
+    const st = parseStreet(v.dir);
+    if (!/\p{L}{2,}/u.test(st.name)) err.dir = 'Escribe la calle y el número, por ejemplo «Calle Mayor 10».';
+    else if (!st.num) err.dir = 'Falta el número del portal. Si no tiene número, escribe «s/n».';
+    return { err, fix, tel, city: city || v.ciudad, st };
+  }
+  function cpHint(cp) {
+    const h = $('#hint-cp'), dl = $('#dl-ciudad'); if (!h) return;
+    if (!CPDB || $('#co-cp').value !== cp) return;
+    const names = cpNames(cp), er = $('#err-cp');
+    if (!names) { h.textContent = ''; $('#co-cp').setAttribute('aria-invalid', 'true'); er.textContent = `El código postal ${cp} no existe. Revisa que esté bien escrito.`; if (dl) dl.innerHTML = ''; return; }
+    h.textContent = '✓ ' + (names.length > 3 ? names.slice(0, 3).join(', ') + ' y ' + (names.length - 3) + ' más' : orList(names));
+    if (dl) dl.innerHTML = names.map(n => `<option value="${esc(n)}"></option>`).join('');
+    const ci = $('#co-ciudad');
+    if (ci && names.length === 1 && !cityMatch(ci.value, names)) { ci.value = names[0]; ci.removeAttribute('aria-invalid'); $('#err-ciudad').textContent = ''; }
+  }
+  /* Comprobación de la calle, por orden:
+     1) La función de Netlify «verificar-direccion» (si la web está en Netlify).
+     2) CartoCiudad directamente desde el navegador (JSON y, si no, JSONP), por ejemplo en GitHub Pages.
+     3) Si nada responde, la compra sigue con la comprobación de código postal y población. */
+  const CARTO = 'https://www.cartociudad.es/geocoder/api/geocoder';
+  async function getJSON(url, ms = 6000) {
+    const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = ctl ? setTimeout(() => ctl.abort(), ms) : 0;
+    try {
+      const r = await fetch(url, { headers: { accept: 'application/json' }, signal: ctl ? ctl.signal : undefined });
+      if (!r.ok || !(r.headers.get('content-type') || '').includes('json')) throw new Error('sin json');
+      return await r.json();
+    } finally { clearTimeout(timer); }
+  }
+  let jsonpN = 0;
+  function getJSONP(url, ms = 6000) {
+    return new Promise((resolve, reject) => {
+      const name = '__carto' + (++jsonpN), s = document.createElement('script');
+      const done = (fn, v) => { clearTimeout(t); delete window[name]; if (window.callback === cb) delete window.callback; s.remove(); fn(v); };
+      const cb = data => done(resolve, data);
+      const t = setTimeout(() => done(reject, new Error('tiempo agotado')), ms);
+      window[name] = cb; window.callback = cb;
+      s.onerror = () => done(reject, new Error('no carga'));
+      s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + name;
+      document.head.appendChild(s);
+    });
+  }
+  async function cartoGet(path) {
+    try { return await getJSON(CARTO + path); }
+    catch (e) { return await getJSONP(CARTO + path.replace(/^\/(find|candidates)\?/, '/$1Jsonp?')); }
+  }
+  const sinTipo = s => norm(s).replace(/^(calle|avenida|plaza|paseo|carretera|travesia|ronda|glorieta|camino|urbanizacion)\s+/, '').replace(/\s+/g, ' ').trim();
+  const cartoName = c => titleCase([c.tip_via, c.address].filter(Boolean).join(' '));
+  async function cartoLookup(d) {
+    const calle = [d.via, d.calle].filter(Boolean).join(' ');
+    if (d.num && d.num !== 's/n') {
+      const f = await cartoGet('/find?q=' + encodeURIComponent(`${calle} ${d.num}, ${d.cp} ${d.ciudad.split('/')[0]}`));
+      if (f && f.type === 'portal' && String(f.postalCode) === d.cp) return { status: 'ok', calle: cartoName(f) };
+    }
+    const lista = await cartoGet('/candidates?limit=6&q=' + encodeURIComponent(calle) + '&cod_postal_filter=' + d.cp);
+    const calles = (Array.isArray(lista) ? lista : []).filter(c => c.type === 'callejero' || c.type === 'portal');
+    const igual = calles.find(c => sinTipo(c.address) === sinTipo(calle));
+    if (igual) return { status: 'calle', calle: cartoName(igual) };
+    return { status: 'no', sugerencias: [...new Set(calles.map(cartoName))].slice(0, 4) };
+  }
+  async function checkStreet(d) {
+    try {
+      const q = new URLSearchParams({ calle: [d.via, d.calle].filter(Boolean).join(' '), numero: d.num === 's/n' ? '' : d.num, cp: d.cp, municipio: d.ciudad.split('/')[0] });
+      const j = await getJSON('/.netlify/functions/verificar-direccion?' + q);
+      if (j && ['ok', 'calle', 'no'].includes(j.status)) return j;
+    } catch (e) { }
+    try { return await cartoLookup(d); } catch (e) { return { status: 'skip' }; }
+  }
+  async function submitStep1() {
+    const keys = ['email', 'nombre', 'apellidos', 'tel', 'cp', 'ciudad', 'prov', 'dir', 'piso'], vals = {};
+    keys.forEach(k => { const el = $('#co-' + k); vals[k] = el ? el.value.trim() : ''; });
+    co.data = { ...co.data, ...vals };
+    const btn = $('#co-form [type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Comprobando…'; }
+    await loadCP();
+    if (btn) { btn.disabled = false; btn.textContent = 'Comprobar dirección'; }
+    if (co.step !== 1) return;
+    const r = checkAddress(vals);
+    let first = null;
+    keys.slice(0, 8).forEach(k => {
+      const el = $('#co-' + k), er = $('#err-' + k), msg = r.err[k];
+      if (!el || !er) return;
+      if (msg) {
+        el.setAttribute('aria-invalid', 'true');
+        er.innerHTML = esc(msg) + (r.fix[k] ? r.fix[k].map(v => ` <button type="button" class="fix" data-fix="${k}" data-val="${esc(v)}">Usar ${esc(v)}</button>`).join('') : '');
+        if (!first) first = el;
+      } else { el.removeAttribute('aria-invalid'); er.textContent = ''; }
+    });
+    if (first) { first.focus(); return; }
+    co.typed = { dir: vals.dir, ciudad: vals.ciudad };
+    co.data = { ...vals, tel: r.tel, ciudad: r.city, piso: pisoFmt(vals.piso || r.st.rest), via: r.st.via, calle: r.st.name, num: r.st.num, dirFmt: fmtStreet(r.st) };
+    co.step = 'check'; renderCheckout();
+    co.verify = await checkStreet(co.data);
+    if (co.step !== 'check') return;
+    if (co.verify.calle && (co.verify.status === 'ok' || co.verify.status === 'calle')) co.data.dirFmt = co.verify.calle + ', ' + co.data.num;
+    gotoStep('confirm');
+  }
+  const fld = (id, label, o = {}) => `<div class="field${o.full ? ' full' : ''}"><label for="co-${id}">${label}</label>${o.select
+    ? `<select id="co-${id}" name="${id}" autocomplete="${o.ac || 'off'}" aria-describedby="err-${id}"><option value="">Elige…</option>${o.select.map(v => `<option${co.data[id] === v ? ' selected' : ''}>${v}</option>`).join('')}</select>`
+    : `<input id="co-${id}" name="${id}" type="${o.type || 'text'}" value="${esc(co.data[id] || '')}" autocomplete="${o.ac || 'off'}"${o.im ? ` inputmode="${o.im}"` : ''}${o.ph ? ` placeholder="${o.ph}"` : ''}${o.max ? ` maxlength="${o.max}"` : ''}${o.list ? ` list="${o.list}"` : ''} aria-describedby="err-${id}${o.hint ? ' hint-' + id : ''}">`}${o.hint ? `<p class="hint" id="hint-${id}" aria-live="polite"></p>` : ''}<p class="err" id="err-${id}" aria-live="polite"></p></div>`;
+  function shipPrice(m) { const sub = subtotal(); return (SHIP[m].free && sub >= FREE) ? 0 : SHIP[m].price; }
+  const itemRow = it => { const p = byId[it.id]; return `<div class="sum-it">${thumb(p, it.ci)}<span>${esc(p.name)}<br><span class="note">${C[p.colors[it.ci]].n} · ${sizeLabel(it.size)} · ${it.qty} ud.</span></span><span class="num">${eur(p.price * it.qty)}</span></div>`; };
+  function renderCheckout() {
+    const stepN = co.step === 'done' ? 4 : (typeof co.step === 'number' ? co.step : 1);
+    $('#co-steps').hidden = co.step === 'done';
+    $('#co-steps').innerHTML = ['Datos', 'Entrega', 'Pago'].map((l, i) => {
+      const k = i + 1, cur = stepN === k, done = stepN > k;
+      return `<li><button class="step${done ? ' done' : ''}"${cur ? ' aria-current="step"' : ''}${done ? ` data-co-step="${k}"` : ' disabled'}><span class="n">${done ? '✓' : k}</span>${l}</button></li>`;
+    }).join('<li class="step-sep" aria-hidden="true"></li>');
+    const d = co.data, main = $('#co-main');
+    if (co.step === 1) {
+      main.innerHTML = `<h2 class="co-h">Datos de envío</h2>
+        <form id="co-form" novalidate>
+          <div class="fields">
+            ${fld('email', 'Email', { full: true, type: 'email', ac: 'email', ph: 'tu@email.com' })}
+            ${fld('nombre', 'Nombre', { ac: 'given-name' })}
+            ${fld('apellidos', 'Apellidos', { ac: 'family-name' })}
+            ${fld('tel', 'Teléfono móvil', { full: true, type: 'tel', ac: 'tel', im: 'tel', ph: '612 345 678' })}
+            ${fld('cp', 'Código postal', { ac: 'postal-code', im: 'numeric', max: 5, ph: '28013', hint: true })}
+            ${fld('ciudad', 'Población', { ac: 'address-level2', list: 'dl-ciudad' })}
+            ${fld('prov', 'Provincia', { full: true, select: PROVS_AZ, ac: 'address-level1' })}
+            ${fld('dir', 'Calle y número', { full: true, ac: 'address-line1', ph: 'Calle Mayor 10' })}
+            ${fld('piso', 'Piso, puerta o escalera (opcional)', { full: true, ac: 'address-line2', ph: '3º B' })}
+          </div>
+          <datalist id="dl-ciudad"></datalist>
+          <div class="co-actions" style="margin-top:22px"><button class="btn-block" type="submit">Comprobar dirección</button></div>
+          <p class="note" style="margin-top:12px">Enviamos a la Península y Baleares. Al poner el código postal rellenamos la población y la provincia, y antes de seguir comprobamos que todo cuadra.</p>
+        </form>`;
+      if (/^\d{5}$/.test(d.cp || '')) loadCP().then(() => cpHint(d.cp));
+    } else if (co.step === 'check') {
+      main.innerHTML = `<h2 class="co-h">Datos de envío</h2><div class="checking" role="status"><span class="spin" aria-hidden="true"></span>Comprobando tu dirección…</div>`;
+    } else if (co.step === 'confirm') {
+      const v = co.verify || { status: 'skip' }, names = cpNames(d.cp);
+      const checks = [];
+      if (names) { checks.push(['ok', `El código postal ${esc(d.cp)} existe`]); checks.push(['ok', `El ${esc(d.cp)} corresponde a ${esc(d.ciudad)}`]); }
+      else checks.push(['info', 'No se ha podido cargar la lista de códigos postales. Se ha comprobado solo el formato.']);
+      checks.push(['ok', `Provincia de ${esc(d.prov)}`]);
+      checks.push(['ok', d.num === 's/n' ? 'Calle sin número (s/n)' : 'La dirección tiene calle y número']);
+      if (v.status === 'ok') checks.push(['ok', 'La calle y el número existen en el callejero oficial']);
+      else if (v.status === 'calle') checks.push(['warn', `La calle existe en el ${esc(d.cp)}, pero no encontramos el número ${esc(d.num)}. Revisa que esté bien.`]);
+      else if (v.status === 'no') checks.push(['warn', `No encontramos «${esc([d.via, d.calle].filter(Boolean).join(' '))}» en el ${esc(d.cp)}. Revisa cómo se escribe.`]);
+      else checks.push(['info', 'La calle exacta se comprueba con el callejero oficial (CartoCiudad) cuando la tienda está publicada. En esta vista previa se han comprobado el código postal, la población y la provincia.']);
+      const warn = v.status === 'calle' || v.status === 'no';
+      const sugs = v.status === 'no' && Array.isArray(v.sugerencias) ? v.sugerencias.slice(0, 4) : [];
+      const changed = co.typed && (norm(co.typed.dir) !== norm(d.dirFmt + (d.piso ? ', ' + d.piso : '')) || norm(co.typed.ciudad) !== norm(d.ciudad));
+      main.innerHTML = `<h2 class="co-h">Confirma tu dirección</h2>
+        <div class="verify">
+          <p class="v-title ${warn ? 'warn' : 'ok'}">${warn ? 'Revisa tu dirección' : '✓ Dirección comprobada'}</p>
+          <p class="v-addr"><b>${esc(d.nombre)} ${esc(d.apellidos)}</b><br>${addrLine(d)}<br>${esc(d.cp)} ${esc(d.ciudad)} (${esc(d.prov)})<br>${esc(d.tel.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3'))}</p>
+          ${changed ? `<p class="note">La hemos puesto en el formato que usan Correos y las agencias de envío.</p>` : ''}
+          ${sugs.length ? `<div><p class="sub-label">¿Querías decir…?</p><div class="v-sugs">${sugs.map(s => `<button class="opt" data-street="${esc(s)}">${esc(s)}</button>`).join('')}</div></div>` : ''}
+          <ul class="v-checks">${checks.map(([c, t]) => `<li class="${c}">${t}</li>`).join('')}</ul>
+        </div>
+        <div class="co-actions"><button type="button" class="linkish" data-co-step="1">Editar dirección</button><button class="btn-block" data-act="co-confirm">${warn ? 'Está bien, continuar' : 'Sí, enviar aquí'}</button></div>`;
+    } else if (co.step === 2) {
+      main.innerHTML = `<h2 class="co-h">Método de envío</h2>
+        <div class="recap"><div><p class="label">Enviar a</p><p>${esc(d.nombre)} ${esc(d.apellidos)}<br>${addrLine(d)}<br>${esc(d.cp)} ${esc(d.ciudad)} (${esc(d.prov)})</p></div><button class="linkish" data-co-step="1" style="font-size:13px">Cambiar</button></div>
+        <form id="co-form" novalidate>
+          <fieldset class="choices"><legend class="sub-label">Elige cómo lo quieres recibir</legend>
+            ${Object.entries(SHIP).map(([k, m]) => { const pr = shipPrice(k); return `<label class="choice"><input type="radio" name="ship" value="${k}"${co.method === k ? ' checked' : ''}><span><b>${m.n}</b><span class="s">${m.d}${m.free && pr ? ' · gratis desde 29,90 €' : ''}</span><span class="eta">${eta(k)}</span></span><span class="pr">${pr ? eur(pr) : 'Gratis'}</span></label>`; }).join('')}
+          </fieldset>
+          <div class="co-actions" style="margin-top:22px"><button type="button" class="linkish" data-co-step="1">← Volver</button><button class="btn-block" type="submit">Continuar al pago</button></div>
+        </form>`;
+    } else if (co.step === 3) {
+      const t = totals(co.method);
+      main.innerHTML = `<h2 class="co-h">Pago</h2>
+        <div class="recap"><div><p class="label">Entrega</p><p>${SHIP[co.method].n} · ${eta(co.method).toLowerCase()}<br>${addrLine(d)}, ${esc(d.cp)} ${esc(d.ciudad)}</p></div><button class="linkish" data-co-step="2" style="font-size:13px">Cambiar</button></div>
+        <form id="co-form" novalidate>
+          <fieldset class="choices"><legend class="sub-label">Método de pago</legend>
+            ${Object.entries(PAYS).map(([k, [n, s]]) => `<label class="choice"><input type="radio" name="pay" value="${k}"${co.pay === k ? ' checked' : ''}><span><b>${n}</b><span class="s">${s}</span></span><span></span></label>`).join('')}
+          </fieldset>
+          <div class="demo-box" style="margin-top:14px">Modo demo: no se cobra nada. En la tienda real, al pulsar «Pagar» se abriría la pasarela segura (por ejemplo Stripe o Redsys) para meter los datos de pago.</div>
+          <label class="check" style="margin-top:16px"><input type="checkbox" id="co-terms" aria-describedby="err-terms"><span>He leído y acepto las condiciones de compra y la política de privacidad.</span></label>
+          <p class="err" id="err-terms" aria-live="polite"></p>
+          <div class="co-actions" style="margin-top:18px"><button type="button" class="linkish" data-co-step="2">← Volver</button><button class="btn-block" type="submit">Pagar ${eur(t.total)}</button></div>
+        </form>`;
+    } else {
+      const o = co.order;
+      main.innerHTML = `<p class="label" style="color:var(--ok)">Modo demo · no se ha cobrado nada</p>
+        <h2 class="co-h" style="font-size:clamp(28px,6vw,48px)">Pedido realizado</h2>
+        <p class="done-num">${o.n}</p>
+        <p>Gracias, ${esc(o.name)}. ${o.eta} a ${esc(o.city)}. En la tienda real aquí se enviaría el email de confirmación con el seguimiento.</p>
+        <div class="summary">
+          <div class="sum-items">${o.items.map(itemRow).join('')}</div>
+          <div class="row total"><span>Total pagado</span><span class="num">${eur(o.total)}</span></div>
+        </div>
+        <div class="co-actions"><button class="btn-block" data-act="co-finish">Seguir comprando</button><button class="linkish" data-act="account" style="font-size:13px">Ver mis pedidos</button></div>`;
+    }
+    renderSummary();
+  }
+  function renderSummary() {
+    const box = $('#co-sum');
+    if (co.step === 'done') { box.innerHTML = ''; return; }
+    const t = totals(co.method);
+    box.innerHTML = `<aside class="summary" aria-label="Resumen del pedido">
+      <p class="sub-label">Resumen · ${count()} ${count() === 1 ? 'artículo' : 'artículos'}</p>
+      <div class="sum-items">${cart.map(itemRow).join('')}</div>
+      <div class="row"><span>Subtotal</span><span class="num">${eur(t.sub)}</span></div>
+      ${t.disc ? `<div class="row disc"><span>Descuento ${promo}</span><span class="num">−${eur(t.disc)}</span></div>` : ''}
+      <div class="row"><span>${SHIP[co.method].n}</span><span class="num">${t.ship ? eur(t.ship) : 'Gratis'}</span></div>
+      <div class="row total"><span>Total <span class="note" style="font-weight:400">IVA incluido</span></span><span class="num">${eur(t.total)}</span></div>
+    </aside>`;
+  }
+  function gotoStep(s) { co.step = s; renderCheckout(); $('#co-scroll').scrollTop = 0; const h = $('#co-main .co-h'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
+  function placeOrder() {
+    const t = totals(co.method), now = new Date();
+    const n = `AS${String(now.getFullYear()).slice(2)}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${Math.floor(1000 + Math.random() * 9000)}`;
+    co.order = { n, date: now.toISOString(), items: cart.map(it => ({ ...it })), total: t.total, method: co.method, eta: eta(co.method), name: co.data.nombre, city: co.data.ciudad };
+    orders = [co.order, ...orders].slice(0, 20); save('asfalto-orders', orders);
+    cart = []; promo = null; save('asfalto-promo', null); saveCart();
+    gotoStep('done');
+  }
+
+  /* ================= Cuenta ================= */
+  const acc = { tab: 'login' };
+  const dateFmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  function ordersHTML() {
+    return orders.length ? orders.map(o => `<div class="order"><div class="top"><b class="mono">${o.n}</b><span>${eur(o.total)}</span></div><span class="note">${dateFmt.format(new Date(o.date))} · ${o.items.reduce((s, i) => s + i.qty, 0)} artículos · ${SHIP[o.method] ? SHIP[o.method].n : ''}</span><span class="status">Preparando · ${o.eta.toLowerCase()}</span></div>`).join('')
+      : `<p class="note">Aún no tienes pedidos. Cuando compres, aparecerán aquí.</p>`;
+  }
+  function renderAccount() {
+    const login = acc.tab === 'login';
+    $('#acc-body').innerHTML = `
+      <div class="tabs-line" role="group" aria-label="Acceso"><button data-acc="login" aria-pressed="${login}">Iniciar sesión</button><button data-acc="register" aria-pressed="${!login}">Crear cuenta</button></div>
+      <form id="acc-form" novalidate style="display:grid;gap:14px;margin-top:20px">
+        ${login ? '' : `<div class="field"><label for="acc-name">Nombre</label><input id="acc-name" autocomplete="given-name"></div>`}
+        <div class="field"><label for="acc-email">Email</label><input id="acc-email" type="email" autocomplete="email" placeholder="tu@email.com"></div>
+        <div class="field"><label for="acc-pass">Contraseña</label><input id="acc-pass" type="password" autocomplete="${login ? 'current-password' : 'new-password'}"${login ? '' : ' placeholder="Mínimo 8 caracteres"'}></div>
+        <button class="btn-block" type="submit" style="margin-top:4px">${login ? 'Iniciar sesión' : 'Crear cuenta'}</button>
+        <p class="note" id="acc-msg" aria-live="polite"></p>
+      </form>
+      <h3 class="sub-label" style="margin-top:28px">Mis pedidos</h3>
+      <div>${ordersHTML()}</div>`;
+  }
+
+  /* ================= Ayuda ================= */
+  const COPY = v => `<div class="copy-row"><span>${v}</span><button data-copy="${v}">Copiar</button></div>`;
+  const INFO = {
+    envios: ['Envíos y entregas', () => `<p>Enviamos a la Península y Baleares. Para Canarias, Ceuta y Melilla, escríbenos antes de comprar.</p>
+      ${tableHTML({ head: ['Método', 'Plazo', 'Precio'], rows: Object.values(SHIP).map(m => [m.n, m.days[0] === m.days[1] ? m.days[0] + ' día laborable' : m.days[0] + '–' + m.days[1] + ' días laborables', eur(m.price) + (m.free ? ' · gratis desde 29,90 €' : '')]) })}
+      <p>Cuando el pedido sale del almacén te mandamos un email con el número de seguimiento.</p>`],
+    devoluciones: ['Devoluciones', () => `<p>Tienes 30 días desde que recibes el pedido para devolverlo. La ropa tiene que estar sin usar y con la etiqueta puesta.</p>
+      <h3>Cómo devolver</h3><ol><li>Entra en Mi cuenta, abre el pedido y elige las prendas.</li><li>Llévalo a un punto de recogida (gratis) o pide que pasemos a por él a casa (2,95 €).</li><li>Cuando nos llegue, te devolvemos el dinero en un máximo de 14 días, por el mismo método con el que pagaste.</li></ol>
+      <p class="note">Por higiene, los pendientes y la ropa interior no se pueden devolver.</p>`],
+    tallas: ['Guía de tallas', () => `<p>Mídete sobre la ropa interior con una cinta métrica. Si estás entre dos tallas, coge la grande para un corte más ancho. En cada prenda tienes un buscador de talla.</p>
+      <h3>Ropa · Mujer</h3>${tableHTML(SIZE_TABLES.mujer)}<h3>Ropa · Hombre</h3>${tableHTML(SIZE_TABLES.hombre)}
+      <h3>Pantalones · Mujer</h3>${tableHTML(SIZE_TABLES.pmujer)}<h3>Pantalones · Hombre</h3>${tableHTML(SIZE_TABLES.phombre)}<p class="note">Medidas del cuerpo en centímetros.</p>`],
+    pedido: ['Estado del pedido', () => `<p>Escribe el número de pedido. Lo tienes en el email de confirmación (empieza por AS).</p>
+      <form id="track-form" class="inline-form" novalidate><label for="track-n" class="sr">Número de pedido</label><input id="track-n" placeholder="AS261015-1234" autocomplete="off"><button class="pill pill-dark" type="submit">Buscar</button></form>
+      <div id="track-out" aria-live="polite"></div>`],
+    faq: ['Preguntas frecuentes', () => [
+      ['¿Cuándo sale ropa nueva?', 'Cada jueves a las 10:00, hora de Madrid. Si te suscribes a la newsletter te avisamos el miércoles por la noche.'],
+      ['¿Vais a reponer las tallas agotadas?', 'Algunas sí. Toca la talla tachada en la ficha, deja tu email y te avisamos si vuelve.'],
+      ['¿Puedo cambiar una talla?', 'Sí. Devuelve la prenda y pide la talla nueva a la vez, así no tienes que esperar a que nos llegue la primera.'],
+      ['¿Cómo uso un código de descuento?', 'Escríbelo en la cesta, en «Código promocional», antes de tramitar el pedido. Solo se puede usar un código por compra.'],
+      ['¿Enviáis fuera de España?', 'De momento solo a España (Península y Baleares).'],
+      ['¿Cómo sé mi talla?', 'En cada prenda, toca «Guía de tallas»: escribes tu medida y te decimos qué talla coger.']
+    ].map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')],
+    nosotros: ['Sobre nosotros', () => `<p>Asfalto nace en Madrid en 2026 con una idea sencilla: ropa de calle buena, a precio de estudiante, sin esperar a la temporada.</p><p>Por eso sacamos prendas nuevas cada jueves, en tiradas cortas. Si algo te gusta, no lo dejes para luego.</p>`],
+    tiendas: ['Tiendas', () => `<p>De momento solo vendemos online. Nuestra primera tienda física abrirá en Madrid en 2027.</p><p>Mientras, puedes recoger tus pedidos en más de 3.000 puntos de recogida por toda España.</p>`],
+    sostenibilidad: ['Sostenibilidad', () => `<p>Producimos en tiradas cortas para no acabar con ropa sin vender. Usamos rellenos de poliéster reciclado en los plumíferos y enviamos en bolsas de papel.</p>`],
+    trabaja: ['Trabaja con nosotros', () => `<p>¿Te molaría currar en Asfalto? Mándanos tu CV y cuéntanos qué te gustaría hacer.</p>${COPY('empleo@asfalto.es')}`],
+    contacto: ['Contacto', () => `<p>Escríbenos y te respondemos en menos de 24 horas laborables.</p>${COPY('hola@asfalto.es')}<p class="note">Lunes a viernes, de 10:00 a 19:00.</p>`],
+    privacidad: ['Política de privacidad', () => `<p>Usamos tus datos solo para gestionar tus pedidos, tu cuenta y, si te suscribes, la newsletter. No los vendemos a nadie.</p><p>Puedes pedir que los borremos cuando quieras escribiendo a privacidad@asfalto.es.</p>`],
+    cookies: ['Configurar cookies', () => {
+      const c = load('asfalto-cookies', null) || {};
+      return `<p>Elige qué cookies podemos usar. Puedes cambiarlo cuando quieras desde el pie de la web.</p>
+      <div><label class="toggle"><span><b>Necesarias</b><br><span class="note">Hacen que funcione la cesta y el inicio de sesión. Siempre activas.</span></span><input type="checkbox" checked disabled></label>
+      <label class="toggle"><span><b>Analíticas</b><br><span class="note">Nos dicen qué páginas se visitan más.</span></span><input type="checkbox" id="ck-an"${c.an ? ' checked' : ''}></label>
+      <label class="toggle"><span><b>Publicidad</b><br><span class="note">Para enseñarte anuncios de Asfalto en otras webs.</span></span><input type="checkbox" id="ck-mk"${c.mk ? ' checked' : ''}></label></div>
+      <button class="btn-block" data-act="ck-save">Guardar preferencias</button><p class="note" id="ck-msg" aria-live="polite"></p>`;
+    }]
+  };
+  function openInfo(k) {
+    const [title, body] = INFO[k];
+    $('#info-title').textContent = title; $('#info-body').innerHTML = body(); $('#info-body').scrollTop = 0;
+    if (openId !== 'info') openLayer('info');
+  }
+
+  /* ================= Cookies ================= */
+  function cookieBanner(show) {
+    const b = $('#cookies'); b.hidden = !show;
+    document.documentElement.style.setProperty('--lift', show ? (b.offsetHeight + 8) + 'px' : '0px');
+  }
+  function setCookies(an, mk) { save('asfalto-cookies', { an, mk }); cookieBanner(false); }
+
+  /* ================= Eventos ================= */
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t.id === 'q') renderSearch();
+    if (t.id && t.id.startsWith('co-')) {
+      t.removeAttribute('aria-invalid'); const er = document.getElementById('err-' + t.name); if (er) er.textContent = '';
+      if (t.id === 'co-cp') {
+        const v = t.value.replace(/\D/g, '').slice(0, 5); if (v !== t.value) t.value = v;
+        const h = $('#hint-cp'); if (h) h.textContent = '';
+        const pr = v.length === 5 ? provOf(v) : null;
+        if (pr) { const s = $('#co-prov'); s.value = pr; s.removeAttribute('aria-invalid'); $('#err-prov').textContent = ''; }
+        if (v.length === 5) loadCP().then(() => cpHint(v));
+      }
+    }
+  });
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (t.name === 'ship') { co.method = t.value; renderSummary(); }
+    if (t.name === 'pay') co.pay = t.value;
+    if (t.id === 'co-terms') $('#err-terms').textContent = '';
+  });
+
+  document.addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    switch (f.id) {
+      case 'search-form': { const q = $('#q').value.trim(); if (!q) break; st.q = q; $('#q').blur(); nav('buscar'); break; }
+      case 'news-form': {
+        const v = $('#email').value.trim(), note = $('#news-note');
+        if (!EMAIL.test(v)) { note.textContent = 'Revisa el email: le falta algo (ej. nombre@gmail.com).'; $('#email').focus(); break; }
+        note.innerHTML = 'Modo demo: aquí se guardaría tu email. Tu código: <b>BIENVENIDA</b> (−15%).';
+        break;
+      }
+      case 'promo-form': {
+        const v = $('#promo-in').value.trim().toUpperCase(), msg = $('#promo-msg');
+        if (PROMOS[v]) { promo = v; save('asfalto-promo', promo); renderCart(); }
+        else { msg.hidden = false; msg.style.color = 'var(--err)'; msg.textContent = v ? `El código «${v}» no existe o ha caducado.` : 'Escribe un código.'; }
+        break;
+      }
+      case 'notify-form': {
+        const v = $('#notify-email').value.trim(), msg = $('#notify-msg');
+        msg.textContent = EMAIL.test(v) ? `Modo demo: aquí se guardaría el aviso de la talla ${pdp.notify} para ${v}.` : 'Escribe un email válido.';
+        break;
+      }
+      case 'finder-form': {
+        const v = parseFloat($('#finder-in').value.replace(',', '.')), out = $('#finder-out'), p = pdp.p;
+        if (!(v >= 40 && v <= 170)) { out.innerHTML = '<p class="note" style="color:var(--err)">Escribe tu medida en centímetros, por ejemplo 92.</p>'; break; }
+        const s = recommend(p, v);
+        if (!s) { out.innerHTML = '<p>Tu medida es más grande que nuestra talla más grande. Si el corte es oversize, prueba con la XL.</p>'; break; }
+        const sold = (p.out || []).includes(s);
+        out.innerHTML = `<p>Te recomendamos la talla <b>${s}</b>.${/oversize|boxy|baggy|wide/i.test(p.fit) ? ' Este corte ya es ancho: si lo quieres más suelto, coge una más.' : ''}${sold ? ' Ahora mismo está agotada.' : ''}</p><button class="btn-block" data-pick-size="${s}">${sold ? 'Avisarme cuando vuelva la ' + s : 'Elegir talla ' + s}</button>`;
+        break;
+      }
+      case 'acc-form': {
+        const em = $('#acc-email').value.trim(), pw = $('#acc-pass').value, msg = $('#acc-msg');
+        if (!EMAIL.test(em)) { msg.textContent = 'Escribe un email válido.'; break; }
+        if (!pw) { msg.textContent = 'Escribe tu contraseña.'; break; }
+        if (acc.tab === 'register' && pw.length < 8) { msg.textContent = 'La contraseña necesita al menos 8 caracteres.'; break; }
+        msg.textContent = 'Modo demo: aquí se conectaría el inicio de sesión (por ejemplo, Firebase Auth).';
+        break;
+      }
+      case 'track-form': {
+        const v = $('#track-n').value.trim().toUpperCase(), out = $('#track-out');
+        const o = orders.find(x => x.n === v);
+        out.innerHTML = o ? `<div class="order"><div class="top"><b class="mono">${o.n}</b><span>${eur(o.total)}</span></div><span class="status">Preparando · ${o.eta.toLowerCase()}</span></div>`
+          : `<p class="note" style="color:var(--err)">${v ? 'No encontramos ese pedido. Revisa el número en tu email de confirmación.' : 'Escribe el número de pedido.'}</p>`;
+        break;
+      }
+      case 'co-form': {
+        if (co.step === 1) submitStep1();
+        else if (co.step === 2) gotoStep(3);
+        else if (co.step === 3) {
+          if (!$('#co-terms').checked) { $('#err-terms').textContent = 'Marca la casilla para poder terminar la compra.'; $('#co-terms').focus(); break; }
+          placeOrder();
+        }
+        break;
+      }
+    }
+  });
+
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button, [data-close]');
+    if (!t) return;
+    const d = t.dataset;
+    if (d.open) { openProduct(d.open, d.ci != null ? +d.ci : null); return; }
+    if (d.go != null) { nav(d.go); return; }
+    if (d.gate) { setG(d.gate); nav(d.gate); return; }
+    if (d.gender) { if (openId === 'menu') { menuG = d.gender; renderMenu(); } else nav(d.gender); return; }
+    if (d.fav) { toggleFav(d.fav); return; }
+    if (d.quick) { const p = byId[d.quick]; addToCart(p, selC[p.id] || 0, d.size); return; }
+    if (d.sw) {
+      const p = byId[d.sw], i = +d.i; selC[p.id] = i;
+      $$(`[data-card="${p.id}"]`).forEach(card => {
+        card.querySelector('.view.front').innerHTML = art(p, i);
+        card.querySelector('.view.back').innerHTML = art(p, i, true);
+        card.querySelector('.card-img').setAttribute('aria-label', `Ver ${p.name}, ${C[p.colors[i]].n}`);
+        card.querySelectorAll('.sw').forEach((b, k) => b.setAttribute('aria-pressed', String(k === i)));
+      });
+      return;
+    }
+    if (d.rail) { const r = document.getElementById(d.rail); if (r) r.scrollBy({ left: +d.dir * r.clientWidth * .8, behavior: smooth() }); return; }
+    if (d.fit != null) { st.fit = d.fit || null; renderPLP(); return; }
+    if (d.colsm) { st.colsM = +d.colsm; renderPLP(); return; }
+    if (d.colsd) { st.colsD = +d.colsd; renderPLP(); return; }
+    if (d.pcol) { pdp.ci = +d.pcol; selC[pdp.p.id] = pdp.ci; renderGallery(); renderInfo(); return; }
+    if (d.psize) { pickSize(d.psize); return; }
+    if (d.pickSize) { closeLayer(true); pickSize(d.pickSize); const s = $('#pdp-sizes'); if (s) s.scrollIntoView({ behavior: smooth(), block: 'center' }); return; }
+    if (d.zoom) { openZoom(+d.zoom); return; }
+    if (d.trend) { $('#q').value = d.trend; renderSearch(); return; }
+    if (d.sort) { st.sort = d.sort; renderPLP(); return; }
+    if (d.fcolor) { st.colors.has(d.fcolor) ? st.colors.delete(d.fcolor) : st.colors.add(d.fcolor); renderPLP(); return; }
+    if (d.fprice) { st.price = d.fprice; renderPLP(); return; }
+    if (d.coStep) { gotoStep(+d.coStep); return; }
+    if (d.fix) {
+      const el = $('#co-' + d.fix); if (el) { el.value = d.val; el.removeAttribute('aria-invalid'); $('#err-' + d.fix).textContent = ''; el.focus(); }
+      return;
+    }
+    if (d.street) { co.data.dir = d.street + ' ' + (co.data.num || ''); co.step = 1; renderCheckout(); submitStep1(); return; }
+    if (d.acc) { acc.tab = d.acc; renderAccount(); return; }
+    if (d.info) { openInfo(d.info); return; }
+    if (d.copy) {
+      const v = d.copy;
+      const done = () => { t.textContent = 'Copiado'; setTimeout(() => { t.textContent = 'Copiar'; }, 1600); };
+      try { navigator.clipboard.writeText(v).then(done, () => selectNear(t)); } catch (err) { selectNear(t); }
+      return;
+    }
+    if (d.close !== undefined) { closeLayer(); return; }
+    switch (d.act) {
+      case 'menu': menuG = st.g; renderMenu(); openLayer('menu'); break;
+      case 'logo': nav(st.g); break;
+      case 'cart': renderCart(); openLayer('cart'); break;
+      case 'filters': renderFilters(); openLayer('filters'); break;
+      case 'f-apply': closeLayer(true); break;
+      case 'f-clear': resetFilters(); renderPLP(); break;
+      case 'account': renderAccount(); openLayer('account'); break;
+      case 'search': $('#q').value = st.q || ''; renderSearch(); openLayer('search'); break;
+      case 'search-all': st.q = $('#q').value.trim(); nav('buscar'); break;
+      case 'favs': nav('favoritos'); break;
+      case 'pdp-back': goBack(); break;
+      case 'go-style': nav(d.g || st.g); requestAnimationFrame(() => { const s = $('#asfaltostyle'); if (s) s.scrollIntoView({ behavior: smooth() }); }); break;
+      case 'shop': nav(`${st.g}-novedades`); break;
+      case 'size-guide': openSizeGuide(pdp.p); break;
+      case 'pdp-add': case 'bb-add':
+        if (!pdp.p) break;
+        if (!pdp.size) { needSize(); break; }
+        addToCart(pdp.p, pdp.ci, pdp.size); break;
+      case 'zoom-prev': stepZoom(-1); break;
+      case 'zoom-next': stepZoom(1); break;
+      case 'toast-cart': $('#toast').classList.remove('on'); renderCart(); openLayer('cart'); break;
+      case 'qty': { const it = cart[+d.k]; if (!it) break; it.qty += +d.n; if (it.qty <= 0) cart.splice(+d.k, 1); saveCart(); break; }
+      case 'rm': cart.splice(+d.k, 1); saveCart(); break;
+      case 'to-fav': { const it = cart[+d.k]; if (!it) break; if (!favs.has(it.id)) toggleFav(it.id); cart.splice(+d.k, 1); saveCart(); break; }
+      case 'promo-off': promo = null; save('asfalto-promo', null); renderCart(); break;
+      case 'checkout': if (count()) { co.step = 1; co.order = null; loadCP(); renderCheckout(); openLayer('checkout'); } break;
+      case 'co-confirm': gotoStep(2); break;
+      case 'co-finish': nav(st.g); break;
+      case 'ck-all': setCookies(true, true); break;
+      case 'ck-none': setCookies(false, false); break;
+      case 'ck-save': setCookies(!!$('#ck-an').checked, !!$('#ck-mk').checked); $('#ck-msg').textContent = 'Preferencias guardadas.'; break;
+    }
+  });
+  function selectNear(btn) { const s = btn.parentElement.querySelector('span'); if (!s) return; const r = document.createRange(); r.selectNodeContents(s); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); btn.textContent = 'Selecciónalo y copia'; }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { if (openId) closeLayer(); return; }
+    if (openId === 'zoom' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { stepZoom(e.key === 'ArrowLeft' ? -1 : 1); return; }
+    if (e.key === 'Tab' && openId) {
+      const el = document.getElementById(openId);
+      const f = [...el.querySelectorAll('button:not([disabled]),input:not([disabled]),select,a[href],summary,[tabindex]:not([tabindex="-1"])')].filter(x => x.getClientRects().length);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  let raf; window.addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { measureHead(); checkBar(); if (!$('#cookies').hidden) cookieBanner(true); }); });
+
+  updateBadges(); renderCart();
+  route();
+  if (!load('asfalto-cookies', null)) cookieBanner(true);
+})();
+</script>
+</body>
+</html>
